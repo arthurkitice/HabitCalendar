@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environments (Ambientes virtuais)
+.venv/
+venv/
+ENV/
+env/
+.env/
+bin/
+lib/
+include/
+
+# Database (Seu banco de dados pessoal)
+*.db
+*.sqlite3
+
+# IDE / Editor (Arquivos específicos do VS Code ou PyCharm)
+.vscode/
+.idea/
+
+# CustomTkinter / Tkinter temporary files
+*.log
