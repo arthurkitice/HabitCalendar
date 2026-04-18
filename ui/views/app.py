@@ -3,6 +3,14 @@ from repositories import DayRepository, MonthRepository
 from dtos import DayDTO
 from database import get_db
 from helper import get_reversed_days
+from config import get_last_month_index, save_current_month_index
+from ui.widgets import (
+    build_day_button, 
+    build_navigation_button, 
+    update_day_button, 
+    update_navigation_button, 
+    update_empty_button
+)
 
 class CalendarApp(ctk.CTk):
     def __init__(self):
@@ -11,8 +19,10 @@ class CalendarApp(ctk.CTk):
         self.title("Calendário")
         self.geometry("1100x700")
 
+        self.minsize(500, 350)
+
         self.months = self.get_months()
-        self.current_month_index = 0
+        self.current_month_index = get_last_month_index()
         self.btn_dict = {}
         self.build_ui()
 
@@ -39,58 +49,9 @@ class CalendarApp(ctk.CTk):
             with get_db() as db:
                 day_repository = DayRepository(db)
                 day = day_repository.check_day(day_id)
-                style = self.get_button_style(day)
-                self.btn_dict[(row, column)].configure(fg_color=style["fg_color"], hover_color=style["hover_color"])
+                update_day_button(self, self.btn_dict[(row, column)], day, (row, column))
         except Exception as e:
             print(f"Erro inesperado: {e}")
-
-    def get_navigation_button_style(self, direction, disabled=False):
-        direction_text = "<" if direction == "prev" else ">"
-        direction_condition = self.current_month_index > 0 if direction == "prev" else self.current_month_index < len(self.months) - 1
-
-        if disabled or not direction_condition:
-            return {
-                "text": " ", # Mantém a sua sacada genial da geometria
-                "fg_color": "transparent", # O botão fica invisível
-                "hover_color": "gray", # Evita que fique cinza ao passar o mouse
-                "text_color": "gray",
-                "text_color_disabled": "gray",
-                "state": "disabled",
-                "cursor": "arrow" # Cursor normal para indicar que não é clicável
-            }
-        else:
-            return {
-                "text": direction_text, # Exibe a seta apenas se for possível navegar
-                "fg_color": "#2F0C6F", # Verde moderno ou Cinza escuro
-                "hover_color": "#280A5F", # Mantém a cor no hover
-                "text_color": "white", # Evita a piscada preta
-                "text_color_disabled": "gray", # Caso desabilite um dia válido no futuro
-                "state": "normal",
-                "cursor": "hand2" # Muda o cursor para indicar que é clicável
-            }
-    
-    def get_button_style(self, day, clickable=True):
-        # Um método auxiliar para limpar o código visual
-        if day.number == 0 or not clickable:
-            return {
-                "text": str(day.number) if day.number != 0 else " ", # Mantém a sua sacada genial da geometria
-                "fg_color": "#2F2F2F", # O botão fica invisível
-                "hover_color": "gray", # Evita que fique cinza ao passar o mouse
-                "text_color": "gray",
-                "text_color_disabled": "gray",
-                "state": "disabled",
-                "cursor": "arrow" # Cursor normal para indicar que não é clicável
-            }
-        else:
-            return {
-                "text": str(day.number),
-                "fg_color": "#227651" if day.checked else "#333333", # Verde moderno ou Cinza escuro
-                "hover_color": "#1A593D" if day.checked else "#282828", # Mantém a cor no hover
-                "text_color": "white", # Evita a piscada preta
-                "text_color_disabled": "gray", # Caso desabilite um dia válido no futuro
-                "state": "normal",
-                "cursor": "hand2" # Muda o cursor para indicar que é clicável
-            }
 
     def change_month(self, opperation):
         if opperation == "next":
@@ -100,6 +61,8 @@ class CalendarApp(ctk.CTk):
         elif opperation == "prev":
             if self.current_month_index - 1 >= 0:
                 self.current_month_index -= 1
+
+        save_current_month_index(self.current_month_index)
 
         self.update_top_bar()
         self.update_days_frame()
@@ -115,45 +78,15 @@ class CalendarApp(ctk.CTk):
         for btn in self.btn_dict.values():
             if cont > 0:
                 day = prev_month_days[cont-1]
-                style = self.get_button_style(DayDTO(id=0, number=day, checked=False, month_id=0), clickable=False)
-                btn.configure(
-                    text=style["text"],
-                    fg_color=style["fg_color"],
-                    state=style["state"],
-                    text_color=style["text_color"],
-                    text_color_disabled=style["text_color_disabled"],
-                    hover_color=style["hover_color"],
-                    cursor=style["cursor"]
-                )
+                update_empty_button(self, btn, DayDTO(id=0, number=day, checked=False, month_id=0))
                 cont -= 1
+
             elif btn.cget("text") == " ":
                 filler_number += 1
-                style = self.get_button_style(DayDTO(id=0, number=filler_number, checked=False, month_id=0), clickable=False)
-                btn.configure(
-                    text=style["text"],
-                    fg_color=style["fg_color"],
-                    state=style["state"],
-                    text_color=style["text_color"],
-                    text_color_disabled=style["text_color_disabled"],
-                    hover_color=style["hover_color"],
-                    cursor=style["cursor"]
-                )
+                update_empty_button(self, btn, DayDTO(id=0, number=filler_number, checked=False, month_id=0))
         
     def build_button(self, day, row, column):
-        style = self.get_button_style(day)
-
-        button = ctk.CTkButton(
-            self.days_frame, 
-            corner_radius=20, 
-            text=style["text"], 
-            command=lambda d_id=day.id, r=row, c=column: self.check_day(d_id, r, c),
-            fg_color=style["fg_color"],
-            state=style["state"],
-            text_color=style["text_color"],
-            text_color_disabled=style["text_color_disabled"],
-            hover_color=style["hover_color"],
-            cursor=style["cursor"]
-        )
+        button = build_day_button(self, day, row, column)
         button.grid(row=row, column=column, padx=5, pady=5, sticky="nsew")
 
         return button
@@ -168,18 +101,7 @@ class CalendarApp(ctk.CTk):
             else:
                 day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
 
-            style = self.get_button_style(day)
-            
-            btn.configure(
-                text=style["text"],
-                command=lambda d_id=day.id, r=key[0], c=key[1]: self.check_day(d_id, r, c),
-                fg_color=style["fg_color"],
-                state=style["state"],
-                text_color=style["text_color"],
-                text_color_disabled=style["text_color_disabled"],
-                hover_color=style["hover_color"],
-                cursor=style["cursor"]
-            )
+            update_day_button(self, btn, day, key, clickable=day.number != 0)
         
         self.style_empty_buttons()
 
@@ -200,29 +122,9 @@ class CalendarApp(ctk.CTk):
     def update_top_bar(self):
         self.month_label.configure(text=self.months[self.current_month_index].name, text_color="white")
 
-        prev_style = self.get_navigation_button_style("prev")
+        update_navigation_button(self, self.prev_button, "prev", disabled=self.current_month_index == 0)
 
-        self.prev_button.configure(
-            text=prev_style["text"],
-            state=prev_style["state"],
-            fg_color=prev_style["fg_color"],
-            text_color=prev_style["text_color"],
-            text_color_disabled=prev_style["text_color_disabled"],
-            hover_color=prev_style["hover_color"],
-            cursor=prev_style["cursor"]
-        )
-
-        next_style = self.get_navigation_button_style("next")
-
-        self.next_button.configure(
-            text=next_style["text"],
-            state=next_style["state"],
-            fg_color=next_style["fg_color"],
-            text_color=next_style["text_color"],
-            text_color_disabled=next_style["text_color_disabled"],
-            hover_color=next_style["hover_color"],
-            cursor=next_style["cursor"]
-        )
+        update_navigation_button(self, self.next_button, "next", disabled=self.current_month_index >= len(self.months) - 1)
 
     def build_top_bar(self):
         self.month_label = ctk.CTkLabel(
@@ -233,34 +135,10 @@ class CalendarApp(ctk.CTk):
         )
         self.month_label.grid(row=0, column=1, padx=5, pady=5)
 
-        prev_style = self.get_navigation_button_style("prev")
-
-        self.prev_button = ctk.CTkButton(
-            self.top_frame, 
-            text="<" if self.current_month_index > 0 else " ", 
-            command=lambda: self.change_month(opperation="prev"), 
-            state=prev_style["state"],
-            fg_color=prev_style["fg_color"],
-            text_color=prev_style["text_color"],
-            text_color_disabled=prev_style["text_color_disabled"],
-            hover_color=prev_style["hover_color"],
-            cursor=prev_style["cursor"]
-        )
+        self.prev_button = build_navigation_button(self, "prev")
         self.prev_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
-        
-        next_style = self.get_navigation_button_style("next")
 
-        self.next_button = ctk.CTkButton(
-            self.top_frame, 
-            text=next_style["text"], 
-            command=lambda: self.change_month(opperation="next"), 
-            state=next_style["state"],
-            fg_color=next_style["fg_color"],
-            text_color=next_style["text_color"],
-            text_color_disabled=next_style["text_color_disabled"],
-            hover_color=next_style["hover_color"],
-            cursor=next_style["cursor"]
-        )
+        self.next_button = build_navigation_button(self, "next")
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
 
     def build_week_days_frame(self):
