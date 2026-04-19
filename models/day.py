@@ -6,11 +6,9 @@ class Day(Base):
     __tablename__ = "days"
 
     id = Column(Integer, primary_key=True)
-    month_id = Column(Integer, ForeignKey("months.id"))
+    month_id = Column(Integer, ForeignKey("months.id", ondelete='CASCADE'))
     number = Column(Integer)
     checked = Column(Boolean, default=False)
-
-    month = relationship("Month", back_populates="day")
 
     def __repr__(self):
         return f"Day(id={self.id}, number='{self.number}', checked='{self.checked}')"

@@ -8,7 +8,7 @@ class Tracker(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-    month = relationship("Month", back_populates="tracker")
+    months = relationship("Month", backref="tracker", cascade="all, delete-orphan", passive_deletes=True)
 
     def __repr__(self):
         return f"Month(id={self.id}, name='{self.name}'"

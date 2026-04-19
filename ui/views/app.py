@@ -222,7 +222,7 @@ class CalendarApp(ctk.CTk):
                 tracker_repository = TrackerRepository(db)
                 tracker_repository.update_tracker(tracker_id, name)
                 self.build_sidebar_buttons()
-                self.update_header()
+                self.update_sidebar()
         except Exception as e:
             print(f"Erro inesperado: {e}")
 
@@ -267,7 +267,7 @@ class CalendarApp(ctk.CTk):
         
         self.update_top_bar()
         self.update_days_frame()
-        self.update_header()
+        self.update_sidebar()
 
     def create_new_tracker(self, tracker_name):
         try:
@@ -281,8 +281,18 @@ class CalendarApp(ctk.CTk):
     def toggle_sidebar(self):
         if self.sidebar_visible:
             self.sidebar_frame.grid_forget()
+            # Passar string vazia no uniform para quebrar a união da coluna com as outras
+            # Assim o customtkinter consegue expremer o conteúdo dela isolado no canto
+            # Se passar o mesmo nome das outras o ctk entende que mesmo que seja weight 0 
+            # ainda faz parte da união e não expreme todo o conteúdo
+            self.reduced_sidebar_frame.grid(row=0, column=0, rowspan=4, padx=(0, 5), pady=20, sticky="nsew")
+            self.grid_columnconfigure(0, weight=0, uniform="")
+
         else:
+            self.reduced_sidebar_frame.grid_forget()
             self.sidebar_frame.grid(row=0, column=0, rowspan=4, padx=(0, 20), pady=20, sticky="nsew")
+            self.grid_columnconfigure(0, weight=1, uniform="window")
+
         self.sidebar_visible = not self.sidebar_visible
 
     # =====================
@@ -296,78 +306,84 @@ class CalendarApp(ctk.CTk):
         if getattr(self, "sidebar_buttons_frame", None):
             self.sidebar_buttons_frame.destroy()
 
-        self.sidebar_buttons_frame = ctk.CTkFrame(self.sidebar_frame)
-        self.sidebar_buttons_frame.grid(row=1, column=0, columnspan=2, padx=0, pady=0, sticky="nsew")
-        
+        self.sidebar_buttons_frame = ctk.CTkFrame(self.sidebar_frame, corner_radius=0)
+        self.sidebar_buttons_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
+        self.sidebar_buttons_frame.grid_columnconfigure(0, weight=1)
+
 
         for i, tracker in enumerate(trackers):
             self.tracker_btn[tracker.id] = build_sidebar_button(self, tracker.name, lambda t_id=tracker.id: self.change_tracker(t_id))
-            self.tracker_btn[tracker.id].grid(row=i+1, column=0, padx=10, pady=10)
+            self.tracker_btn[tracker.id].grid(row=i+1, column=0, padx=10, pady=10, sticky="we")
 
             edit_btn = build_sidebar_edit_button(self, lambda t=tracker: self.open_new_tracker_popup(operation="edit", tracker=t))
-            edit_btn.grid(row=i+1, column=1, padx=5, pady=10)
+            edit_btn.grid(row=i+1, column=1, padx=5, pady=10, sticky="we")
 
             remove_btn = build_sidebar_remove_button(self, lambda t_id=tracker.id: self.remove_tracker(t_id))
-            remove_btn.grid(row=i+1, column=2, padx=5, pady=10)
+            remove_btn.grid(row=i+1, column=2, padx=5, pady=10, sticky="we")
+
+    def update_sidebar(self):
+        tracker = self.get_tracker_by_id(self.current_tracker_id)
+        self.tracker_label.configure(text=f"Marcador atual:\n{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
 
     def build_sidebar(self):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text="Marcadores", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
         self.sidebar_label.grid(row=0, column=0, padx=5, pady=5)
 
-        self.add_tracker_button = style_button(self.sidebar_frame, text="+", command=lambda: self.open_new_tracker_popup(operation="create"))
+        self.add_tracker_button = style_button(self.sidebar_frame, text="+", command=lambda: self.open_new_tracker_popup(operation="create"), width=50)
         self.add_tracker_button.grid(row=0, column=1, padx=5, pady=5)
+
+        self.hide_sidebar_button = style_button(self.sidebar_frame, text="<", command=lambda: self.toggle_sidebar(), width=50)
+        self.hide_sidebar_button.grid(row=0, column=2, padx=5, pady=5, sticky = "w")
+
+        tracker = self.get_tracker_by_id(self.current_tracker_id)
+
+        self.tracker_frame = ctk.CTkFrame(self.sidebar_frame, corner_radius=0)
+        self.tracker_frame.grid(row=2, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
+        self.tracker_frame.grid_columnconfigure(0, weight=1)
+
+        self.tracker_label = ctk.CTkLabel(self.tracker_frame, text=f"Marcador atual:\n{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        self.tracker_label.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
         self.build_sidebar_buttons()
     
-    # ===================
-    # HEADER DA INTERFACE
-    # ===================
-    def update_header(self):
-        tracker = self.get_tracker_by_id(self.current_tracker_id)
-        self.header_label.configure(text=f"{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
-
-    def build_header(self):
-        tracker = self.get_tracker_by_id(self.current_tracker_id)
-        self.header_label = ctk.CTkLabel(self.header_frame, text=f"{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
-        self.header_label.grid(row=0, column=1, padx=5, pady=5)
-
-        self.header_button = style_button(self.header_frame, text="≡", command=lambda: self.toggle_sidebar())
-        self.header_button.grid(row=0, column=0, padx=5, pady=5, sticky = 'w')
+    def build_reduced_sidebar(self):
+        self.toggle_button = style_button(self.reduced_sidebar_frame, text=">", command=lambda: self.toggle_sidebar(), width=40)
+        self.toggle_button.grid(row=0, column=0, padx=0, pady=5, sticky="w")
 
     # =======================
     # CONSTRUÇÃO DA INTERFACE
     # =======================
 
     def build_ui(self):
-        self.grid_columnconfigure(1, weight=1)
-        self.grid_rowconfigure(3, weight=1)
-
-        self.header_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.header_frame.grid(row=0, column=1, padx=20, pady=(20, 0), sticky="ew")
-        self.header_frame.grid_columnconfigure((0, 1, 2), weight=1, uniform="main")
-        self.header_frame.grid_rowconfigure(0 , weight=1)
-
         self.top_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.top_frame.grid(row=1, column=1, padx=20, pady=20, sticky="ew")
+        self.top_frame.grid(row=0, column=1, padx=20, pady=20, sticky="ew")
         self.top_frame.grid_columnconfigure((0, 1, 2), weight=1, uniform="main")
         self.top_frame.grid_rowconfigure(0 , weight=1)
 
         self.days_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.days_frame.grid(row=3, column=1, padx=20, pady=(0, 20), sticky="nsew")
+        self.days_frame.grid(row=2, column=1, padx=20, pady=(0, 20), sticky="nsew")
         self.days_frame.grid_columnconfigure(tuple(range(7)), weight=1, uniform="days")
         self.days_frame.grid_rowconfigure(tuple(range(6)), weight=1, uniform="days")
 
         self.week_days_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.week_days_frame.grid(row=2, column=1, padx=20, pady=0, sticky="nsew")
+        self.week_days_frame.grid(row=1, column=1, padx=20, pady=0, sticky="nsew")
         self.week_days_frame.grid_columnconfigure(tuple(range(7)), weight=1, uniform="week_days")
         self.week_days_frame.grid_rowconfigure(0, weight=1)
 
         self.sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.sidebar_frame.grid(row=0, column=0, rowspan=4, padx=(0, 20), pady=20, sticky="nsw")
+        self.sidebar_frame.grid(row=0, column=0, rowspan=4, padx=(0, 20), pady=20, sticky="nsew")
         self.sidebar_frame.grid_columnconfigure(0, weight=1)
+        self.sidebar_frame.grid_rowconfigure(1, weight=1)
+
+        self.reduced_sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
+        self.sidebar_frame.grid_columnconfigure(0, weight=1)
+
+        self.grid_columnconfigure(0, weight=1, uniform="window")
+        self.grid_columnconfigure(1, weight=4, uniform="window")
+        self.grid_rowconfigure(2, weight=1)
 
         self.build_top_bar()
         self.build_days_frame()
         self.build_week_days_frame()
         self.build_sidebar()
-        self.build_header()
+        self.build_reduced_sidebar()

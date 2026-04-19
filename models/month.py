@@ -9,10 +9,9 @@ class Month(Base):
     name = Column(String)
     number = Column(Integer)
     year = Column(Integer)
-    tracker_id = Column(Integer, ForeignKey("trackers.id")) 
+    tracker_id = Column(Integer, ForeignKey("trackers.id", ondelete='CASCADE')) 
 
-    tracker = relationship("Tracker", back_populates="month")
-    day = relationship("Day", back_populates="month")
+    days = relationship("Day", backref="month", cascade="all, delete-orphan", passive_deletes=True)
 
     def __repr__(self):
-        return f"Month(id={self.id}, name='{self.name}', number={self.number})"
+        return f"Month(id={self.id}, name='{self.name}', number={self.number}), year={self.year}, tracker_id={self.tracker_id}"

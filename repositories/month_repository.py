@@ -38,7 +38,7 @@ class MonthRepository:
                     checked=d.checked,
                     month_id=d.month_id
                 ) 
-                for d in month.day
+                for d in month.days
             ]
             return MonthWithDaysDTO(
                 id=month.id,
@@ -60,7 +60,7 @@ class MonthRepository:
                     checked=d.checked,
                     month_id=d.month_id
                 ) 
-                for d in month.day
+                for d in month.days
             ]
             return MonthWithDaysDTO(
                 id=month.id,

@@ -87,7 +87,7 @@ class TrackerRepository:
                     year=m.year,
                     tracker_id=m.tracker_id
                 ) 
-                for m in tracker.month
+                for m in tracker.months
             ]
             return TrackerWithMonthsDTO(
                 id=tracker.id,
