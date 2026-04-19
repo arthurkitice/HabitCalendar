@@ -12,7 +12,9 @@ class MonthRepository:
             MonthDTO(
                 id=month.id,
                 name=month.name,
-                number=month.number
+                number=month.number,
+                year=month.year,
+                tracker_id=month.tracker_id
             ) for month in months
         ]
 
@@ -21,7 +23,9 @@ class MonthRepository:
         return MonthDTO(
             id=month.id,
             name=month.name,
-            number=month.number
+            number=month.number,
+            year=month.year,
+            tracker_id=month.tracker_id
         ) if month else None
     
     def get_month_with_days_by_id(self, month_id: int):
@@ -40,6 +44,8 @@ class MonthRepository:
                 id=month.id,
                 name=month.name,
                 number=month.number,
+                year=month.year,
+                tracker_id=month.tracker_id,
                 days=days
             )
         return None
@@ -60,6 +66,8 @@ class MonthRepository:
                 id=month.id,
                 name=month.name,
                 number=month.number,
+                year=month.year,
+                tracker_id=month.tracker_id,
                 days=days
             )
         return None
@@ -69,11 +77,13 @@ class MonthRepository:
         return MonthDTO(
             id=month.id,
             name=month.name,
-            number=month.number
+            number=month.number,
+            year=month.year,
+            tracker_id=month.tracker_id
         ) if month else None
 
-    def create_month(self, name: str, number: int):
-        new_month = Month(name=name, number=number)
+    def create_month(self, name: str, number: int, year: int, tracker_id: int):
+        new_month = Month(name=name, number=number, year=year, tracker_id=tracker_id)
         self.db.add(new_month)
         self.db.commit()
         self.db.refresh(new_month)
@@ -81,35 +91,20 @@ class MonthRepository:
         return MonthDTO(
             id=new_month.id, 
             name=new_month.name, 
-            number=new_month.number
+            number=new_month.number,
+            year=new_month.year,
+            tracker_id=new_month.tracker_id
         )
     
     def get_days_by_month_id(self, month_id: int):
-        month = self.get_month_by_id(month_id)
-        if month:
-            days = [
-                DayDTO(
-                    id=d.id, 
-                    number=d.number,
-                    checked=d.checked,
-                    month_id=d.month_id
-                ) 
-                for d in month.day
-            ]
-            return days
+        # Correção: Usar o método que retorna o DTO com os dias já mapeados
+        month_with_days = self.get_month_with_days_by_id(month_id)
+        if month_with_days:
+            return month_with_days.days
         return None
     
     def get_days_by_month_number(self, month_number: int):
-        month = self.get_month_with_days_by_number(month_number)
-        if month:
-            days = [
-                DayDTO(
-                    id=d.id, 
-                    number=d.number,
-                    checked=d.checked,
-                    month_id=d.month_id
-                ) 
-                for d in month.days
-            ]
-            return days
+        month_with_days = self.get_month_with_days_by_number(month_number)
+        if month_with_days:
+            return month_with_days.days
         return None

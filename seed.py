@@ -1,6 +1,6 @@
 import os
 from database import get_db, engine, Base
-from repositories import DayRepository, MonthRepository
+from repositories import DayRepository, MonthRepository, TrackerRepository
 from dtos import DayDTO, MonthDTO
 from helper import get_days, get_month_name
 
@@ -24,10 +24,14 @@ try:
     with get_db() as db:
         day_repository = DayRepository(db)
         month_repository = MonthRepository(db)
+        tracker_repository = TrackerRepository(db)
+
+        tracker_repository.create_tracker(name="Marcador padrão")
+
         # Criação dos meses
         for month_number in range(STARTING_MONTH, MONTHS + 1):
             month_name = get_month_name(month_number)
-            month = month_repository.create_month(name=month_name, number=month_number)
+            month = month_repository.create_month(name=month_name, number=month_number, year=YEAR, tracker_id=1)
             print(f"Mês {month_name} criado com sucesso!")
 
             for day in get_days(YEAR, month_number):

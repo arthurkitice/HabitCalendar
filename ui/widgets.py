@@ -1,4 +1,8 @@
 import customtkinter as ctk
+from PIL import Image
+
+edit_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/edit_icon.png"), size=(30, 30))
+trash_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/trash_icon.png"), size=(30, 30))
 
 def get_navigation_button_style(self, direction, disabled=False):
         direction_text = "<" if direction == "prev" else ">"
@@ -17,8 +21,8 @@ def get_navigation_button_style(self, direction, disabled=False):
         else:
             return {
                 "text": direction_text, # Exibe a seta apenas se for possível navegar
-                "fg_color": "#2F0C6F", # Verde moderno ou Cinza escuro
-                "hover_color": "#280A5F", # Mantém a cor no hover
+                "fg_color": "#270C59", # Verde moderno ou Cinza escuro
+                "hover_color": "#200949", # Mantém a cor no hover
                 "text_color": "white", # Evita a piscada preta
                 "text_color_disabled": "gray", # Caso desabilite um dia válido no futuro
                 "state": "normal",
@@ -47,7 +51,20 @@ def get_button_style(self, day, clickable=True):
                 "state": "normal",
                 "cursor": "hand2" # Muda o cursor para indicar que é clicável
             }
-        
+
+def style_button(frame, text, command):
+      button = ctk.CTkButton(
+            frame,
+            corner_radius=5,
+            text=text,
+            command=command,
+            fg_color= "#272727",
+            hover_color= "#1E1E1E",
+            text_color="white",
+            cursor="hand2"
+      )
+      return button
+
 def build_day_button(self, day, row, column):
         style = get_button_style(self, day)
 
@@ -132,3 +149,42 @@ def update_empty_button(self, button, day, clickable=False, **kwargs):
     }
 
     button.configure(**config)
+
+def build_sidebar_button(self, text, command):
+        button = ctk.CTkButton(
+            self.sidebar_buttons_frame, 
+            text=text,
+            command=command,
+            fg_color="#333333",
+            text_color="white",
+            hover_color="#444444",
+            cursor="hand2"
+        )
+        return button
+
+def build_sidebar_edit_button(self, command):
+        button = ctk.CTkButton(
+            self.sidebar_buttons_frame, 
+            text="",
+            image=edit_icon,
+            command=command,
+            fg_color="#333333",
+            text_color="white",
+            hover_color="#444444",
+            cursor="hand2",
+            font=ctk.CTkFont(size=20)
+        )
+        return button
+
+def build_sidebar_remove_button(self, command):
+        button = ctk.CTkButton(
+            self.sidebar_buttons_frame, 
+            text="",
+            image=trash_icon,
+            command=command,
+            fg_color="#333333",
+            text_color="white",
+            hover_color="#282828",
+            cursor="hand2",
+        )
+        return button
