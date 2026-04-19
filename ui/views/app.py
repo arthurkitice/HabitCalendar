@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from repositories import DayRepository, MonthRepository, TrackerRepository
 from dtos import DayDTO
-from ui.views.new_tracker_view import AlterTrackerWindow
+from ui.views.new_tracker_view import AlterTrackerFrame
 from database import get_db
 from helper import get_reversed_days
 from config import get_last_month_index, save_current_month_index
@@ -268,21 +268,21 @@ class CalendarApp(ctk.CTk):
             print(f"Operação inválida: {operation}")
             return
         
-        window_exists = self.new_tracker_window is not None and self.new_tracker_window.winfo_exists()
-
-        if window_exists:
-            self.new_tracker_window.focus()
-            return
+        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
+            self.popup_frame.destroy()
         
         if operation == "create":
-            self.new_tracker_window = AlterTrackerWindow(self, on_save=self.create_new_tracker)
+            self.popup_frame = AlterTrackerFrame(self, on_save=self.create_new_tracker)
         else:
-            self.new_tracker_window = AlterTrackerWindow(
+            self.popup_frame = AlterTrackerFrame(
                 self, 
                 on_save=self.edit_tracker, 
                 tracker_id=tracker.id, 
                 tracker_name=tracker.name
             )
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.popup_frame.wait_visibility()
+        self.popup_frame.grab_set()
 
     def change_tracker(self, tracker_id):
         last_tracker_id = self.current_tracker_id

@@ -62,8 +62,8 @@ def style_button(frame, text, command, **kwargs):
             corner_radius=5,
             text=text,
             command=command,
-            fg_color= "#272727",
-            hover_color= "#1E1E1E",
+            fg_color= "#333333",
+            hover_color= "#303030",
             text_color="white",
             cursor="hand2",
             **kwargs
