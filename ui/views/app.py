@@ -30,7 +30,7 @@ class CalendarApp(ctk.CTk):
 
         trackers = self.get_trackers()
 
-        self.current_tracker_id = trackers[0].id if trackers else 1
+        self.current_tracker_id = trackers[0].id if trackers else 0
 
         self.months = self.get_months()
 
@@ -46,11 +46,7 @@ class CalendarApp(ctk.CTk):
         self.new_tracker_window = None
         self.btn_dict = {}
         
-        # Só constrói a UI se tiver meses carregados
-        if self.months:
-            self.build_ui()
-        else:
-            print("Nenhum mês ou tracker encontrado no banco de dados!")
+        self.build_ui()
 
     # ================================
     # MÉTODOS DE INTERAÇÃO COM O BANCO
@@ -60,7 +56,8 @@ class CalendarApp(ctk.CTk):
         try:
             with get_db() as db:
                 tracker_repository = TrackerRepository(db)
-                months = tracker_repository.get_tracker_with_months_by_id(self.current_tracker_id).months
+                trackers_with_months = tracker_repository.get_tracker_with_months_by_id(self.current_tracker_id)
+                months = trackers_with_months.months if trackers_with_months else None
                 return months
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -70,7 +67,7 @@ class CalendarApp(ctk.CTk):
             with get_db() as db:
                 month_repository = MonthRepository(db)
                 # Chama a função baseada no ID, e não no número!
-                days = month_repository.get_days_by_month_id(month_id) 
+                days = month_repository.get_days_by_month_id(month_id)
                 return days
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -149,6 +146,9 @@ class CalendarApp(ctk.CTk):
     # ====================
 
     def update_days_frame(self):
+        if not self.months:
+            return
+
         days = self.get_days(self.months[self.current_month_index].id)
         filler_number = 0
 
@@ -163,24 +163,34 @@ class CalendarApp(ctk.CTk):
         self.style_empty_buttons()
 
     def build_days_frame(self):
-        days = self.get_days(self.months[self.current_month_index].id)
-        filler_number = 0
-        for i in range(6):
-            for j in range(7):
-                if days :
-                    day = days.pop(0)
-                else:
+        if self.months:
+            days = self.get_days(self.months[self.current_month_index].id)
+            filler_number = 0
+            for i in range(6):
+                for j in range(7):
+                    if days :
+                        day = days.pop(0)
+                    else:
+                        day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
+
+                    self.btn_dict[(i, j)] = self.build_button(day, i, j)
+
+            self.style_empty_buttons()
+        else:
+            filler_number = 0
+            for i in range(6):
+                for j in range(7):
                     day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
-
-                self.btn_dict[(i, j)] = self.build_button(day, i, j)
-
-        self.style_empty_buttons()
+                    self.btn_dict[(i, j)] = self.build_button(day, i, j)
     
     # ===============================
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
 
     def update_top_bar(self):
+        if not self.months:
+            return
+        
         current_month = self.months[self.current_month_index]
 
         self.month_label.configure(text=f"{current_month.year}\n{current_month.name}", text_color="white")
@@ -190,11 +200,16 @@ class CalendarApp(ctk.CTk):
         update_navigation_button(self, self.next_button, "next", disabled=self.current_month_index >= len(self.months) - 1)
 
     def build_top_bar(self):
-        current_month = self.months[self.current_month_index]
-
+        
+        
+        if not self.months:
+            year, name = None, None
+        else: 
+            current_month = self.months[self.current_month_index]
+            year, name = current_month.year, current_month.name
         self.month_label = ctk.CTkLabel(
             self.top_frame, 
-            text=f"{current_month.year}\n{current_month.name}", 
+            text=f"{year}\n{name}", 
             font=ctk.CTkFont(size=20, weight="bold"),
             text_color="white"
         )
@@ -216,6 +231,10 @@ class CalendarApp(ctk.CTk):
             label = ctk.CTkLabel(self.week_days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color="white")
             label.grid(row=0, column=i, padx=5, pady=5)
 
+    # ==================
+    # MÉTODOS DA SIDEBAR
+    # ==================
+
     def edit_tracker(self, name, tracker_id):
         try:
             with get_db() as db:
@@ -231,13 +250,17 @@ class CalendarApp(ctk.CTk):
             with get_db() as db:
                 tracker_repository = TrackerRepository(db)
                 tracker_repository.delete_tracker(tracker_id)
+
+                trackers = self.get_trackers()
+                last_tracker_id = trackers[-1].id if trackers else 0
+
+                if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
+                    self.change_tracker(last_tracker_id)
+                    self.update_components()
+
                 self.build_sidebar_buttons()
         except Exception as e:
             print(f"Erro inesperado: {e}")
-
-    # ==================
-    # MÉTODOS DA SIDEBAR
-    # ==================
 
     def open_new_tracker_popup(self, operation, tracker=None):
 
@@ -262,12 +285,15 @@ class CalendarApp(ctk.CTk):
             )
 
     def change_tracker(self, tracker_id):
+        last_tracker_id = self.current_tracker_id
         self.current_tracker_id = tracker_id
-        self.months = self.get_months()
-        
-        self.update_top_bar()
-        self.update_days_frame()
-        self.update_sidebar()
+        if tracker_id == 0:
+            self.show_forbidden_content()
+        elif last_tracker_id == 0:
+            self.show_normal_content()
+        else:
+            self.months = self.get_months()
+            self.update_components()
 
     def create_new_tracker(self, tracker_name):
         try:
@@ -277,6 +303,11 @@ class CalendarApp(ctk.CTk):
                 self.build_sidebar_buttons()
         except Exception as e:
             print(f"Erro inesperado: {e}")
+
+        if self.current_tracker_id == 0:
+            trackers = self.get_trackers()
+            self.current_tracker_id = trackers[0].id if trackers else 0
+            self.update_components()
 
     def toggle_sidebar(self):
         if self.sidebar_visible:
@@ -323,7 +354,8 @@ class CalendarApp(ctk.CTk):
 
     def update_sidebar(self):
         tracker = self.get_tracker_by_id(self.current_tracker_id)
-        self.tracker_label.configure(text=f"Marcador atual:\n{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        tracker_text = tracker.name if tracker is not None else "Nenhum"
+        self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
 
     def build_sidebar(self):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text="Marcadores", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
@@ -336,12 +368,13 @@ class CalendarApp(ctk.CTk):
         self.hide_sidebar_button.grid(row=0, column=2, padx=5, pady=5, sticky = "w")
 
         tracker = self.get_tracker_by_id(self.current_tracker_id)
+        tracker_text = tracker.name if tracker is not None else "Nenhum"
 
         self.tracker_frame = ctk.CTkFrame(self.sidebar_frame, corner_radius=0)
         self.tracker_frame.grid(row=2, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
         self.tracker_frame.grid_columnconfigure(0, weight=1)
 
-        self.tracker_label = ctk.CTkLabel(self.tracker_frame, text=f"Marcador atual:\n{tracker.name}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        self.tracker_label = ctk.CTkLabel(self.tracker_frame, text=f"Marcador atual:\n{tracker_text}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
         self.tracker_label.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
         self.build_sidebar_buttons()
@@ -349,6 +382,57 @@ class CalendarApp(ctk.CTk):
     def build_reduced_sidebar(self):
         self.toggle_button = style_button(self.reduced_sidebar_frame, text=">", command=lambda: self.toggle_sidebar(), width=40)
         self.toggle_button.grid(row=0, column=0, padx=0, pady=5, sticky="w")
+
+    # ===============
+    # FORBIDDEN FRAME
+    # ===============
+
+    def forbidden_check(self):
+        if self.get_trackers():
+            self.show_normal_content()
+        else:
+            self.show_forbidden_content()
+
+    def show_forbidden_content(self):
+        self.top_frame.grid_forget()
+        self.days_frame.grid_forget()
+        self.week_days_frame.grid_forget()
+        self.forbidden_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=0)
+    
+    def show_normal_content(self):
+        self.forbidden_frame.grid_forget()
+        self.top_frame.grid(row=0, column=1, padx=20, pady=20, sticky="ew")
+        self.days_frame.grid(row=2, column=1, padx=20, pady=(0, 20), sticky="nsew")
+        self.week_days_frame.grid(row=1, column=1, padx=20, pady=0, sticky="nsew")
+
+        self.grid_rowconfigure(0, weight=0)
+        self.grid_rowconfigure(2, weight=1)
+
+        self.update_days_frame()
+        self.update_top_bar()
+        self.update_sidebar()
+        
+    def build_forbidden_content(self):
+        self.forbidden_label = ctk.CTkLabel(
+            self.forbidden_frame, 
+            text="Adicione um novo marcador\nclicando no botão '+' da barra lateral\npara visualizar algum calendário",
+            font=ctk.CTkFont(size=20),
+            text_color="gray"
+        )
+        self.forbidden_label.grid(row=0, column=0, sticky="nsew")
+
+    def update_components(self):
+        self.months = self.get_months()
+        if not self.months:
+            self.months = []
+
+        self.update_days_frame()
+        self.update_sidebar()
+        self.update_top_bar()
+        self.forbidden_check()
 
     # =======================
     # CONSTRUÇÃO DA INTERFACE
@@ -376,7 +460,12 @@ class CalendarApp(ctk.CTk):
         self.sidebar_frame.grid_rowconfigure(1, weight=1)
 
         self.reduced_sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
-        self.sidebar_frame.grid_columnconfigure(0, weight=1)
+        self.reduced_sidebar_frame.grid_columnconfigure(0, weight=1)
+
+        self.forbidden_frame = ctk.CTkFrame(self, corner_radius=0)
+        self.forbidden_frame.grid_columnconfigure(0, weight=1)
+        self.forbidden_frame.grid_rowconfigure(0, weight=1)
+        self.build_forbidden_content()
 
         self.grid_columnconfigure(0, weight=1, uniform="window")
         self.grid_columnconfigure(1, weight=4, uniform="window")
@@ -387,3 +476,5 @@ class CalendarApp(ctk.CTk):
         self.build_week_days_frame()
         self.build_sidebar()
         self.build_reduced_sidebar()
+
+        self.forbidden_check()

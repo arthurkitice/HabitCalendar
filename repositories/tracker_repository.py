@@ -12,10 +12,12 @@ class TrackerRepository:
     
     def get_dto_tracker_by_id(self, tracker_id: int):
         tracker = self.db.query(Tracker).filter(Tracker.id == tracker_id).first()
-        return TrackerDTO(
-            id=tracker.id,
-            name=tracker.name
-        )
+        if tracker:
+            return TrackerDTO(
+                id=tracker.id,
+                name=tracker.name
+            )
+        return None
 
     def get_tracker_by_name(self, tracker_name: str):
         tracker = self.db.query(Tracker).filter(Tracker.name == tracker_name).first()
