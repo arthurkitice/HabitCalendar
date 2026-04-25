@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from models import Tracker, Month, Day
-from dtos import TrackerDTO, TrackerWithMonthsDTO, MonthDTO
 from constants import STARTING_YEAR, MONTHS
-from helper import get_days
+import calendar
 
 class TrackerRepository:
     def __init__(self, db: Session):
@@ -20,7 +19,9 @@ class TrackerRepository:
             self.db.add(month)
             self.db.flush() 
 
-            for day in get_days(STARTING_YEAR, month_number):
+            days_count = calendar.monthrange(STARTING_YEAR, month_number)[1]
+
+            for day in range(1, days_count + 1):
                 day = Day(number=day, checked=False, month_id=month.id)
                 self.db.add(day)
 

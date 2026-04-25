@@ -1,9 +1,10 @@
 import customtkinter as ctk
+from functools import partial
 from services import TrackerService, MonthService, DayService
 from dtos import DayDTO
 from ui.views.new_tracker_view import AlterTrackerFrame
 from database import get_db
-from helper import get_reversed_days
+from helper import get_days, get_reversed_days
 from config import get_last_month_index, save_current_month_index
 from ui.widgets import (
     build_day_button, 
@@ -16,6 +17,11 @@ from ui.widgets import (
     build_sidebar_remove_button,
     style_button
 )
+
+CALENDAR_ROWS = 6
+CALENDAR_COLS = 7
+SIDEBAR_WEIGHT = 1
+MAIN_WEIGHT = 4
 
 class CalendarApp(ctk.CTk):
     def __init__(self):
@@ -46,6 +52,8 @@ class CalendarApp(ctk.CTk):
         self.new_tracker_window = None
         self.btn_dict = {}
         
+        self.normal_content =  True if self.get_trackers() else False
+
         self.build_ui()
 
     # ================================
@@ -147,15 +155,16 @@ class CalendarApp(ctk.CTk):
     def update_days_frame(self):
         if not self.months:
             return
+        current_month = self.months[self.current_month_index]
 
-        days = self.get_days(self.months[self.current_month_index].id)
-        filler_number = 0
+        days = self.get_days(current_month.id)
+        week_days = get_days(current_month.year, current_month.number)
 
         for key, btn in self.btn_dict.items():
-            if days:
-                day = days.pop(0)
+            if len(week_days) == 0 or week_days.pop(0) == 0:
+                day = DayDTO(id=0, number=0, checked=False, month_id=0)
             else:
-                day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
+                day = days.pop(0)
 
             update_day_button(self, btn, day, key, clickable=day.number != 0)
         
@@ -163,23 +172,23 @@ class CalendarApp(ctk.CTk):
 
     def build_days_frame(self):
         if self.months:
-            days = self.get_days(self.months[self.current_month_index].id)
-            filler_number = 0
-            for i in range(6):
-                for j in range(7):
-                    if days :
-                        day = days.pop(0)
+            current_month = self.months[self.current_month_index]
+            days = self.get_days(current_month.id)
+            week_days = get_days(current_month.year, current_month.number)
+            for i in range(CALENDAR_ROWS):
+                for j in range(CALENDAR_COLS):
+                    if len(week_days) == 0 or week_days.pop(0) == 0:
+                        day = DayDTO(id=0, number=0, checked=False, month_id=0)
                     else:
-                        day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
+                        day = days.pop(0)
 
                     self.btn_dict[(i, j)] = self.build_button(day, i, j)
 
             self.style_empty_buttons()
         else:
-            filler_number = 0
-            for i in range(6):
-                for j in range(7):
-                    day = DayDTO(id=0, number=filler_number, checked=False, month_id=0)
+            for i in range(CALENDAR_ROWS):
+                for j in range(CALENDAR_COLS):
+                    day = DayDTO(id=0, number=0, checked=False, month_id=0)
                     self.btn_dict[(i, j)] = self.build_button(day, i, j)
     
     # ===============================
@@ -253,6 +262,8 @@ class CalendarApp(ctk.CTk):
                 trackers = self.get_trackers()
                 last_tracker_id = trackers[-1].id if trackers else 0
 
+                # Atualiza os componentes e troca para o último tracker criado caso o
+                # tracker selecionado seja removido ou não existam trackers
                 if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
                     self.change_tracker(last_tracker_id)
                     self.update_components()
@@ -284,15 +295,8 @@ class CalendarApp(ctk.CTk):
         self.popup_frame.grab_set()
 
     def change_tracker(self, tracker_id):
-        last_tracker_id = self.current_tracker_id
         self.current_tracker_id = tracker_id
-        if tracker_id == 0:
-            self.show_forbidden_content()
-        elif last_tracker_id == 0:
-            self.show_normal_content()
-        else:
-            self.months = self.get_months()
-            self.update_components()
+        self.update_components()
 
     def create_new_tracker(self, tracker_name):
         try:
@@ -344,13 +348,13 @@ class CalendarApp(ctk.CTk):
             return
 
         for i, tracker in enumerate(trackers):
-            self.tracker_btn[tracker.id] = build_sidebar_button(self, tracker.name, lambda t_id=tracker.id: self.change_tracker(t_id))
+            self.tracker_btn[tracker.id] = build_sidebar_button(self, tracker.name, command=partial(self.change_tracker, tracker.id))
             self.tracker_btn[tracker.id].grid(row=i+1, column=0, padx=10, pady=10, sticky="we")
 
-            edit_btn = build_sidebar_edit_button(self, lambda t=tracker: self.open_new_tracker_popup(operation="edit", tracker=t))
+            edit_btn = build_sidebar_edit_button(self, command=partial(self.open_new_tracker_popup, "edit", tracker))
             edit_btn.grid(row=i+1, column=1, padx=5, pady=10, sticky="we")
 
-            remove_btn = build_sidebar_remove_button(self, lambda t_id=tracker.id: self.remove_tracker(t_id))
+            remove_btn = build_sidebar_remove_button(self, command=partial(self.remove_tracker, tracker.id))
             remove_btn.grid(row=i+1, column=2, padx=5, pady=10, sticky="we")
 
     def update_sidebar(self):
@@ -362,10 +366,10 @@ class CalendarApp(ctk.CTk):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text="Marcadores", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
         self.sidebar_label.grid(row=0, column=0, padx=5, pady=5)
 
-        self.add_tracker_button = style_button(self.sidebar_frame, text="+", command=lambda: self.open_new_tracker_popup(operation="create"), width=50)
+        self.add_tracker_button = style_button(self.sidebar_frame, text="+", command=partial(self.open_new_tracker_popup, "create"), width=50)
         self.add_tracker_button.grid(row=0, column=1, padx=5, pady=5)
 
-        self.hide_sidebar_button = style_button(self.sidebar_frame, text="<", command=lambda: self.toggle_sidebar(), width=50)
+        self.hide_sidebar_button = style_button(self.sidebar_frame, text="<", command=self.toggle_sidebar, width=50)
         self.hide_sidebar_button.grid(row=0, column=2, padx=5, pady=5, sticky = "w")
 
         tracker = self.get_tracker_by_id(self.current_tracker_id)
@@ -381,7 +385,7 @@ class CalendarApp(ctk.CTk):
         self.build_sidebar_buttons()
     
     def build_reduced_sidebar(self):
-        self.toggle_button = style_button(self.reduced_sidebar_frame, text=">", command=lambda: self.toggle_sidebar(), width=40)
+        self.toggle_button = style_button(self.reduced_sidebar_frame, text=">", command=self.toggle_sidebar, width=40)
         self.toggle_button.grid(row=0, column=0, padx=0, pady=5, sticky="w")
 
     # ===============
@@ -389,9 +393,11 @@ class CalendarApp(ctk.CTk):
     # ===============
 
     def forbidden_check(self):
-        if self.get_trackers():
+        if self.get_trackers() and not self.normal_content:
+            self.normal_content = True
             self.show_normal_content()
-        else:
+        elif not self.get_trackers() and self.normal_content:
+            self.normal_content = False
             self.show_forbidden_content()
 
     def show_forbidden_content(self):
@@ -412,9 +418,7 @@ class CalendarApp(ctk.CTk):
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(2, weight=1)
 
-        self.update_days_frame()
-        self.update_top_bar()
-        self.update_sidebar()
+        self.update_components()
         
     def build_forbidden_content(self):
         self.forbidden_label = ctk.CTkLabel(
@@ -447,12 +451,12 @@ class CalendarApp(ctk.CTk):
 
         self.days_frame = ctk.CTkFrame(self, corner_radius=0)
         self.days_frame.grid(row=2, column=1, padx=20, pady=(0, 20), sticky="nsew")
-        self.days_frame.grid_columnconfigure(tuple(range(7)), weight=1, uniform="days")
-        self.days_frame.grid_rowconfigure(tuple(range(6)), weight=1, uniform="days")
+        self.days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="days")
+        self.days_frame.grid_rowconfigure(tuple(range(CALENDAR_ROWS)), weight=1, uniform="days")
 
         self.week_days_frame = ctk.CTkFrame(self, corner_radius=0)
         self.week_days_frame.grid(row=1, column=1, padx=20, pady=0, sticky="nsew")
-        self.week_days_frame.grid_columnconfigure(tuple(range(7)), weight=1, uniform="week_days")
+        self.week_days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="week_days")
         self.week_days_frame.grid_rowconfigure(0, weight=1)
 
         self.sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
@@ -468,8 +472,8 @@ class CalendarApp(ctk.CTk):
         self.forbidden_frame.grid_rowconfigure(0, weight=1)
         self.build_forbidden_content()
 
-        self.grid_columnconfigure(0, weight=1, uniform="window")
-        self.grid_columnconfigure(1, weight=4, uniform="window")
+        self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window")
+        self.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window")
         self.grid_rowconfigure(2, weight=1)
 
         self.build_top_bar()

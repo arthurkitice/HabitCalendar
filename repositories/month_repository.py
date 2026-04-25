@@ -1,6 +1,5 @@
 from sqlalchemy.orm import Session
 from models import Month
-from dtos import MonthDTO, DayDTO, MonthWithDaysDTO
 
 class MonthRepository:
     def __init__(self, db: Session):
