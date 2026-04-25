@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from repositories import DayRepository, MonthRepository, TrackerRepository
+from services import TrackerService, MonthService, DayService
 from dtos import DayDTO
 from ui.views.new_tracker_view import AlterTrackerFrame
 from database import get_db
@@ -55,8 +55,8 @@ class CalendarApp(ctk.CTk):
     def get_months(self):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                trackers_with_months = tracker_repository.get_tracker_with_months_by_id(self.current_tracker_id)
+                tracker_service = TrackerService(db)
+                trackers_with_months = tracker_service.get_tracker_with_months_by_id(self.current_tracker_id)
                 months = trackers_with_months.months if trackers_with_months else None
                 return months
         except Exception as e:
@@ -65,18 +65,17 @@ class CalendarApp(ctk.CTk):
     def get_days(self, month_id):
         try:
             with get_db() as db:
-                month_repository = MonthRepository(db)
-                # Chama a função baseada no ID, e não no número!
-                days = month_repository.get_days_by_month_id(month_id)
-                return days
+                month_service = MonthService(db)
+                month = month_service.get_month_with_days_by_id(month_id)
+                return month.days
         except Exception as e:
             print(f"Erro inesperado: {e}")
 
     def get_trackers(self):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                trackers = tracker_repository.get_all_trackers()
+                tracker_service = TrackerService(db)
+                trackers = tracker_service.get_all_trackers()
                 return trackers
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -84,8 +83,8 @@ class CalendarApp(ctk.CTk):
     def get_tracker_by_id(self, tracker_id):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                tracker = tracker_repository.get_dto_tracker_by_id(tracker_id)
+                tracker_service = TrackerService(db)
+                tracker = tracker_service.get_tracker_by_id(tracker_id)
                 return tracker
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -93,8 +92,8 @@ class CalendarApp(ctk.CTk):
     def check_day(self, day_id, row, column):
         try:
             with get_db() as db:
-                day_repository = DayRepository(db)
-                day = day_repository.check_day(day_id)
+                day_service = DayService(db)
+                day = day_service.check_day(day_id)
                 update_day_button(self, self.btn_dict[(row, column)], day, (row, column))
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -238,8 +237,8 @@ class CalendarApp(ctk.CTk):
     def edit_tracker(self, name, tracker_id):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                tracker_repository.update_tracker(tracker_id, name)
+                tracker_service = TrackerService(db)
+                tracker_service.update_tracker(tracker_id, name)
                 self.build_sidebar_buttons()
                 self.update_sidebar()
         except Exception as e:
@@ -248,8 +247,8 @@ class CalendarApp(ctk.CTk):
     def remove_tracker(self, tracker_id):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                tracker_repository.delete_tracker(tracker_id)
+                tracker_service = TrackerService(db)
+                tracker_service.delete_tracker(tracker_id)
 
                 trackers = self.get_trackers()
                 last_tracker_id = trackers[-1].id if trackers else 0
@@ -298,8 +297,8 @@ class CalendarApp(ctk.CTk):
     def create_new_tracker(self, tracker_name):
         try:
             with get_db() as db:
-                tracker_repository = TrackerRepository(db)
-                tracker_repository.create_tracker(name=tracker_name)
+                tracker_service = TrackerService(db)
+                tracker_service.create_tracker(name=tracker_name)
                 self.build_sidebar_buttons()
         except Exception as e:
             print(f"Erro inesperado: {e}")
@@ -341,6 +340,8 @@ class CalendarApp(ctk.CTk):
         self.sidebar_buttons_frame.grid(row=1, column=0, columnspan=3, padx=5, pady=5, sticky="nsew")
         self.sidebar_buttons_frame.grid_columnconfigure(0, weight=1)
 
+        if not trackers:
+            return
 
         for i, tracker in enumerate(trackers):
             self.tracker_btn[tracker.id] = build_sidebar_button(self, tracker.name, lambda t_id=tracker.id: self.change_tracker(t_id))

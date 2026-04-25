@@ -1,8 +1,17 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
+from models.day import Day
 
-@dataclass
-class DayDTO:
+class DayDTO(BaseModel):
     id: int
-    number: int  # Usando string para facilitar a serialização
+    number: int
     checked: bool
     month_id: int
+    
+    @classmethod
+    def from_entity(cls, day: Day) -> "DayDTO":
+        return cls(
+            id=day.id,
+            number=day.number,
+            checked=day.checked,
+            month_id=day.month_id
+        )
