@@ -5,33 +5,26 @@ edit_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/edit_icon.png"), size=(
 trash_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/trash_icon.png"), size=(30, 30))
 right_arrow_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/right_arrow_icon.png"), size=(40, 40))
 left_arrow_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/left_arrow_icon.png"), size=(40, 40))
+plus_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/plus_icon.png"), size=(40, 40))
 
-def get_navigation_button_style(self, direction, disabled=False):
-        image = left_arrow_icon if direction == "prev" else right_arrow_icon
+def get_navigation_button_style(self, direction):
         direction_condition = self.current_month_index > 0 if direction == "prev" else self.current_month_index < len(self.months) - 1
 
-        if disabled or not direction_condition:
-            return {
-                "text": " ",
-                "fg_color": "transparent",
-                "hover_color": "gray",
-                "text_color": "gray",
-                "text_color_disabled": "gray",
-                "state": "disabled",
-                "cursor": "arrow",
-                "image": None
-            }
+        if not direction_condition:
+            image = plus_icon
         else:
-            return {
-                "text": "",
-                "fg_color": "transparent",
-                "hover_color": "#272727",
-                "text_color": "white",
-                "text_color_disabled": "gray",
-                "state": "normal",
-                "cursor": "hand2",
-                "image": image
-            }
+            image = left_arrow_icon if direction == "prev" else right_arrow_icon
+
+        return {
+            "text": "",
+            "fg_color": "transparent",
+            "hover_color": "#272727",
+            "text_color": "white",
+            "text_color_disabled": "gray",
+            "state": "normal",
+            "cursor": "hand2",
+            "image": image
+        }
         
 def get_button_style(self, day, clickable=True):
         # Um método auxiliar para limpar o código visual
@@ -88,13 +81,13 @@ def build_day_button(self, day, row, column):
 
         return button
 
-def build_navigation_button(self, direction):
+def build_navigation_button(self, direction, command):
     style = get_navigation_button_style(self, direction)
 
     button = ctk.CTkButton(
         self.top_frame, 
         text=style["text"], 
-        command=lambda: self.change_month(opperation=direction), 
+        command=command, 
         state=style["state"],
         fg_color=style["fg_color"],
         text_color=style["text_color"],
@@ -124,8 +117,8 @@ def update_day_button(self, button, day, key, clickable=True, **kwargs):
 
     button.configure(**config)
 
-def update_navigation_button(self, button, direction, disabled=False, **kwargs):
-    style = get_navigation_button_style(self, direction, disabled=disabled)
+def update_navigation_button(self, button, direction, **kwargs):
+    style = get_navigation_button_style(self, direction)
 
     config = {
         "text":style["text"],

@@ -7,19 +7,19 @@ class TrackerRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def _populate_tracker(self, tracker_id: int) -> None:
+    def _populate_tracker(self, tracker_id: int, year: int = STARTING_YEAR) -> None:
         for month_number in range(1, 13):
             month_name = MONTHS[month_number]
             month = Month(
                 name=month_name,
                 number=month_number,
-                year=STARTING_YEAR,
+                year=year,
                 tracker_id=tracker_id
             )
             self.db.add(month)
             self.db.flush() 
 
-            days_count = calendar.monthrange(STARTING_YEAR, month_number)[1]
+            days_count = calendar.monthrange(year, month_number)[1]
 
             for day in range(1, days_count + 1):
                 day = Day(number=day, checked=False, month_id=month.id)
@@ -52,6 +52,17 @@ class TrackerRepository:
 
         return tracker
     
+    def add_tracker_year(self, tracker_id: int, year: int) -> bool:
+        existing = self.db.query(Month)\
+            .filter(Month.tracker_id == tracker_id, Month.year == year)\
+            .first()
+        
+        if existing:
+            return False
+
+        self._populate_tracker(tracker_id=tracker_id, year=year)
+        return True
+
     def update_tracker(self, tracker_id: int, name: str):
         tracker = self.get_tracker_by_id(tracker_id)
         tracker.name = name

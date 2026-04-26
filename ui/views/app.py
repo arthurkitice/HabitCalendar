@@ -3,6 +3,7 @@ from functools import partial
 from services import TrackerService, MonthService, DayService
 from dtos import DayDTO
 from ui.views.new_tracker_view import AlterTrackerFrame
+from ui.views.new_year_view import NewYearView
 from database import get_db
 from helper import get_days, get_reversed_days
 from config import get_last_month_index, save_current_month_index
@@ -106,6 +107,28 @@ class CalendarApp(ctk.CTk):
         except Exception as e:
             print(f"Erro inesperado: {e}")
 
+    def add_year(self, year):
+        try:
+            with get_db() as db:
+                tracker_service = TrackerService(db)
+
+                current_month_id = self.months[self.current_month_index].id
+                current_year = self.months[self.current_month_index].year
+
+                tracker_service.add_tracker_year(tracker_id=self.current_tracker_id, year=year)
+
+                self.months = self.get_months()
+
+                for i, month in enumerate(self.months):
+                    if month.id == current_month_id:
+                        self.current_month_index = i
+
+                operation = "prev" if year < current_year else "next"
+
+                self.change_month(operation)
+        except Exception as e:
+            print(f"Erro inesperado: {e}")
+
     # =======================
     # MÉTODOS DOS DIAS DO MÊS
     # =======================
@@ -134,14 +157,19 @@ class CalendarApp(ctk.CTk):
 
         return button
 
-    def change_month(self, opperation):
-        if opperation == "next":
-            if self.current_month_index + 1 < len(self.months):
-                self.current_month_index += 1
+    def change_month(self, operation):
+        first_month = self.current_month_index - 1 < 0 and operation == "prev"
+        last_month = self.current_month_index + 1 >= len(self.months) and operation == "next"
+
+        if  first_month or last_month:
+            self.open_new_year_popup(1 if last_month else -1)
+            return
+
+        if operation == "next":
+            self.current_month_index += 1
             
-        elif opperation == "prev":
-            if self.current_month_index - 1 >= 0:
-                self.current_month_index -= 1
+        elif operation == "prev":
+            self.current_month_index -= 1
 
         save_current_month_index(self.current_month_index)
 
@@ -191,6 +219,25 @@ class CalendarApp(ctk.CTk):
                     day = DayDTO(id=0, number=0, checked=False, month_id=0)
                     self.btn_dict[(i, j)] = self.build_button(day, i, j)
     
+    def open_new_year_popup(self, operation):
+
+        if operation not in [-1, 1]:
+            print(f"Operação inválida: {operation}")
+            return
+        
+        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
+            self.popup_frame.destroy()
+        
+        current_year = self.months[self.current_month_index].year
+
+        year = current_year + operation
+
+        self.popup_frame = NewYearView(self, on_save=partial(self.add_year, year), year=year)
+    
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.popup_frame.wait_visibility()
+        self.popup_frame.grab_set()
+
     # ===============================
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
@@ -203,9 +250,9 @@ class CalendarApp(ctk.CTk):
 
         self.month_label.configure(text=f"{current_month.year}\n{current_month.name}", text_color="white")
 
-        update_navigation_button(self, self.prev_button, "prev", disabled=self.current_month_index == 0)
+        update_navigation_button(self, self.prev_button, "prev")
 
-        update_navigation_button(self, self.next_button, "next", disabled=self.current_month_index >= len(self.months) - 1)
+        update_navigation_button(self, self.next_button, "next")
 
     def build_top_bar(self):
         
@@ -223,10 +270,10 @@ class CalendarApp(ctk.CTk):
         )
         self.month_label.grid(row=0, column=1, padx=5, pady=5)
 
-        self.prev_button = build_navigation_button(self, "prev")
+        self.prev_button = build_navigation_button(self, direction="prev", command=partial(self.change_month, "prev"))
         self.prev_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
 
-        self.next_button = build_navigation_button(self, "next")
+        self.next_button = build_navigation_button(self, direction="next", command=partial(self.change_month, "next"))
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
 
     # ========================

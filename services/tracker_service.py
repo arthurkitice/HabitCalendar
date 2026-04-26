@@ -2,6 +2,9 @@ from sqlalchemy.orm import Session
 from repositories import TrackerRepository
 from dtos import TrackerDTO, TrackerWithMonthsDTO
 
+MIN_YEAR = 2000
+MAX_YEAR = 2100
+
 class TrackerService:
     def __init__(self, db: Session):
         self.db = db
@@ -58,6 +61,15 @@ class TrackerService:
             return TrackerDTO.from_entity(tracker)
         return None
     
+    def add_tracker_year(self, tracker_id: int, year: int) -> bool | None:
+        if not self.get_tracker_by_id(tracker_id):
+            return None
+
+        if not (MIN_YEAR <= year <= MAX_YEAR):
+            return False #Ano fora do intervalo válido
+        
+        return self.tracker_repository.add_tracker_year(tracker_id=tracker_id, year=year)
+
     def update_tracker(self, tracker_id: int, name: str) -> TrackerDTO | None:
         if self.get_tracker_by_id(tracker_id):
             tracker = self.tracker_repository.update_tracker(tracker_id, name)
