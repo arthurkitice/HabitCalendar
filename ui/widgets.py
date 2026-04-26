@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+from constants import Direction
 
 edit_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/edit_icon.png"), size=(30, 30))
 trash_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/trash_icon.png"), size=(30, 30))
@@ -8,12 +9,12 @@ left_arrow_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/left_arrow_icon.p
 plus_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/plus_icon.png"), size=(40, 40))
 
 def get_navigation_button_style(self, direction):
-        direction_condition = self.current_month_index > 0 if direction == "prev" else self.current_month_index < len(self.months) - 1
+        direction_condition = self.current_month_index > 0 if direction == Direction.PREV else self.current_month_index < len(self.months) - 1
 
         if not direction_condition:
             image = plus_icon
         else:
-            image = left_arrow_icon if direction == "prev" else right_arrow_icon
+            image = left_arrow_icon if direction == Direction.PREV else right_arrow_icon
 
         return {
             "text": "",

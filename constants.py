@@ -1,3 +1,5 @@
+from enum import Enum, auto
+
 STARTING_YEAR = 2026
 MONTHS = {
     1: "Janeiro", 
@@ -13,3 +15,11 @@ MONTHS = {
     11: "Novembro",
     12: "Dezembro"
 }
+
+class Direction(Enum):
+    PREV = auto()
+    NEXT = auto()
+
+class Operation(Enum):
+    CREATE = auto()
+    EDIT = auto()
