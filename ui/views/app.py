@@ -1,12 +1,10 @@
 import customtkinter as ctk
 from functools import partial
-from services import TrackerService, MonthService, DayService
 from dtos import DayDTO, MonthDTO, TrackerDTO
 from ui.views.new_tracker_view import AlterTrackerFrame
 from ui.views.new_year_view import NewYearView
-from database import get_db
 from helper import get_days, get_reversed_days
-from config import get_last_month_index, save_current_month_index
+from config import get_last_month_index, save_current_month_index, get_last_tracker_id, save_current_tracker_id
 from ui.widgets import (
     build_day_button, 
     build_navigation_button, 
@@ -19,6 +17,7 @@ from ui.widgets import (
     style_button
 )
 from constants import Direction, Operation
+from controllers.calendar_controller import CalendarController
 
 CALENDAR_ROWS = 6
 CALENDAR_COLS = 7
@@ -34,101 +33,55 @@ class CalendarApp(ctk.CTk):
 
         self.minsize(500, 350)
 
+        self.controller = CalendarController()
+
         self.sidebar_visible = True
 
-        trackers = self.get_trackers()
+        trackers = self.controller.get_trackers()
 
-        self.current_tracker_id = trackers[0].id if trackers else 0
-
-        self.months = self.get_months()
-
-        if not self.months:
-            self.months = []
-
-        self.current_month_index = get_last_month_index()
+        self.current_tracker_id = get_last_tracker_id()
         
+        self.months = self.controller.get_months(self.current_tracker_id)
+
+        self.current_month_index = get_last_month_index(self.current_tracker_id)
+
         # 4. Proteção: garante que o índice do JSON não é maior que a lista de meses
         if self.months and self.current_month_index >= len(self.months):
             self.current_month_index = 0
 
+        if not self.months:
+            self.months = []
+
         self.new_tracker_window = None
         self.btn_dict = {}
         
-        self.normal_content =  True if self.get_trackers() else False
+        self.normal_content =  True if trackers else False
 
         self.build_ui()
 
     # ================================
     # MÉTODOS DE INTERAÇÃO COM O BANCO
     # ================================
-
-    def get_months(self) -> list[MonthDTO] | None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                trackers_with_months = tracker_service.get_tracker_with_months_by_id(self.current_tracker_id)
-                months = trackers_with_months.months if trackers_with_months else None
-                return months
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
-
-    def get_days(self, month_id: int) -> list[DayDTO] | None:
-        try:
-            with get_db() as db:
-                month_service = MonthService(db)
-                month = month_service.get_month_with_days_by_id(month_id)
-                return month.days
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
-
-    def get_trackers(self) -> list[TrackerDTO] | None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                trackers = tracker_service.get_all_trackers()
-                return trackers
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
-
-    def get_tracker_by_id(self, tracker_id: int) -> TrackerDTO | None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                tracker = tracker_service.get_tracker_by_id(tracker_id)
-                return tracker
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
-
     def check_day(self, day_id: int, row: int, column: int) -> None:
-        try:
-            with get_db() as db:
-                day_service = DayService(db)
-                day = day_service.check_day(day_id)
-                update_day_button(self, self.btn_dict[(row, column)], day, (row, column))
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+        day = self.controller.check_day(day_id)
+        update_day_button(self, self.btn_dict[(row, column)], day)
 
     def add_year(self, year: int) -> None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
 
-                current_month_id = self.months[self.current_month_index].id
-                current_year = self.months[self.current_month_index].year
+        current_month_id = self.months[self.current_month_index].id
+        current_year = self.months[self.current_month_index].year
 
-                tracker_service.add_tracker_year(tracker_id=self.current_tracker_id, year=year)
+        self.controller.add_year(tracker_id=self.current_tracker_id, year=year)
 
-                self.months = self.get_months()
+        self.months = self.controller.get_months(self.current_tracker_id)
 
-                for i, month in enumerate(self.months):
-                    if month.id == current_month_id:
-                        self.current_month_index = i
+        for i, month in enumerate(self.months):
+            if month.id == current_month_id:
+                self.current_month_index = i
 
-                operation = Direction.PREV if year < current_year else Direction.NEXT
+        operation = Direction.PREV if year < current_year else Direction.NEXT
 
-                self.change_month(operation)
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+        self.change_month(operation)
 
     # =======================
     # MÉTODOS DOS DIAS DO MÊS
@@ -152,8 +105,8 @@ class CalendarApp(ctk.CTk):
                 filler_number += 1
                 update_empty_button(self, btn, DayDTO(id=0, number=filler_number, checked=False, month_id=0))
 
-    def build_button(self, day: int, row: int, column: int) -> ctk.CTkButton:
-        button = build_day_button(self, day, row, column)
+    def build_button(self, day: DayDTO, row: int, column: int) -> ctk.CTkButton:
+        button = build_day_button(self, day, command=partial(self.check_day, day.id, row, column))
         button.grid(row=row, column=column, padx=5, pady=5, sticky="nsew")
 
         return button
@@ -172,7 +125,7 @@ class CalendarApp(ctk.CTk):
         elif operation == Direction.PREV:
             self.current_month_index -= 1
 
-        save_current_month_index(self.current_month_index)
+        save_current_month_index(self.current_tracker_id, self.current_month_index)
 
         self.update_top_bar()
         self.update_days_frame()
@@ -185,8 +138,7 @@ class CalendarApp(ctk.CTk):
         if not self.months:
             return
         current_month = self.months[self.current_month_index]
-
-        days = self.get_days(current_month.id)
+        days = self.controller.get_days(month_id=current_month.id)
         week_days = get_days(current_month.year, current_month.number)
 
         for key, btn in self.btn_dict.items():
@@ -195,14 +147,14 @@ class CalendarApp(ctk.CTk):
             else:
                 day = days.pop(0)
 
-            update_day_button(self, btn, day, key, clickable=day.number != 0)
+            update_day_button(self, btn, day, clickable=day.number != 0, command=partial(self.check_day, day.id, key[0], key[1]))
         
         self.style_empty_buttons()
 
     def build_days_frame(self) -> None:
         if self.months:
             current_month = self.months[self.current_month_index]
-            days = self.get_days(current_month.id)
+            days = self.controller.get_days(current_month.id)
             week_days = get_days(current_month.year, current_month.number)
             for i in range(CALENDAR_ROWS):
                 for j in range(CALENDAR_COLS):
@@ -215,9 +167,9 @@ class CalendarApp(ctk.CTk):
 
             self.style_empty_buttons()
         else:
+            day = DayDTO(id=0, number=0, checked=False, month_id=0)
             for i in range(CALENDAR_ROWS):
                 for j in range(CALENDAR_COLS):
-                    day = DayDTO(id=0, number=0, checked=False, month_id=0)
                     self.btn_dict[(i, j)] = self.build_button(day, i, j)
     
     def open_new_year_popup(self, operation: Direction) -> None:
@@ -290,33 +242,23 @@ class CalendarApp(ctk.CTk):
     # ==================
 
     def edit_tracker(self, name: str, tracker_id: int) -> None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                tracker_service.update_tracker(tracker_id, name)
-                self.build_sidebar_buttons()
-                self.update_sidebar()
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+        self.controller.edit_tracker(tracker_id, name)
+        self.build_sidebar_buttons()
+        self.update_sidebar()
 
     def remove_tracker(self, tracker_id: int) -> None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                tracker_service.delete_tracker(tracker_id)
+        self.controller.remove_tracker(tracker_id)
 
-                trackers = self.get_trackers()
-                last_tracker_id = trackers[-1].id if trackers else 0
+        trackers = self.controller.get_trackers()
+        last_tracker_id = trackers[-1].id if trackers else 0
 
-                # Atualiza os componentes e troca para o último tracker criado caso o
-                # tracker selecionado seja removido ou não existam trackers
-                if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
-                    self.change_tracker(last_tracker_id)
-                    self.update_components()
+        # Atualiza os componentes e troca para o último tracker criado caso o
+        # tracker selecionado seja removido ou não existam trackers
+        if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
+            self.change_tracker(last_tracker_id)
+            self.update_components()
 
-                self.build_sidebar_buttons()
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+        self.build_sidebar_buttons()
 
     def open_new_tracker_popup(self, operation: Operation, tracker: TrackerDTO | None = None) -> None:
         if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
@@ -337,19 +279,15 @@ class CalendarApp(ctk.CTk):
 
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id
+        save_current_tracker_id(self.current_tracker_id)
         self.update_components()
 
     def create_new_tracker(self, tracker_name: str) -> None:
-        try:
-            with get_db() as db:
-                tracker_service = TrackerService(db)
-                tracker_service.create_tracker(name=tracker_name)
-                self.build_sidebar_buttons()
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+        self.controller.create_tracker(tracker_name)
+        self.build_sidebar_buttons()
 
         if self.current_tracker_id == 0:
-            trackers = self.get_trackers()
+            trackers = self.controller.get_trackers()
             self.current_tracker_id = trackers[0].id if trackers else 0
             self.update_components()
 
@@ -375,7 +313,7 @@ class CalendarApp(ctk.CTk):
     # =====================
 
     def build_sidebar_buttons(self) -> None:
-        trackers = self.get_trackers()
+        trackers = self.controller.get_trackers()
         self.tracker_btn = {}
 
         if getattr(self, "sidebar_buttons_frame", None):
@@ -399,7 +337,7 @@ class CalendarApp(ctk.CTk):
             remove_btn.grid(row=i+1, column=2, padx=5, pady=10, sticky="we")
 
     def update_sidebar(self) -> None:
-        tracker = self.get_tracker_by_id(self.current_tracker_id)
+        tracker = self.controller.get_tracker_by_id(tracker_id=self.current_tracker_id)
         tracker_text = tracker.name if tracker is not None else "Nenhum"
         self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text}", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
 
@@ -413,7 +351,7 @@ class CalendarApp(ctk.CTk):
         self.hide_sidebar_button = style_button(self.sidebar_frame, text="<", command=self.toggle_sidebar, width=50)
         self.hide_sidebar_button.grid(row=0, column=2, padx=5, pady=5, sticky = "w")
 
-        tracker = self.get_tracker_by_id(self.current_tracker_id)
+        tracker = self.controller.get_tracker_by_id(tracker_id=self.current_tracker_id)
         tracker_text = tracker.name if tracker is not None else "Nenhum"
 
         self.tracker_frame = ctk.CTkFrame(self.sidebar_frame, corner_radius=0)
@@ -434,10 +372,11 @@ class CalendarApp(ctk.CTk):
     # ===============
 
     def forbidden_check(self) -> None:
-        if self.get_trackers() and not self.normal_content:
+        trackers = self.controller.get_trackers()
+        if trackers and not self.normal_content:
             self.normal_content = True
             self.show_normal_content()
-        elif not self.get_trackers() and self.normal_content:
+        elif not trackers and self.normal_content:
             self.normal_content = False
             self.show_forbidden_content()
 
@@ -471,9 +410,16 @@ class CalendarApp(ctk.CTk):
         self.forbidden_label.grid(row=0, column=0, sticky="nsew")
 
     def update_components(self) -> None:
-        self.months = self.get_months()
+        self.current_month_index = get_last_month_index(self.current_tracker_id)
+
+        self.months = self.controller.get_months(self.current_tracker_id)
         if not self.months:
             self.months = []
+
+        elif self.current_month_index >= len(self.months):
+            self.current_month_index = len(self.months) - 1
+
+            save_current_month_index(self.current_tracker_id, self.current_month_index)
 
         self.update_days_frame()
         self.update_sidebar()

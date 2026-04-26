@@ -64,14 +64,14 @@ def style_button(frame, text, command, **kwargs):
       )
       return button
 
-def build_day_button(self, day, row, column):
+def build_day_button(self, day, command):
         style = get_button_style(self, day)
 
         button = ctk.CTkButton(
             self.days_frame, 
             corner_radius=20, 
             text=style["text"], 
-            command=lambda d_id=day.id, r=row, c=column: self.check_day(d_id, r, c),
+            command=command,
             fg_color=style["fg_color"],
             state=style["state"],
             text_color=style["text_color"],
@@ -101,12 +101,11 @@ def build_navigation_button(self, direction, command):
     )
     return button
 
-def update_day_button(self, button, day, key, clickable=True, **kwargs):
+def update_day_button(self, button, day, clickable=True, **kwargs):
     style = get_button_style(self, day, clickable)
 
     config = {
         "text":style["text"],
-        "command":lambda d_id=day.id, r=key[0], c=key[1]: self.check_day(d_id, r, c),
         "fg_color":style["fg_color"],
         "state":style["state"],
         "text_color":style["text_color"],
