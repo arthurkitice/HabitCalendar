@@ -3,7 +3,7 @@ from ui.widgets import style_button
 
 class AlterTrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker_name=None, tracker_id=None):
-        super().__init__(parent, width=500, height=400, corner_radius=15, border_width=4, border_color="#000000")
+        super().__init__(parent, width=500, height=400, corner_radius=15, border_width=4, border_color="black")
 
         self.grid_propagate(False)
 

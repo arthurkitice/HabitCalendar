@@ -39,6 +39,17 @@ class MonthService:
             return None
         return MonthDTO.from_entity(month)
 
+    def get_specific_month(self, tracker_id: int, year: int, month_number: int) -> MonthDTO | None:
+        """Retorna um mês específico de acordo com o tracker, ano e número do mês"""
+        month = self.month_repository.get_month_by_year_number(tracker_id, year, month_number)
+        if not month:
+            return None
+        return MonthDTO.from_entity(month)
+
+    def get_years_from_tracker(self, tracker_id: int) -> list[int]:
+        years = self.month_repository.get_years_from_tracker(tracker_id)
+        return [y[0] for y in years]
+
     def create_month(self, number: int, year: int, tracker_id: int) -> MonthDTO | None:
         tracker_repository = TrackerRepository(self.db)
 

@@ -26,6 +26,25 @@ def get_navigation_button_style(self, direction):
             "cursor": "hand2",
             "image": image
         }
+
+def get_year_nav_button_style(self, direction):
+        direction_condition = self.year - 1 in self.years if direction == Direction.PREV else self.year + 1 in self.years
+
+        if not direction_condition:
+            image = plus_icon
+        else:
+            image = left_arrow_icon if direction == Direction.PREV else right_arrow_icon
+
+        return {
+            "text": "",
+            "fg_color": "transparent",
+            "hover_color": "#272727",
+            "text_color": "white",
+            "text_color_disabled": "gray",
+            "state": "normal",
+            "cursor": "hand2",
+            "image": image
+        }
         
 def get_button_style(self, day, clickable=True):
         # Um método auxiliar para limpar o código visual
@@ -57,11 +76,13 @@ def style_button(frame, text, command, **kwargs):
             text=text,
             command=command,
             fg_color= "#333333",
-            hover_color= "#303030",
+            hover_color= "#282828",
             text_color="white",
-            cursor="hand2",
-            **kwargs
+            cursor="hand2"
       )
+
+      button.configure(**kwargs)
+
       return button
 
 def build_day_button(self, day, command):
@@ -100,6 +121,26 @@ def build_navigation_button(self, direction, command):
         width=65
     )
     return button
+
+def build_year_nav_button(self, frame, direction, command):
+    style = get_year_nav_button_style(self, direction)
+
+    button = ctk.CTkButton(
+        frame, 
+        text=style["text"], 
+        command=command, 
+        state=style["state"],
+        fg_color=style["fg_color"],
+        text_color=style["text_color"],
+        text_color_disabled=style["text_color_disabled"],
+        hover_color=style["hover_color"],
+        cursor=style["cursor"],
+        image=style["image"],
+        height=50,
+        width=65
+    )
+    return button
+
 
 def update_day_button(self, button, day, clickable=True, **kwargs):
     style = get_button_style(self, day, clickable)

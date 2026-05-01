@@ -17,7 +17,6 @@ def handle_db(method):
             return None
     return wrapper
 
-
 class CalendarController:
     @handle_db
     def get_trackers(self, db) -> list[TrackerDTO] | None:

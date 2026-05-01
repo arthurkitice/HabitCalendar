@@ -3,6 +3,7 @@ from functools import partial
 from dtos import DayDTO, MonthDTO, TrackerDTO
 from ui.views.new_tracker_view import AlterTrackerFrame
 from ui.views.new_year_view import NewYearView
+from ui.views.year_view import YearView
 from helper import get_days, get_reversed_days
 from config import get_last_month_index, save_current_month_index, get_last_tracker_id, save_current_tracker_id
 from ui.widgets import (
@@ -41,7 +42,7 @@ class CalendarApp(ctk.CTk):
 
         self.current_tracker_id = get_last_tracker_id()
         
-        self.months = self.controller.get_months(self.current_tracker_id)
+        self.months: list[MonthDTO] = self.controller.get_months(self.current_tracker_id)
 
         self.current_month_index = get_last_month_index(self.current_tracker_id)
 
@@ -67,21 +68,24 @@ class CalendarApp(ctk.CTk):
         update_day_button(self, self.btn_dict[(row, column)], day)
 
     def add_year(self, year: int) -> None:
-
-        current_month_id = self.months[self.current_month_index].id
         current_year = self.months[self.current_month_index].year
 
         self.controller.add_year(tracker_id=self.current_tracker_id, year=year)
+
+        self.refresh_months()
+
+        operation = Direction.PREV if year < current_year else Direction.NEXT
+
+        self.change_month(operation)
+
+    def refresh_months(self):
+        current_month_id = self.months[self.current_month_index].id
 
         self.months = self.controller.get_months(self.current_tracker_id)
 
         for i, month in enumerate(self.months):
             if month.id == current_month_id:
                 self.current_month_index = i
-
-        operation = Direction.PREV if year < current_year else Direction.NEXT
-
-        self.change_month(operation)
 
     # =======================
     # MÉTODOS DOS DIAS DO MÊS
@@ -130,6 +134,15 @@ class CalendarApp(ctk.CTk):
         self.update_top_bar()
         self.update_days_frame()
 
+    def change_month_by_id(self, month_id: int) -> bool:
+        for i, month in enumerate(self.months):
+            if month.id == month_id:
+                self.current_month_index = i
+                save_current_month_index(self.current_tracker_id, self.current_month_index)
+                self.update_components()
+                return True
+        return False
+    
     # ====================
     # FRAME DE DIAS DO MẼS
     # ====================
@@ -195,13 +208,32 @@ class CalendarApp(ctk.CTk):
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
 
+    def open_years_popup(self, year: int):
+        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
+            self.popup_frame.destroy()
+        
+        self.popup_frame = YearView(
+            self, 
+            tracker_id=self.current_tracker_id, 
+            on_select=self.change_month_by_id,
+            on_new_year=self.refresh_months,
+            year=year
+        )
+    
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.popup_frame.wait_visibility()
+        self.popup_frame.grab_set()
+
     def update_top_bar(self) -> None:
         if not self.months:
             return
         
         current_month = self.months[self.current_month_index]
 
-        self.month_label.configure(text=f"{current_month.year}\n{current_month.name}", text_color="white")
+        self.month_label.configure(
+            text=f"{current_month.year}\n{current_month.name}", 
+            command=partial(self.open_years_popup, current_month.year)
+        )
 
         update_navigation_button(self, self.prev_button, Direction.PREV)
 
@@ -213,11 +245,15 @@ class CalendarApp(ctk.CTk):
         else: 
             current_month = self.months[self.current_month_index]
             year, name = current_month.year, current_month.name
-        self.month_label = ctk.CTkLabel(
+        self.month_label = ctk.CTkButton(
             self.top_frame, 
             text=f"{year}\n{name}", 
             font=ctk.CTkFont(size=20, weight="bold"),
-            text_color="white"
+            command=partial(self.open_years_popup, year),
+            cursor="hand2",
+            text_color="white",
+            fg_color="transparent",
+            hover_color="#272727"
         )
         self.month_label.grid(row=0, column=1, padx=5, pady=5)
 
