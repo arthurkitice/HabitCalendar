@@ -1,12 +1,30 @@
 import customtkinter as ctk
 from PIL import Image
 from constants import Direction
+import cairosvg
+import io
 
-edit_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/edit_icon.png"), size=(30, 30))
-trash_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/trash_icon.png"), size=(30, 30))
-right_arrow_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/right_arrow_icon.png"), size=(40, 40))
-left_arrow_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/left_arrow_icon.png"), size=(40, 40))
-plus_icon = ctk.CTkImage(dark_image=Image.open("ui/icons/plus_icon.png"), size=(40, 40))
+def carregar_icone_svg(caminho_arquivo, tamanho_icone):
+    # Multiplicamos o tamanho desejado por 4 para garantir nitidez 
+    largura_render = tamanho_icone[0] * 4
+    altura_render = tamanho_icone[1] * 4
+
+    png_bytes = cairosvg.svg2png(
+        url=caminho_arquivo, 
+        output_width=largura_render, 
+        output_height=altura_render
+    )
+    
+    imagem_memoria = io.BytesIO(png_bytes)
+    imagem_pillow = Image.open(imagem_memoria)
+    
+    return ctk.CTkImage(light_image=imagem_pillow, dark_image=imagem_pillow, size=tamanho_icone)
+
+left_arrow_icon = carregar_icone_svg("ui/icons/left_arrow_dark.svg", (30, 30))
+right_arrow_icon = carregar_icone_svg("ui/icons/right_arrow_dark.svg", (30, 30))
+plus_icon = carregar_icone_svg("ui/icons/plus_dark.svg", (30, 30))
+edit_icon = carregar_icone_svg("ui/icons/pencil_dark.svg", (30, 30))
+trash_icon = carregar_icone_svg("ui/icons/bin_dark.svg", (30, 30))
 
 def get_navigation_button_style(self, direction):
         direction_condition = self.current_month_index > 0 if direction == Direction.PREV else self.current_month_index < len(self.months) - 1
