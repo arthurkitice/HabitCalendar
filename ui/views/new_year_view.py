@@ -3,7 +3,15 @@ from ui.widgets import style_button
 
 class NewYearView(ctk.CTkFrame):
     def __init__(self, parent, on_save, year):
-        super().__init__(parent, width=500, height=400, corner_radius=15, border_width=4, border_color="black")
+        super().__init__(
+            parent, 
+            width=500, 
+            height=400, 
+            corner_radius=15, 
+            border_width=4, 
+            border_color="black",
+            fg_color="#2B2B2B"
+        )
 
         self.grid_propagate(False)
 

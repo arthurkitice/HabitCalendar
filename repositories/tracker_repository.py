@@ -1,77 +1,55 @@
 from sqlalchemy.orm import Session
-from models import Tracker, Month, Day
-from constants import STARTING_YEAR, MONTHS
-import calendar
+from models import Tracker
+from .year_repository import YearRepository  # Importamos o repositório irmão
+from datetime import datetime
 
 class TrackerRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def _populate_tracker(self, tracker_id: int, year: int = STARTING_YEAR) -> None:
-        for month_number in range(1, 13):
-            month_name = MONTHS[month_number]
-            month = Month(
-                name=month_name,
-                number=month_number,
-                year=year,
-                tracker_id=tracker_id
-            )
-            self.db.add(month)
-            self.db.flush() 
-
-            days_count = calendar.monthrange(year, month_number)[1]
-
-            for day in range(1, days_count + 1):
-                day = Day(number=day, checked=False, month_id=month.id)
-                self.db.add(day)
-
-        self.db.commit()
-
-    def get_tracker_by_id(self, tracker_id: int):
+    def get_tracker_by_id(self, tracker_id: int) -> Tracker | None:
         return self.db.query(Tracker).filter(Tracker.id == tracker_id).first()
 
-    def get_tracker_by_name(self, tracker_name: str):
+    def get_tracker_by_name(self, tracker_name: str) -> Tracker | None:
         return self.db.query(Tracker).filter(Tracker.name == tracker_name).first()
     
     def get_all_trackers(self) -> list[Tracker]:
         return self.db.query(Tracker).all()
 
-    def get_tracker_name(self, tracker_id: int):
-        return self.db.query(Tracker).filter(Tracker.id == tracker_id).first().name
+    def get_tracker_name(self, tracker_id: int) -> str | None:
+        tracker = self.get_tracker_by_id(tracker_id)
+        return tracker.name if tracker else None
 
-    def create_tracker(self, name: str):
+    def create_tracker(self, name: str) -> Tracker | None:
         if self.get_tracker_by_name(name):
             return None
 
         tracker = Tracker(name=name)
         self.db.add(tracker)
-        self.db.commit()
-        self.db.refresh(tracker)
+        self.db.flush()
 
-        self._populate_tracker(tracker_id=tracker.id)
+        # Por padrão, cada marcador criado inicia com o ano atual
+        year_repo = YearRepository(self.db)
+        current_year = datetime.now().year
+        year_repo.create_year_with_cascade(tracker_id=tracker.id, year_number=current_year)
 
         return tracker
-    
-    def add_tracker_year(self, tracker_id: int, year: int) -> bool:
-        existing = self.db.query(Month)\
-            .filter(Month.tracker_id == tracker_id, Month.year == year)\
-            .first()
-        
-        if existing:
-            return False
 
-        self._populate_tracker(tracker_id=tracker_id, year=year)
-        return True
-
-    def update_tracker(self, tracker_id: int, name: str):
+    def update_tracker(self, tracker_id: int, name: str) -> Tracker | None:
         tracker = self.get_tracker_by_id(tracker_id)
+        if not tracker:
+            return None
+            
         tracker.name = name
         self.db.commit()
         self.db.refresh(tracker)
-
         return tracker
 
-    def delete_tracker(self, tracker_id: int):
+    def delete_tracker(self, tracker_id: int) -> bool:
         tracker = self.get_tracker_by_id(tracker_id)
+        if not tracker:
+            return False
+            
         self.db.delete(tracker)
         self.db.commit()
+        return True

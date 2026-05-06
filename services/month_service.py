@@ -20,24 +20,17 @@ class MonthService:
             return None
         return [MonthWithDaysDTO.from_entity(m) for m in months]
 
-    def get_month_by_id(self, month_id: int) -> MonthDTO | None:
+    def get_month(self, month_id: int) -> MonthDTO | None:
         month = self.month_repository.get_month_by_id(month_id)
         if not month:
             return None
         return MonthDTO.from_entity(month)
     
-    def get_month_with_days_by_id(self, month_id: int) -> MonthWithDaysDTO | None:
+    def get_month_with_days(self, month_id: int) -> MonthWithDaysDTO | None:
         month = self.month_repository.get_month_by_id(month_id)
         if not month:
             return None
         return MonthWithDaysDTO.from_entity(month)
-    
-    def get_month_by_number(self, month_number: int) -> MonthDTO | None:
-        """Retorna apenas o primeiro mês de acordo com o número"""
-        month = self.month_repository.get_month_by_number(month_number)
-        if not month:
-            return None
-        return MonthDTO.from_entity(month)
 
     def get_specific_month(self, tracker_id: int, year: int, month_number: int) -> MonthDTO | None:
         """Retorna um mês específico de acordo com o tracker, ano e número do mês"""
@@ -45,22 +38,10 @@ class MonthService:
         if not month:
             return None
         return MonthDTO.from_entity(month)
-
-    def get_years_from_tracker(self, tracker_id: int) -> list[int]:
-        years = self.month_repository.get_years_from_tracker(tracker_id)
-        return [y[0] for y in years]
-
-    def create_month(self, number: int, year: int, tracker_id: int) -> MonthDTO | None:
-        tracker_repository = TrackerRepository(self.db)
-
-        if not tracker_repository.get_tracker_by_id(tracker_id):
+    
+    def get_specific_month_with_days(self, tracker_id: int, year: int, month_number: int) -> MonthWithDaysDTO | None:
+        """Retorna um mês específico com os dias de acordo com o tracker, ano e número do mês"""
+        month = self.month_repository.get_month_by_year_number(tracker_id, year, month_number)
+        if not month:
             return None
-
-        month = self.month_repository.create_month(
-            name=MONTHS[number], 
-            number=number, 
-            year=year, 
-            tracker_id=tracker_id
-        )
-
-        return MonthDTO.from_entity(month)
+        return MonthWithDaysDTO.from_entity(month)

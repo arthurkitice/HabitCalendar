@@ -19,23 +19,12 @@ class DayService:
             return None
         return DayDTO.from_entity(day)
 
-    def create_day(self, number: int, checked: bool, month_id: int) -> DayDTO | None:
-        month_repository = MonthRepository(self.db)
-
-        if not month_repository.get_month_by_id(month_id):
-            return None
-
-        day = self.day_repository.create_day(
-            number=number,
-            checked=checked,
-            month_id=month_id
-        )
-
-        return DayDTO.from_entity(day)
-    
     def check_day(self, day_id: int) -> DayDTO | None:
         if not self.day_repository.get_day_by_id(day_id):
             return None
         day = self.day_repository.check_day(day_id)
         return DayDTO.from_entity(day)
-        
+    
+    def get_specific_day(self, tracker_id: int, year: int, month: int, day: int) -> DayDTO | None:
+        """Retorna um dia específico em um mês, ano e tracker"""
+        return DayDTO.from_entity(self.day_repository.get_specific_day(tracker_id, year, month, day))

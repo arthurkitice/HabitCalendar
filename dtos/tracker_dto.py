@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from models.tracker import Tracker
-from .month_dto import MonthDTO
+from .year_dto import YearDTO
 
 class TrackerDTO(BaseModel):
     id: int
@@ -10,11 +10,11 @@ class TrackerDTO(BaseModel):
     def from_entity(cls, tracker: Tracker) -> "TrackerDTO":
         return cls(id=tracker.id, name=tracker.name)
 
-class TrackerWithMonthsDTO(BaseModel):
+class TrackerWithYearsDTO(BaseModel):
     id: int
     name: str
-    months: list[MonthDTO]
+    years: list[YearDTO]
 
     @classmethod
-    def from_entity(cls, tracker: Tracker) -> "TrackerWithMonthsDTO":
-        return cls(id=tracker.id, name=tracker.name, months=[MonthDTO.from_entity(m) for m in tracker.months])
+    def from_entity(cls, tracker: Tracker) -> "TrackerWithYearsDTO":
+        return cls(id=tracker.id, name=tracker.name, years=[YearDTO.from_entity(m) for m in tracker.years])

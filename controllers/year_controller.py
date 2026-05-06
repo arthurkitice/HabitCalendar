@@ -1,6 +1,6 @@
 from functools import wraps
 from database import get_db
-from services import MonthService
+from services import MonthService, YearService
 
 def handle_db(method):
     @wraps(method)
@@ -18,8 +18,13 @@ def handle_db(method):
 class YearController:
     @handle_db
     def get_years(self, db, tracker_id: int) -> list[int]:
-        month_service = MonthService(db)
-        return month_service.get_years_from_tracker(tracker_id)
+        year_service = YearService(db)
+        return year_service.get_years_from_tracker(tracker_id)
+
+    @handle_db
+    def add_year(self, db, tracker_id: int, year: int) -> bool | None:
+        year_service = YearService(db)
+        return year_service.add_tracker_year(tracker_id=tracker_id, year_number=year)
 
     @handle_db
     def get_month_id(self, db, tracker_id: int,  year: int, month_number: int) -> int| None:

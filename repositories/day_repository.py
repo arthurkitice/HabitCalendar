@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Day
+from models import Day, Year, Month, Tracker
 
 class DayRepository:
     def __init__(self, db: Session):
@@ -11,14 +11,6 @@ class DayRepository:
     def get_day_number(self, day_id: int):
         return self.db.query(Day).filter(Day.id == day_id).first().number
 
-    def create_day(self, number: int, checked: bool, month_id: int):
-        day = Day(number=number, checked=checked, month_id=month_id)
-        self.db.add(day)
-        self.db.commit()
-        self.db.refresh(day)
-        
-        return day
-    
     def check_day(self, day_id: int):
         day = self.get_day_by_id(day_id)
         day.checked = False if day.checked else True
@@ -26,3 +18,16 @@ class DayRepository:
         self.db.refresh(day)
         
         return day
+    
+    def get_specific_day(self, tracker_id: int, year: int, month: int, day: int) -> Day | None:
+        """Retorna um dia específico em um mês, ano e tracker"""
+        return self.db.query(Day)\
+            .join(Month)\
+            .join(Year)\
+            .join(Tracker)\
+            .filter(
+                Tracker.id == tracker_id,
+                Year.number == year,
+                Month.number == month,
+                Day.number == day
+            ).first()

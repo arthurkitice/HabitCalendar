@@ -1,6 +1,13 @@
 from enum import Enum, auto
+from helper import carregar_icone_svg
 
 STARTING_YEAR = 2026
+
+AUX_COLOR = "#27488F"
+AUX_HOVER_COLOR = "#233C73"
+
+WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
+
 MONTHS = {
     1: "Janeiro", 
     2: "Fevereiro",
@@ -20,6 +27,18 @@ class Direction(Enum):
     PREV = auto()
     NEXT = auto()
 
+class IconType(Enum):
+    EDIT = auto()
+    REMOVE = auto()
+    CONFIG = auto()
+
 class Operation(Enum):
     CREATE = auto()
     EDIT = auto()
+
+class Icons:
+    LEFT_ARROW = carregar_icone_svg("ui/icons/left_arrow_dark.svg", (30, 30))
+    RIGHT_ARROW = carregar_icone_svg("ui/icons/right_arrow_dark.svg", (30, 30))
+    PLUS = carregar_icone_svg("ui/icons/plus_dark.svg", (30, 30))
+    EDIT = carregar_icone_svg("ui/icons/pencil_dark.svg", (30, 30))
+    TRASH = carregar_icone_svg("ui/icons/bin_dark.svg", (30, 30))
