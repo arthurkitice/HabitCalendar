@@ -6,21 +6,26 @@ from ui.views.year_view import YearView
 from config import get_last_month, get_last_year, save_current_date
 from ui.widgets import NavigationButton, DayButton, style_button
 from constants import Direction, MONTHS, WEEK_DAYS
-from controllers import CalendarController
+from services import TrackerService, DayService, YearService, MonthService
 import calendar
 
 CALENDAR_ROWS = 6
 CALENDAR_COLS = 7
 
 class MainCalendarView(ctk.CTkFrame):
-    def __init__(self, parent, initial_tracker_id, controller: CalendarController):
+    def __init__(self, parent, initial_tracker_id):
         super().__init__(parent, fg_color="transparent") 
-        self.controller = controller
         
+        self.tracker_service = TrackerService()
+        self.day_service = DayService()
+        self.year_service = YearService()
+        self.month_service = MonthService()
+
         self.current_tracker_id = initial_tracker_id
         self.current_month = get_last_month(self.current_tracker_id)
         self.current_year = get_last_year(self.current_tracker_id)
-        self.years = self.controller.get_years(tracker_id=self.current_tracker_id)
+
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
         
         self.day_buttons: list[DayButton] = []
 
@@ -36,7 +41,8 @@ class MainCalendarView(ctk.CTkFrame):
         self.current_tracker_id = tracker_id
         self.current_month = get_last_month(self.current_tracker_id)
         self.current_year = get_last_year(self.current_tracker_id)
-        self.years = self.controller.get_years(tracker_id=self.current_tracker_id)
+
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
         
         # Proteção contra anos deletados
         if self.years and self.current_year not in self.years:
@@ -50,17 +56,14 @@ class MainCalendarView(ctk.CTkFrame):
     # ================================
     # MÉTODOS DE INTERAÇÃO COM O BANCO
     # ================================
-    def check_day(self, index: int) -> None:
+    def check_day(self, day_id: int, index: int) -> None:
+        if day_id == 0:
+            return
         self.day_buttons[index].check_day()
-        self.controller.check_day(
-            tracker_id=self.current_tracker_id, 
-            year=self.current_year,
-            month=self.current_month,
-            day = self.day_buttons[index].day
-        )
+        self.day_service.check_day(day_id)
 
     def add_year(self, year: int) -> None:
-        self.controller.add_year(tracker_id=self.current_tracker_id, year=year)
+        self.year_service.add_tracker_year(tracker_id=self.current_tracker_id, year=year)
         self._refresh_years()
         
         self.current_year = year
@@ -72,7 +75,7 @@ class MainCalendarView(ctk.CTkFrame):
 
     def _refresh_years(self):
         """Atualiza apenas a lista de anos disponíveis para o popup e botões de navegação"""
-        self.years = self.controller.get_years(tracker_id=self.current_tracker_id)
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
 
     # =======================
     # MÉTODOS DOS DIAS DO MÊS
@@ -124,11 +127,13 @@ class MainCalendarView(ctk.CTkFrame):
         self.update_calendar()
     
     def _generate_month_cells(self) -> list[DayDTO]:
-        month_days = self.controller.get_specific_days(
+        month_data = self.month_service.get_specific_month_with_days(
             tracker_id=self.current_tracker_id, 
             year=self.current_year, 
-            month=self.current_month
+            month_number=self.current_month
         )
+
+        month_days = month_data.days if month_data else []
         
         first_week_day = (calendar.monthrange(self.current_year, self.current_month)[0] + 1) % 7
         empty_day: DayDTO = DayDTO(id=0, number=0, checked=False, month_id=0)
@@ -141,7 +146,7 @@ class MainCalendarView(ctk.CTkFrame):
     
     def update_days_frame(self) -> None:
         for i, (btn, day) in enumerate(zip(self.day_buttons, self._generate_month_cells())):
-            btn.update_button(day=day.number, checked=day.checked, command=partial(self.check_day, i))
+            btn.update_button(day=day.number, checked=day.checked, command=partial(self.check_day, day.id, i))
         
         self.style_empty_buttons()
 
@@ -149,20 +154,24 @@ class MainCalendarView(ctk.CTkFrame):
         self.days_frame = ctk.CTkFrame(self, corner_radius=10)
         self.days_frame.grid(row=2, column=0, padx=20, pady=(0, 20), sticky="nsew")
         self.days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="days")
-        self.days_frame.grid_rowconfigure(tuple(range(CALENDAR_ROWS)), weight=1, uniform="days")
+        self.days_frame.grid_rowconfigure(tuple(range(1, CALENDAR_ROWS + 1)), weight=1, uniform="days")
         
         all_cells = self._generate_month_cells()
         self.day_buttons.clear()
 
-        for index, day in enumerate(all_cells):
-            row, col = divmod(index, CALENDAR_COLS)
+        for i, day in enumerate(WEEK_DAYS):
+            label = ctk.CTkLabel(self.days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color="white")
+            label.grid(row=0, column=i, padx=5, pady=5)
+
+        for i, day in enumerate(all_cells):
+            row, col = divmod(i, CALENDAR_COLS)
             button = DayButton(
                 self.days_frame, 
                 day=day.number, 
                 checked=day.checked, 
-                command=partial(self.check_day, index)
+                command=partial(self.check_day, day.id, i)
             )
-            button.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
+            button.grid(row=row+1, column=col, padx=5, pady=5, sticky="nsew")
             self.day_buttons.append(button)
         
         self.style_empty_buttons()
@@ -236,15 +245,15 @@ class MainCalendarView(ctk.CTkFrame):
         )
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
 
-    def build_week_days_frame(self) -> None:
-        self.week_days_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.week_days_frame.grid(row=1, column=0, padx=20, pady=0, sticky="nsew")
-        self.week_days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="week_days")
-        self.week_days_frame.grid_rowconfigure(0, weight=1)
+    # def build_week_days_frame(self) -> None:
+    #     self.week_days_frame = ctk.CTkFrame(self, corner_radius=10)
+    #     self.week_days_frame.grid(row=1, column=0, padx=20, pady=0, sticky="nsew")
+    #     self.week_days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="week_days")
+    #     self.week_days_frame.grid_rowconfigure(0, weight=1)
 
-        for i, day in enumerate(WEEK_DAYS):
-            label = ctk.CTkLabel(self.week_days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color="white")
-            label.grid(row=0, column=i, padx=5, pady=5)
+    #     for i, day in enumerate(WEEK_DAYS):
+    #         label = ctk.CTkLabel(self.week_days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color="white")
+    #         label.grid(row=0, column=i, padx=5, pady=5)
 
     def _get_condition(self, direction: Direction) -> bool | None:
         match direction:
@@ -257,5 +266,5 @@ class MainCalendarView(ctk.CTkFrame):
             
     def build_ui(self) -> None:
         self.build_top_bar()
-        self.build_week_days_frame()
+        #self.build_week_days_frame()
         self.build_days_frame()

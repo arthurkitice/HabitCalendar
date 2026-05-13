@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import style_button
 
-class NewYearView(ctk.CTkFrame):
+class DeleteYearView(ctk.CTkFrame):
     def __init__(self, parent, on_save, year):
         super().__init__(
             parent, 
@@ -21,11 +21,13 @@ class NewYearView(ctk.CTkFrame):
         self.build_ui()
 
     def ui(self):
-        self.label = ctk.CTkLabel(self, text=f"Novo Ano: {self.year}\n", font=ctk.CTkFont(size=22, weight="bold"))
-        self.label.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
+        text_label_1 = f"Tem certeza que deseja\ndeletar o ano {self.year}?"
+        self.label_1 = ctk.CTkLabel(self, text=text_label_1, font=ctk.CTkFont(size=22, weight="bold"))
+        self.label_1.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
-        self.label = ctk.CTkLabel(self, text=f"Confirmar criação do ano?\nEssa ação aumentará o\ntamanho do banco de dados\n", font=ctk.CTkFont(size=16))
-        self.label.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
+        text_label_2 = f"Você pode criar o ano novamente\nmas perderá qualquer marcação realizada\n\nEssa ação é irreversível"
+        self.label_2 = ctk.CTkLabel(self, text=text_label_2, font=ctk.CTkFont(size=16))
+        self.label_2.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
         self.btn_confirm = style_button(self, text="Confirmar", command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=3, column=1, padx=5, pady=5)

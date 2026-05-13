@@ -1,11 +1,12 @@
 import customtkinter as ctk
-from constants import Direction, IconType, Icons
+from constants import Direction, IconType, Icons, AuxColorGreen
+import tkinter as tk
 
 class _Day:
     FG_COLOR = "#333333" 
     HOVER_COLOR = "#282828"
-    FG_COLOR_CHECKED = "#1A593D"
-    HOVER_COLOR_CHECKED = "#14462F"
+    FG_COLOR_CHECKED = AuxColorGreen.FG
+    HOVER_COLOR_CHECKED = AuxColorGreen.HOVER
     FG_COLOR_DISABLED = "#2F2F2F"
 
 class _Navigation:
@@ -117,7 +118,7 @@ class DayButton(ctk.CTkButton):
 class SidebarButton(ctk.CTkButton):
     def __init__(self, parent, command, icon_type: IconType | None = None, tracker: str | None = None, **kwargs):
         """
-        Cria um botão da sidebar. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG (ainda não implementado)
+        Cria um botão da sidebar. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
         """
         self.icon_type = icon_type
         text = tracker or ""
@@ -145,5 +146,106 @@ class SidebarButton(ctk.CTkButton):
                 return Icons.EDIT
             case IconType.REMOVE:
                 return Icons.TRASH
+            case IconType.CONFIG:
+                return Icons.CONFIG
             case _:
                 return None
+            
+class IconButton(ctk.CTkButton):
+    def __init__(self, parent, command, icon_type: IconType, **kwargs):
+        """
+        Cria um botão com ícone. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
+        """
+        self.icon_type = icon_type
+        
+        image = self._get_image()
+
+        super().__init__(
+            parent,
+            image=image,
+            text="",
+            command=command,
+            fg_color=_Sidebar.FG_COLOR,
+            text_color="white",
+            hover_color=_Sidebar.HOVER_COLOR,
+            cursor="hand2",
+            height=40,
+            width=40
+        )
+        self.configure(**kwargs)
+
+    def _get_image(self):
+        match self.icon_type:
+            case IconType.EDIT:
+                return Icons.EDIT
+            case IconType.REMOVE:
+                return Icons.TRASH
+            case IconType.CONFIG:
+                return Icons.CONFIG
+            case IconType.BIG_TRASH:
+                return Icons.BIG_TRASH
+            case _:
+                return None
+            
+import customtkinter as ctk
+
+class SmartScrollableFrame(ctk.CTkScrollableFrame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._parent_frame.grid_columnconfigure(0, weight=0)
+        self._parent_frame.grid_columnconfigure(1, weight=1)
+
+        self._scrollbar.grid(row=1, column=0, sticky="ns", padx=(5, 0))
+        self._parent_canvas.grid(row=1, column=1, sticky="nsew")
+
+        # Monitora mudanças de tamanho direto no Canvas (a tela de rolagem)
+        self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")
+        
+        # O add="+" garante que não vamos sobrescrever outros eventos do sistema
+        self.bind_all("<MouseWheel>", self._force_mouse_scroll, add="+") 
+        self.bind_all("<Button-4>", self._force_mouse_scroll, add="+")
+        self.bind_all("<Button-5>", self._force_mouse_scroll, add="+")
+
+    def _get_heights(self):
+        """Calcula a altura real do conteúdo e a altura visível na tela."""
+        self._parent_canvas.update_idletasks()
+        
+        # bbox("all") retorna (x_inicial, y_inicial, x_final, y_final) de todos os itens
+        bbox = self._parent_canvas.bbox("all") 
+        
+        # Se tiver itens, a altura é y_final - y_inicial. Se estiver vazio, é 0.
+        content_height = (bbox[3] - bbox[1]) if bbox else 0
+        visible_height = self._parent_canvas.winfo_height()
+        
+        return content_height, visible_height
+
+    def _check_scrollbar(self, event=None):
+        content_height, visible_height = self._get_heights()
+
+        # Agora a matemática funciona perfeitamente!
+        if content_height > visible_height:
+            self._scrollbar.grid()
+        else:
+            self._scrollbar.grid_remove()
+
+    def _force_mouse_scroll(self, event):
+        if not self.winfo_exists():
+            return
+
+        # 1. Checa se o mouse está realmente em cima deste frame de rolagem
+        x, y = self.winfo_pointerxy()
+        widget_under_mouse = self.winfo_containing(x, y)
+        
+        if widget_under_mouse and str(widget_under_mouse).startswith(str(self)):
+            
+            # 2. A MÁGICA CONTRA O "SCROLL NO VAZIO" ACONTECE AQUI:
+            content_height, visible_height = self._get_heights()
+            if content_height <= visible_height:
+                return # Interrompe a função. O scroll não faz nada!
+
+            # 3. Se passou pela verificação acima, permite rolar a tela
+            if event.num == 4 or event.delta > 0:
+                self._parent_canvas.yview_scroll(-1, "units")
+            elif event.num == 5 or event.delta < 0:
+                self._parent_canvas.yview_scroll(1, "units")

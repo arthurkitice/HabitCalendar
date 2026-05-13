@@ -3,8 +3,13 @@ from helper import carregar_icone_svg
 
 STARTING_YEAR = 2026
 
-AUX_COLOR = "#27488F"
-AUX_HOVER_COLOR = "#233C73"
+class AuxColorBlue:
+    FG = "#27488F"
+    HOVER = "#233C73"
+
+class AuxColorGreen:
+    FG = "#1A593D"
+    HOVER = "#14462F"
 
 WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
@@ -31,6 +36,7 @@ class IconType(Enum):
     EDIT = auto()
     REMOVE = auto()
     CONFIG = auto()
+    BIG_TRASH = auto()
 
 class Operation(Enum):
     CREATE = auto()
@@ -42,3 +48,5 @@ class Icons:
     PLUS = carregar_icone_svg("ui/icons/plus_dark.svg", (30, 30))
     EDIT = carregar_icone_svg("ui/icons/pencil_dark.svg", (30, 30))
     TRASH = carregar_icone_svg("ui/icons/bin_dark.svg", (30, 30))
+    CONFIG = carregar_icone_svg("ui/icons/settings_dark.svg", (30, 30))
+    BIG_TRASH = carregar_icone_svg("ui/icons/bin_dark.svg", (40, 40))

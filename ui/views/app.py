@@ -1,9 +1,9 @@
 import customtkinter as ctk
-from controllers import CalendarController
 from config import get_last_tracker_id
-
+from services import TrackerService
 from ui.views.app_sidebar import SidebarView
 from ui.views.app_calendar import MainCalendarView
+from functools import partial
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
@@ -14,14 +14,14 @@ class CalendarApp(ctk.CTk):
 
         self.title("Calendário")
         self.geometry("1100x700")
-        self.minsize(500, 350)
-
-        self.controller = CalendarController()
+        self.minsize(850, 450)
         
+        self.tracker_service = TrackerService()
+
         # Grid Principal do App
-        self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window")
-        self.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window")
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
+        self.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window", minsize=500)
+        self.grid_rowconfigure(0, weight=1, minsize=400)
 
         self.build_forbidden_content()
 
@@ -29,7 +29,6 @@ class CalendarApp(ctk.CTk):
         initial_tracker_id = get_last_tracker_id()
         self.sidebar_view = SidebarView(
             self, 
-            controller=self.controller, 
             initial_tracker_id=initial_tracker_id,
             on_tracker_change=self.handle_tracker_change,
             on_toggle_visibility=self.handle_sidebar_toggle
@@ -39,8 +38,7 @@ class CalendarApp(ctk.CTk):
         # Instancia o Calendário
         self.calendar_view = MainCalendarView(
             self, 
-            initial_tracker_id=initial_tracker_id,
-            controller=self.controller
+            initial_tracker_id=initial_tracker_id
         )
         
         # Realiza a primeira checagem de estado para preencher os dados
@@ -52,14 +50,15 @@ class CalendarApp(ctk.CTk):
     def handle_sidebar_toggle(self, is_visible: bool):
         """Ajusta as colunas do app principal quando a sidebar expande/contrai"""
         if is_visible:
-            self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window")
+            self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
         else:
-            self.grid_columnconfigure(0, weight=0, uniform="")
+            self.grid_columnconfigure(0, weight=0, uniform="", minsize=0)
 
-    def handle_tracker_change(self):
+    def handle_tracker_change(self, tracker_id=None):
         """Chamado sempre que o tracker atual muda ou a lista de trackers é alterada"""
-        trackers = self.controller.get_trackers()
-        
+        trackers = self.tracker_service.get_all_trackers()
+        if tracker_id:
+            self.calendar_view.update_tracker_data(tracker_id=tracker_id) #Averiguar a parte do diálogo entre as views
         if trackers:
             self.forbidden_frame.grid_forget()
             self.calendar_view.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
