@@ -11,6 +11,10 @@ class AuxColorGreen:
     FG = "#1A593D"
     HOVER = "#14462F"
 
+class AuxColorGrey:
+    FG = "#242424"
+    HOVER = "#1E1E1E"
+
 WEEK_DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"]
 
 MONTHS = {

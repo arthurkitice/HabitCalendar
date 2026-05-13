@@ -26,12 +26,11 @@ class TrackerFrame(ctk.CTkFrame):
         self.tracker = tracker_name
         self.on_tracker_remove = on_tracker_remove
         self._update_years()
-        
+
         self.build_ui()
 
     def _update_years(self):
         self.years: list[int] = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
-        print(self.years)
         self.top_year: int = self.years[-1]
         self.bottom_year: int = self.years[0]
 
@@ -145,7 +144,6 @@ class TrackerFrame(ctk.CTkFrame):
             font=ctk.CTkFont(size=15, weight="bold"),
             fg_color=AuxColorGreen.FG,
             hover_color=AuxColorGreen.HOVER
-
         )
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 

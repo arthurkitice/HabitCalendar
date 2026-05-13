@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import style_button, NavigationButton
 from functools import partial
-from constants import Direction, MONTHS
+from constants import Direction, MONTHS, AuxColorGreen
 from ui.views.new_year_view import NewYearView
 from services import YearService
 
@@ -80,7 +80,7 @@ class YearView(ctk.CTkFrame):
     def new_year_popup(self, year):
         if hasattr(self, "popup_frame"):
             self.popup_frame.destroy()
-            
+
         self.popup_frame = NewYearView(
             self.winfo_toplevel(), 
             on_save=partial(self.add_year, year), 
@@ -133,7 +133,9 @@ class YearView(ctk.CTkFrame):
             "Voltar", 
             command=self.destroy, 
             height=35, 
-            font=ctk.CTkFont(size=15, weight="bold")
+            font=ctk.CTkFont(size=15, weight="bold"),
+            fg_color=AuxColorGreen.FG,
+            hover_color=AuxColorGreen.HOVER
         )
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
@@ -150,7 +152,7 @@ class YearView(ctk.CTkFrame):
         self.build_months()
         self.build_year()
         self.build_back_button()
-        
+
     def select(self, month: int):
         self.on_select(month, self.year)
         self.destroy()

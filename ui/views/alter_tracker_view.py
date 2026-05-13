@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from ui.widgets import style_button
+from constants import AuxColorGreen, AuxColorGrey
 
 class AlterTrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker_name=None, tracker_id=None):
@@ -16,37 +17,40 @@ class AlterTrackerFrame(ctk.CTkFrame):
 
     def ui_new_tracker(self):
         self.label = ctk.CTkLabel(self, text=f"Novo Marcador\n", font=ctk.CTkFont(size=22, weight="bold"))
-        self.label.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
+        self.label.grid(row=1, column=1, padx=5, pady=10, sticky="nsew")
 
-        self.entry = ctk.CTkEntry(self, placeholder_text="Digite o nome do marcador", height=35, width=250)
-        self.entry.grid(row=2, column=1, padx=5, pady=5)
+        self.entry = ctk.CTkEntry(self, placeholder_text="Digite o nome do marcador", height=35)
+        self.entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
     def ui_edit_tracker(self, tracker_name):
         self.label = ctk.CTkLabel(self, text=f"Editar Marcador\n'{tracker_name}'\n", font=ctk.CTkFont(size=22, weight="bold"))
-        self.label.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
+        self.label.grid(row=1, column=1, padx=5, pady=10, sticky="nsew")
 
-        self.entry = ctk.CTkEntry(self, placeholder_text="Digite o novo nome do marcador", height=35, width=250)
-        self.entry.grid(row=2, column=1, padx=5, pady=5)
+        self.entry = ctk.CTkEntry(self, placeholder_text="Digite o novo nome do marcador", height=35)
+        self.entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
         self.entry.insert(0, tracker_name)
 
     def build_ui(self):
         self.grid_columnconfigure((0, 2), weight=1, uniform="main")
-        self.grid_columnconfigure(1, weight=2, uniform="main")
+        self.grid_columnconfigure(1, weight=3, uniform="main")
         self.grid_rowconfigure((0, 5), weight=1, uniform="main")
 
-        self.btn_confirm = style_button(self, text="Salvar", command=self.save, height=35, width=250)
-        self.btn_confirm.grid(row=3, column=1, padx=5, pady=5)
+        self.button_frame = ctk.CTkFrame(self, fg_color="transparent", width=500)
+        self.button_frame.grid_columnconfigure((0, 1), weight=1)
+        self.button_frame.grid_rowconfigure(0, weight=1)
+        self.button_frame.grid(row=3, column=1)
 
-        self.btn_return = style_button(self, text="Cancelar", command=self.back, height=35, width=250)
-        self.btn_return.grid(row=4, column=1, padx=5, pady=5)
+        self.btn_return = style_button(self.button_frame, text="Cancelar", font=ctk.CTkFont(size=15, weight="bold"), command=self.back, height=35, width=250)
+        self.btn_return.grid(row=0, column=0, padx=5, pady=10)
+
+        self.btn_confirm = style_button(self.button_frame, text="Salvar", font=ctk.CTkFont(size=15, weight="bold"), command=self.save, height=35, width=250, fg_color=AuxColorGreen.FG, hover_color=AuxColorGreen.HOVER)
+        self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
         if self.tracker_name:
             self.ui_edit_tracker(self.tracker_name)
         else:
             self.ui_new_tracker()
-
-        
 
     def back(self):
         self.destroy()

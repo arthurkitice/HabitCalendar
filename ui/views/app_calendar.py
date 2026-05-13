@@ -90,10 +90,10 @@ class MainCalendarView(ctk.CTkFrame):
 
         prev_days = range(last_month_days - first_week_day + 1, last_month_days + 1)
         next_days = range(1, 42 - month_days - first_week_day + 1)
-        
+
         filler_number = list(prev_days) + list(next_days)
         empty_indexes = [i for i, btn in enumerate(self.day_buttons) if btn.day == "0"]
-        
+
         for index, number in zip(empty_indexes, filler_number):
             self.day_buttons[index].update_button(day=number, command=None, checked=False, disabled=True)
 
@@ -125,7 +125,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.current_month = target_month
         self.current_year = target_year
         self.update_calendar()
-    
+
     def _generate_month_cells(self) -> list[DayDTO]:
         month_data = self.month_service.get_specific_month_with_days(
             tracker_id=self.current_tracker_id, 
@@ -134,7 +134,7 @@ class MainCalendarView(ctk.CTkFrame):
         )
 
         month_days = month_data.days if month_data else []
-        
+
         first_week_day = (calendar.monthrange(self.current_year, self.current_month)[0] + 1) % 7
         empty_day: DayDTO = DayDTO(id=0, number=0, checked=False, month_id=0)
 
@@ -143,11 +143,11 @@ class MainCalendarView(ctk.CTkFrame):
         all_cells.extend([empty_day] * (total_cells - len(all_cells)))
 
         return all_cells
-    
+
     def update_days_frame(self) -> None:
         for i, (btn, day) in enumerate(zip(self.day_buttons, self._generate_month_cells())):
             btn.update_button(day=day.number, checked=day.checked, command=partial(self.check_day, day.id, i))
-        
+
         self.style_empty_buttons()
 
     def build_days_frame(self) -> None:
@@ -155,7 +155,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.days_frame.grid(row=2, column=0, padx=20, pady=(0, 20), sticky="nsew")
         self.days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="days")
         self.days_frame.grid_rowconfigure(tuple(range(1, CALENDAR_ROWS + 1)), weight=1, uniform="days")
-        
+
         all_cells = self._generate_month_cells()
         self.day_buttons.clear()
 
@@ -173,14 +173,14 @@ class MainCalendarView(ctk.CTkFrame):
             )
             button.grid(row=row+1, column=col, padx=5, pady=5, sticky="nsew")
             self.day_buttons.append(button)
-        
+
         self.style_empty_buttons()
     
     def open_new_year_popup(self, year: int) -> None:
         if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
             self.popup_frame.destroy()
 
-        self.popup_frame = NewYearView(self, on_save=partial(self.add_year, year), year=year)
+        self.popup_frame = NewYearView(self.winfo_toplevel(), on_save=partial(self.add_year, year), year=year)
         self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
         self.popup_frame.wait_visibility()
         self.popup_frame.grab_set()
@@ -191,7 +191,7 @@ class MainCalendarView(ctk.CTkFrame):
     def open_years_popup(self, year: int):
         if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
             self.popup_frame.destroy()
-        
+
         self.popup_frame = YearView(
             parent=self.winfo_toplevel(), 
             tracker_id=self.current_tracker_id, 
