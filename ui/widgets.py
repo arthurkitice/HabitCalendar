@@ -1,42 +1,31 @@
 import customtkinter as ctk
-from constants import Direction, IconType, Icons, Theme
-import tkinter as tk
+from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME
 
-class _Day:
-    FG_COLOR = "#333333" 
-    HOVER_COLOR = "#282828"
-    FG_COLOR_CHECKED = Theme.fg_color()
-    HOVER_COLOR_CHECKED = Theme.hover_color()
-    FG_COLOR_DISABLED = "#2F2F2F"
+FG_COLOR_DISABLED = "#2F2F2F"
 
-class _Navigation:
-    HOVER_COLOR = "#272727"
+class CustomButton(ctk.CTkButton):
+    def __init__(self, parent, text, command, font_size = 20, bold = True, main_color = True, **kwargs):
+        self.main_color = main_color
+        fg_color = PRIMARY_THEME.fg_color() if self.main_color else SECONDARY_THEME.fg_color()
+        hover_color = PRIMARY_THEME.hover_color() if self.main_color else SECONDARY_THEME.hover_color()
 
-class _Sidebar:
-    FG_COLOR = "#242424"
-    HOVER_COLOR = "#1E1E1E"
-
-class _Button:
-    FG_COLOR = "#333333"
-    HOVER_COLOR = "#272727"
-
-def style_button(parent, text, command, font_size = 20, bold = True, main_color = True, **kwargs):
-    fg_color = Theme.fg_color() if main_color else _Button.FG_COLOR
-    hover_color = Theme.hover_color() if main_color else _Button.HOVER_COLOR
-
-    button = ctk.CTkButton(
-        parent,
-        corner_radius=5,
-        text=text,
-        command=command,
-        fg_color= fg_color,
-        hover_color= hover_color,
-        text_color="white",
-        cursor="hand2",
-        font=ctk.CTkFont(size=font_size, weight="bold" if bold else "normal")
-    )
-    button.configure(**kwargs)
-    return button
+        super().__init__(
+            parent,
+            corner_radius=5,
+            text=text,
+            command=command,
+            fg_color= fg_color,
+            hover_color= hover_color,
+            text_color="white",
+            cursor="hand2",
+            font=ctk.CTkFont(size=font_size, weight="bold" if bold else "normal")
+        )
+        self.configure(**kwargs)
+        
+    def reload_colors(self):
+        if not self.main_color:
+            return
+        self.configure(fg_color=PRIMARY_THEME.fg_color(), hover_color=PRIMARY_THEME.hover_color())
 
 class NavigationButton(ctk.CTkButton):
     def __init__(self, parent, direction, command, condition, height=50, width=65, **kwargs):
@@ -49,20 +38,19 @@ class NavigationButton(ctk.CTkButton):
             image=self._get_image(condition),
             fg_color="transparent",
             text_color="white",
-            hover_color= _Navigation.HOVER_COLOR,
+            hover_color= SECONDARY_THEME.hover_color(),
             cursor="hand2",
             height=height,
             width=width,
             **kwargs
         )
+        self.configure(**kwargs)
     
     def update_button(self, condition: bool, **kwargs):
         self.configure(image=self._get_image(condition), **kwargs)
 
     def _get_image(self, condition: bool):
-        if condition:
-            return Icons.PLUS
-        return Icons.RIGHT_ARROW if self.direction == Direction.NEXT else Icons.LEFT_ARROW
+        return ARROWS[self.direction] if not condition else ICONS[IconType.PLUS]
     
 class DayButton(ctk.CTkButton):
     def __init__(self, parent, day, command, checked, **kwargs):
@@ -87,14 +75,14 @@ class DayButton(ctk.CTkButton):
 
     def _get_disabled_button_config(self):
         return {
-            "fg_color": _Day.FG_COLOR_DISABLED,
+            "fg_color": FG_COLOR_DISABLED,
             "cursor": "arrow",
             "state": "disabled"
         }
     
     def _get_button_config(self):
-        fg_color = _Day.FG_COLOR_CHECKED if self.checked else _Day.FG_COLOR
-        hover_color = _Day.HOVER_COLOR_CHECKED if self.checked else _Day.HOVER_COLOR
+        fg_color = PRIMARY_THEME.fg_color() if self.checked else SECONDARY_THEME.fg_color()
+        hover_color = PRIMARY_THEME.hover_color() if self.checked else SECONDARY_THEME.hover_color()
         return {
             "fg_color": fg_color,
             "hover_color": hover_color,
@@ -112,12 +100,17 @@ class DayButton(ctk.CTkButton):
 
     def check_day(self):
         self.checked = not self.checked
-        fg_color = _Day.FG_COLOR_CHECKED if self.checked else _Day.FG_COLOR
-        hover_color = _Day.HOVER_COLOR_CHECKED if self.checked else _Day.HOVER_COLOR
+        fg_color = PRIMARY_THEME.fg_color() if self.checked else SECONDARY_THEME.fg_color()
+        hover_color = PRIMARY_THEME.hover_color() if self.checked else SECONDARY_THEME.hover_color()
         self.configure(
             fg_color=fg_color,
             hover_color=hover_color
         )
+
+    def reload_colors(self):
+        if not self.checked:
+            return
+        self.configure(fg_color=PRIMARY_THEME.fg_color(), hover_color=PRIMARY_THEME.hover_color())
 
 class SidebarButton(ctk.CTkButton):
     def __init__(self, parent, command, icon_type: IconType | None = None, tracker: str | None = None, **kwargs):
@@ -135,9 +128,9 @@ class SidebarButton(ctk.CTkButton):
             text=text,
             image=image,
             command=command,
-            fg_color=_Sidebar.FG_COLOR,
+            fg_color=TERTIARY_THEME.fg_color(),
             text_color="white",
-            hover_color=_Sidebar.HOVER_COLOR,
+            hover_color=TERTIARY_THEME.hover_color(),
             cursor="hand2",
             height=40,
             **icon_width
@@ -145,15 +138,7 @@ class SidebarButton(ctk.CTkButton):
         self.configure(**kwargs)
 
     def _get_image(self):
-        match self.icon_type:
-            case IconType.EDIT:
-                return Icons.EDIT
-            case IconType.REMOVE:
-                return Icons.TRASH
-            case IconType.CONFIG:
-                return Icons.CONFIG
-            case _:
-                return None
+        return ICONS[self.icon_type] if self.icon_type else None
             
 class IconButton(ctk.CTkButton):
     def __init__(self, parent, command, icon_type: IconType, **kwargs):
@@ -169,9 +154,9 @@ class IconButton(ctk.CTkButton):
             image=image,
             text="",
             command=command,
-            fg_color=_Sidebar.FG_COLOR,
+            fg_color=SECONDARY_THEME.fg_color(),
             text_color="white",
-            hover_color=_Sidebar.HOVER_COLOR,
+            hover_color=SECONDARY_THEME.hover_color(),
             cursor="hand2",
             height=40,
             width=40
@@ -179,29 +164,18 @@ class IconButton(ctk.CTkButton):
         self.configure(**kwargs)
 
     def _get_image(self):
-        match self.icon_type:
-            case IconType.EDIT:
-                return Icons.EDIT
-            case IconType.REMOVE:
-                return Icons.TRASH
-            case IconType.CONFIG:
-                return Icons.CONFIG
-            case IconType.BIG_TRASH:
-                return Icons.BIG_TRASH
-            case _:
-                return None
-            
-import customtkinter as ctk
+        return ICONS[self.icon_type] if self.icon_type else None
 
 class SmartScrollableFrame(ctk.CTkScrollableFrame):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, master, scroll_bar_on_right = True, **kwargs):
+        super().__init__(master, **kwargs)
 
-        self._parent_frame.grid_columnconfigure(0, weight=0)
-        self._parent_frame.grid_columnconfigure(1, weight=1)
+        if not scroll_bar_on_right:
+            self._parent_frame.grid_columnconfigure(0, weight=0)
+            self._parent_frame.grid_columnconfigure(1, weight=1)
 
-        self._scrollbar.grid(row=1, column=0, sticky="ns", padx=(5, 0))
-        self._parent_canvas.grid(row=1, column=1, sticky="nsew")
+            self._scrollbar.grid(row=1, column=0, sticky="ns", padx=(5, 0))
+            self._parent_canvas.grid(row=1, column=1, sticky="nsew")
 
         # Monitora mudanças de tamanho direto no Canvas (a tela de rolagem)
         self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")

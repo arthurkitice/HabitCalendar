@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import style_button, IconButton
+from ui.widgets import CustomButton, IconButton
 from functools import partial
 from constants import IconType
 from .delete_year_view import DeleteYearView
@@ -132,7 +132,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = style_button(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
+        self.back_button = CustomButton(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def show_double_year_frame(self):

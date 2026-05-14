@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import style_button, NavigationButton
+from ui.widgets import CustomButton, NavigationButton
 from functools import partial
 from constants import Direction, MONTHS
 from .new_year_view import NewYearView
@@ -39,7 +39,7 @@ class YearView(ctk.CTkFrame):
         for i in range(3):
             for j in range(4):
                 num = (4*i) + j + 1
-                button = style_button(self.months, 
+                button = CustomButton(self.months, 
                     text=f"{num}\n{MONTHS[num]}", 
                     command=partial(self.select, num), 
                     font=ctk.CTkFont(size=13), 
@@ -128,7 +128,7 @@ class YearView(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = style_button(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
+        self.back_button = CustomButton(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def build_ui(self):

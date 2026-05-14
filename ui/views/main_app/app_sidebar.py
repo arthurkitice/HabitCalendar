@@ -1,17 +1,14 @@
 import customtkinter as ctk
 from functools import partial
-from ..popups.alter_tracker_view import AlterTrackerFrame
-from ..popups.tracker_view import TrackerFrame
-from ..popups.delete_tracker_view import DeleteTrackerView
-from config import save_current_tracker_id
-from ui.widgets import SidebarButton, style_button, SmartScrollableFrame
+from config import LastTrackerJSON, TrackerDateJSON
+from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
 from constants import IconType
 from dtos import TrackerDTO
 from services import TrackerService
-from ..popups.popup_handler import PopupHandler
+from ..popups import PopupHandler
 
 class SidebarView(ctk.CTkFrame):
-    def __init__(self, parent, initial_tracker_id, on_tracker_change, on_toggle_visibility):
+    def __init__(self, parent, initial_tracker_id, on_tracker_change, on_color_change, on_toggle_visibility):
         super().__init__(parent, fg_color="transparent")
         
         self.tracker_service = TrackerService()
@@ -20,6 +17,7 @@ class SidebarView(ctk.CTkFrame):
         
         # Callbacks para avisar o App.py do que aconteceu aqui dentro
         self.on_tracker_change = on_tracker_change
+        self.on_color_change = on_color_change
         self.on_toggle_visibility = on_toggle_visibility 
         
         self.sidebar_visible = True
@@ -44,6 +42,8 @@ class SidebarView(ctk.CTkFrame):
         trackers = self.tracker_service.get_all_trackers()
         last_tracker_id = trackers[-1].id if trackers else 0
 
+        TrackerDateJSON.remove_tracker_date(tracker_id)
+
         if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
             self.change_tracker(last_tracker_id)
         
@@ -58,17 +58,21 @@ class SidebarView(ctk.CTkFrame):
     def open_tracker_view_popup(self, tracker: TrackerDTO | None = None) -> None:
         PopupHandler.tracker_popup(self, tracker.name, tracker.id)
 
+    def theme_popup(self):
+        PopupHandler.theme_popup(self, self.on_color_change)
+
     def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
         PopupHandler.delete_tracker_popup(self, on_save=partial(self.remove_tracker, tracker.id), tracker_name=tracker.name)
 
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id
-        save_current_tracker_id(self.current_tracker_id)
+        LastTrackerJSON.save_current_tracker_id(self.current_tracker_id)
         self.update_sidebar()
         self.on_tracker_change(tracker_id)
 
     def create_new_tracker(self, tracker_name: str) -> None:
-        self.tracker_service.create_tracker(tracker_name)
+        new_tracker = self.tracker_service.create_tracker(tracker_name)
+        TrackerDateJSON.save_current_date(new_tracker.id)
         self.build_sidebar_buttons()
 
         if self.current_tracker_id == 0:
@@ -96,7 +100,7 @@ class SidebarView(ctk.CTkFrame):
         if getattr(self, "sidebar_buttons_frame", None):
             self.sidebar_buttons_frame.destroy()
 
-        self.sidebar_buttons_frame = SmartScrollableFrame(self.sidebar_frame, corner_radius=0)
+        self.sidebar_buttons_frame = SmartScrollableFrame(self.sidebar_frame, scroll_bar_on_right=False, corner_radius=0)
         self.sidebar_buttons_frame.grid(row=1, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
         self.sidebar_buttons_frame.grid_columnconfigure(0, weight=1)
 
@@ -129,13 +133,13 @@ class SidebarView(ctk.CTkFrame):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text="Marcadores", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
         self.sidebar_label.grid(row=0, column=0, padx=(15, 10), pady=5, sticky= "nsew")
 
-        self.spacer_button = style_button(self.sidebar_frame, text="", command=None, width=44, fg_color="transparent", state="disabled")
+        self.spacer_button = IconButton(self.sidebar_frame, command=self.theme_popup, icon_type=IconType.PALLETE, height=30, width=44)
         self.spacer_button.grid(row=0, column=2, padx=5, pady=5)
 
-        self.add_tracker_button = style_button(self.sidebar_frame, text="+", command=self.open_new_tracker_popup, width=44)
+        self.add_tracker_button = CustomButton(self.sidebar_frame, text="+", command=self.open_new_tracker_popup, height=30, width=44)
         self.add_tracker_button.grid(row=0, column=1, padx=5, pady=5)
 
-        self.hide_sidebar_button = style_button(self.sidebar_frame, text="<", command=self.toggle_sidebar, width=44, main_color=False)
+        self.hide_sidebar_button = CustomButton(self.sidebar_frame, text="<", command=self.toggle_sidebar, width=44, height=30, main_color=False)
         self.hide_sidebar_button.grid(row=0, column=3, padx=(5, 10), pady=5, sticky = "w")
 
         self.tracker_frame = ctk.CTkFrame(self.sidebar_frame, corner_radius=0)
@@ -151,16 +155,19 @@ class SidebarView(ctk.CTkFrame):
         self.reduced_sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
         self.reduced_sidebar_frame.grid_columnconfigure(0, weight=1)
         
-        self.toggle_button = style_button(
+        self.toggle_button = CustomButton(
             self.reduced_sidebar_frame, 
             text=">", 
             command=self.toggle_sidebar, 
-            width=40, 
-            font=ctk.CTkFont(size=20, weight="bold"), 
-            fg_color="transparent"
+            width=40,
+            fg_color="transparent",
+            main_color=False
         )
         self.toggle_button.grid(row=0, column=0, padx=0, pady=5, sticky="w")
 
     def build_ui(self) -> None:
         self.build_reduced_sidebar()
         self.build_full_sidebar()
+
+    def reload_colors(self):
+        self.add_tracker_button.reload_colors()

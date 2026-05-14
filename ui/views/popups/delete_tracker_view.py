@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import style_button
+from ui.widgets import CustomButton
 
 class DeleteTrackerView(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker):
@@ -34,10 +34,10 @@ class DeleteTrackerView(ctk.CTkFrame):
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid(row=3, column=1)
 
-        self.btn_return = style_button(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
+        self.btn_return = CustomButton(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
 
-        self.btn_confirm = style_button(self.button_frame, text="Confirmar", font_size=15, command=self.save, height=35, width=250)
+        self.btn_confirm = CustomButton(self.button_frame, text="Confirmar", font_size=15, command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
     def build_ui(self):
