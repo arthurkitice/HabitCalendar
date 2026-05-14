@@ -1,12 +1,12 @@
 import customtkinter as ctk
-from constants import Direction, IconType, Icons, AuxColorGreen
+from constants import Direction, IconType, Icons, Theme
 import tkinter as tk
 
 class _Day:
     FG_COLOR = "#333333" 
     HOVER_COLOR = "#282828"
-    FG_COLOR_CHECKED = AuxColorGreen.FG
-    HOVER_COLOR_CHECKED = AuxColorGreen.HOVER
+    FG_COLOR_CHECKED = Theme.fg_color()
+    HOVER_COLOR_CHECKED = Theme.hover_color()
     FG_COLOR_DISABLED = "#2F2F2F"
 
 class _Navigation:
@@ -20,16 +20,20 @@ class _Button:
     FG_COLOR = "#333333"
     HOVER_COLOR = "#272727"
 
-def style_button(parent, text, command, **kwargs):
+def style_button(parent, text, command, font_size = 20, bold = True, main_color = True, **kwargs):
+    fg_color = Theme.fg_color() if main_color else _Button.FG_COLOR
+    hover_color = Theme.hover_color() if main_color else _Button.HOVER_COLOR
+
     button = ctk.CTkButton(
         parent,
         corner_radius=5,
         text=text,
         command=command,
-        fg_color= _Button.FG_COLOR,
-        hover_color= _Button.HOVER_COLOR,
+        fg_color= fg_color,
+        hover_color= hover_color,
         text_color="white",
-        cursor="hand2"
+        cursor="hand2",
+        font=ctk.CTkFont(size=font_size, weight="bold" if bold else "normal")
     )
     button.configure(**kwargs)
     return button

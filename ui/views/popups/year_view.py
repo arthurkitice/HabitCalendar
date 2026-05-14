@@ -1,8 +1,8 @@
 import customtkinter as ctk
 from ui.widgets import style_button, NavigationButton
 from functools import partial
-from constants import Direction, MONTHS, AuxColorGreen
-from ui.views.new_year_view import NewYearView
+from constants import Direction, MONTHS
+from .new_year_view import NewYearView
 from services import YearService
 
 class YearView(ctk.CTkFrame):
@@ -39,12 +39,12 @@ class YearView(ctk.CTkFrame):
         for i in range(3):
             for j in range(4):
                 num = (4*i) + j + 1
-                button = style_button(
-                    parent=self.months, 
-                    text= f"{num}\n{MONTHS[num]}", 
+                button = style_button(self.months, 
+                    text=f"{num}\n{MONTHS[num]}", 
                     command=partial(self.select, num), 
-                    font=ctk.CTkFont(size=13),
-                    width=50,
+                    font=ctk.CTkFont(size=13), 
+                    main_color=False,
+                    width=50, 
                     height=50
                 )
                 button.grid(row=i, column=j, padx=5, pady=5, sticky="nsew")
@@ -128,15 +128,7 @@ class YearView(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = style_button(
-            self.button_frame, 
-            "Voltar", 
-            command=self.destroy, 
-            height=35, 
-            font=ctk.CTkFont(size=15, weight="bold"),
-            fg_color=AuxColorGreen.FG,
-            hover_color=AuxColorGreen.HOVER
-        )
+        self.back_button = style_button(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def build_ui(self):

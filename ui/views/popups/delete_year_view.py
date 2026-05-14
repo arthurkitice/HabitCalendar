@@ -1,9 +1,8 @@
 import customtkinter as ctk
 from ui.widgets import style_button
-from constants import AuxColorGreen
 
-class DeleteTrackerrView(ctk.CTkFrame):
-    def __init__(self, parent, on_save, tracker):
+class DeleteYearView(ctk.CTkFrame):
+    def __init__(self, parent, on_save, year):
         super().__init__(
             parent, 
             width=500, 
@@ -18,15 +17,15 @@ class DeleteTrackerrView(ctk.CTkFrame):
 
         self.parent = parent
         self.on_save = on_save
-        self.tracker = tracker
+        self.year = year
         self.build_ui()
 
     def ui(self):
-        text_label_1 = f'Tem certeza que deseja\ndeletar o marcador\n"{self.tracker}"?'
+        text_label_1 = f"Tem certeza que deseja\ndeletar o ano {self.year}?"
         self.label_1 = ctk.CTkLabel(self, text=text_label_1, font=ctk.CTkFont(size=22, weight="bold"))
         self.label_1.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
-        text_label_2 = f"Você perderá todos os anos\ne marcações associadas.\n\nEssa ação é irreversível.\n"
+        text_label_2 = f"Você pode criar o ano novamente\nmas perderá qualquer marcação.\n\nEssa ação é irreversível.\n"
         self.label_2 = ctk.CTkLabel(self, text=text_label_2, font=ctk.CTkFont(size=16), text_color="grey")
         self.label_2.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
@@ -35,10 +34,10 @@ class DeleteTrackerrView(ctk.CTkFrame):
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid(row=3, column=1)
 
-        self.btn_return = style_button(self.button_frame, text="Cancelar", font=ctk.CTkFont(size=15, weight="bold"), command=self.destroy, height=35, width=250)
+        self.btn_return = style_button(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
 
-        self.btn_confirm = style_button(self.button_frame, text="Confirmar", font=ctk.CTkFont(size=15, weight="bold"), command=self.save, height=35, width=250, fg_color=AuxColorGreen.FG, hover_color=AuxColorGreen.HOVER)
+        self.btn_confirm = style_button(self.button_frame, text="Confirmar", font_size=15, command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
     def build_ui(self):

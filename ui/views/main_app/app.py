@@ -1,8 +1,8 @@
 import customtkinter as ctk
 from config import get_last_tracker_id
 from services import TrackerService
-from ui.views.app_sidebar import SidebarView
-from ui.views.app_calendar import MainCalendarView
+from .app_sidebar import SidebarView
+from .app_calendar import MainCalendarView
 from functools import partial
 
 SIDEBAR_WEIGHT = 1

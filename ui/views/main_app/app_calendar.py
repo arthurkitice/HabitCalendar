@@ -1,8 +1,9 @@
 import customtkinter as ctk
 from functools import partial
 from dtos import DayDTO
-from ui.views.new_year_view import NewYearView
-from ui.views.year_view import YearView
+from ..popups.new_year_view import NewYearView
+from ..popups.year_view import YearView
+from ..popups.popup_handler import PopupHandler
 from config import get_last_month, get_last_year, save_current_date
 from ui.widgets import NavigationButton, DayButton, style_button
 from constants import Direction, MONTHS, WEEK_DAYS
@@ -177,30 +178,13 @@ class MainCalendarView(ctk.CTkFrame):
         self.style_empty_buttons()
     
     def open_new_year_popup(self, year: int) -> None:
-        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
-            self.popup_frame.destroy()
-
-        self.popup_frame = NewYearView(self.winfo_toplevel(), on_save=partial(self.add_year, year), year=year)
-        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
-        self.popup_frame.wait_visibility()
-        self.popup_frame.grab_set()
+        PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
 
     # ===============================
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
     def open_years_popup(self, year: int):
-        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
-            self.popup_frame.destroy()
-
-        self.popup_frame = YearView(
-            parent=self.winfo_toplevel(), 
-            tracker_id=self.current_tracker_id, 
-            on_select=self.jump_to_month,
-            year=year
-        )
-        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
-        self.popup_frame.wait_visibility()
-        self.popup_frame.grab_set()
+        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year)
 
     def update_top_bar(self) -> None:
         month_text = MONTHS[self.current_month]
@@ -221,11 +205,11 @@ class MainCalendarView(ctk.CTkFrame):
         month_text = MONTHS[self.current_month]
 
         self.month_button = style_button(
-            parent=self.top_frame,
+            self.top_frame,
             text=f"{self.current_year}\n{month_text}",
             command=partial(self.open_years_popup, self.current_year),
-            font=ctk.CTkFont(size=20, weight="bold"), 
             fg_color="transparent",
+            main_color=False
         )
         self.month_button.grid(row=0, column=1, padx=5, pady=5)
 
@@ -244,16 +228,6 @@ class MainCalendarView(ctk.CTkFrame):
             condition=self._get_condition(Direction.NEXT)
         )
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
-
-    # def build_week_days_frame(self) -> None:
-    #     self.week_days_frame = ctk.CTkFrame(self, corner_radius=10)
-    #     self.week_days_frame.grid(row=1, column=0, padx=20, pady=0, sticky="nsew")
-    #     self.week_days_frame.grid_columnconfigure(tuple(range(CALENDAR_COLS)), weight=1, uniform="week_days")
-    #     self.week_days_frame.grid_rowconfigure(0, weight=1)
-
-    #     for i, day in enumerate(WEEK_DAYS):
-    #         label = ctk.CTkLabel(self.week_days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color="white")
-    #         label.grid(row=0, column=i, padx=5, pady=5)
 
     def _get_condition(self, direction: Direction) -> bool | None:
         match direction:

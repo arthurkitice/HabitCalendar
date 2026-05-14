@@ -3,13 +3,37 @@ from helper import carregar_icone_svg
 
 STARTING_YEAR = 2026
 
-class AuxColorBlue:
-    FG = "#27488F"
-    HOVER = "#233C73"
+MAIN_COLORS = {
+    "blue-prince": {
+        "fg": "#27488F", 
+        "hover": "#233C73"
+    },
+    "green-baby": {
+        "fg": "#1A593D", 
+        "hover": "#14462F"
+    },
+    "purple-haze": {
+        "fg": "#4C1DB8", 
+        "hover": "#381685"
+    },
+    "red-prince": {
+        "fg": "#BE1313", 
+        "hover": "#940707"
+    }
+}
 
-class AuxColorGreen:
-    FG = "#1A593D"
-    HOVER = "#14462F"
+class Theme:
+    current = "green-baby"
+
+    @classmethod
+    def fg_color(cls):
+        """Retorna a cor baseada no tema atual"""
+        return MAIN_COLORS[cls.current]["fg"]
+    
+    @classmethod
+    def hover_color(cls):
+        """Retorna a cor baseada no tema atual"""
+        return MAIN_COLORS[cls.current]["hover"]
 
 class AuxColorGrey:
     FG = "#242424"

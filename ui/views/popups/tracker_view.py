@@ -1,12 +1,12 @@
 import customtkinter as ctk
 from ui.widgets import style_button, IconButton
 from functools import partial
-from constants import IconType, AuxColorGreen, AuxColorBlue
-from ui.views.delete_year_view import DeleteYearView
+from constants import IconType
+from .delete_year_view import DeleteYearView
 from services import YearService
 
 class TrackerFrame(ctk.CTkFrame):
-    def __init__(self, parent, tracker_id, tracker_name, on_tracker_remove):
+    def __init__(self, parent, tracker_id, tracker_name):
         super().__init__(
             parent, 
             width=500, 
@@ -24,7 +24,6 @@ class TrackerFrame(ctk.CTkFrame):
         self.parent = parent
         self.tracker_id = tracker_id
         self.tracker = tracker_name
-        self.on_tracker_remove = on_tracker_remove
         self._update_years()
 
         self.build_ui()
@@ -48,9 +47,6 @@ class TrackerFrame(ctk.CTkFrame):
             self.bottom_year_label.configure(text=f"Menor ano: {self.bottom_year}")
             self.delete_top_year_btn.configure(command=partial(self.delete_year_popup, self.top_year))
             self.delete_bottom_year_btn.configure(command=partial(self.delete_year_popup, self.bottom_year))
-
-        if self.on_tracker_remove:
-            self.on_tracker_remove(self.tracker_id)
 
     def delete_year_popup(self, year):
         if hasattr(self, "popup_frame"):
@@ -136,15 +132,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = style_button(
-            self.button_frame, 
-            "Voltar", 
-            command=self.destroy, 
-            height=35, 
-            font=ctk.CTkFont(size=15, weight="bold"),
-            fg_color=AuxColorGreen.FG,
-            hover_color=AuxColorGreen.HOVER
-        )
+        self.back_button = style_button(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def show_double_year_frame(self):
