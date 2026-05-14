@@ -2,6 +2,7 @@ import customtkinter as ctk
 from functools import partial
 from .alter_tracker_view import AlterTrackerFrame
 from .tracker_view import TrackerFrame
+from .delete_tracker_view import DeleteTrackerrView
 from config import save_current_tracker_id
 from ui.widgets import SidebarButton, style_button, SmartScrollableFrame
 from constants import Operation, IconType, AuxColorBlue, AuxColorGreen
@@ -73,6 +74,16 @@ class SidebarView(ctk.CTkFrame):
         self.popup_frame.wait_visibility()
         self.popup_frame.grab_set()
 
+    def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
+        if getattr(self, "popup_frame", None) and self.popup_frame.winfo_exists():
+            self.popup_frame.destroy()
+
+        self.popup_frame = DeleteTrackerrView(self.winfo_toplevel(), tracker=tracker.name, on_save=partial(self.remove_tracker, tracker.id))
+
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
+        self.popup_frame.wait_visibility()
+        self.popup_frame.grab_set()
+
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id
         save_current_tracker_id(self.current_tracker_id)
@@ -121,7 +132,7 @@ class SidebarView(ctk.CTkFrame):
             edit_btn = SidebarButton(self.sidebar_buttons_frame, command=partial(self.open_new_tracker_popup, Operation.EDIT, tracker), icon_type=IconType.EDIT)
             edit_btn.grid(row=i+1, column=1, padx=5, pady=10, sticky="we")
 
-            remove_btn = SidebarButton(self.sidebar_buttons_frame, command=partial(self.remove_tracker, tracker.id), icon_type=IconType.REMOVE)
+            remove_btn = SidebarButton(self.sidebar_buttons_frame, command=partial(self.open_delete_tracker_popup, tracker), icon_type=IconType.REMOVE)
             remove_btn.grid(row=i+1, column=2, padx=5, pady=10, sticky="we")
 
             config_btn = SidebarButton(self.sidebar_buttons_frame, command=partial(self.open_tracker_view_popup, tracker), icon_type=IconType.CONFIG)
