@@ -6,7 +6,7 @@ from .delete_year_view import DeleteYearView
 from services import YearService
 
 class TrackerFrame(ctk.CTkFrame):
-    def __init__(self, parent, tracker_id, tracker_name):
+    def __init__(self, parent, tracker_id, tracker_name, on_year_remove):
         super().__init__(
             parent, 
             width=500, 
@@ -24,6 +24,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.parent = parent
         self.tracker_id = tracker_id
         self.tracker = tracker_name
+        self.on_year_remove = on_year_remove
         self._update_years()
 
         self.build_ui()
@@ -35,6 +36,7 @@ class TrackerFrame(ctk.CTkFrame):
 
     def remove_year(self, year):
         self.year_service.delete_year(tracker_id=self.tracker_id, year_number=year)
+        self.on_year_remove(year, is_top_year=True) if year == self.top_year else self.on_year_remove(year, is_top_year=False)
         self._update_years()
         self.top_label.configure(text=f"Marcador: {self.tracker}\nQuantidade de anos no banco de dados: {len(self.years)}")
         if len(self.years) == 1:

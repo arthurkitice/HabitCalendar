@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from config import LastTrackerJSON, CurrentThemeJSON
+from config import LastTrackerJSON, CurrentThemeJSON, TrackerDateJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
@@ -35,7 +35,8 @@ class CalendarApp(ctk.CTk):
             initial_tracker_id=initial_tracker_id,
             on_tracker_change=self.handle_tracker_change,
             on_color_change=self.handle_color_change,
-            on_toggle_visibility=self.handle_sidebar_toggle
+            on_toggle_visibility=self.handle_sidebar_toggle,
+            on_year_remove=self.handle_year_removal
         )
         self.sidebar_view.grid(row=0, column=0, sticky="nsew")
 
@@ -74,6 +75,18 @@ class CalendarApp(ctk.CTk):
     def handle_color_change(self):
         self.sidebar_view.reload_colors()
         self.calendar_view.reload_colors()
+
+    def handle_year_removal(self, year: int, is_top_year: bool = True):
+        if self.calendar_view.current_year != year:
+            return
+   
+        if is_top_year:
+            month, year = 12, year-1
+        else:
+            month, year = 1, year+1
+
+        TrackerDateJSON.save_current_date(self.calendar_view.current_tracker_id, month, year)
+        self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
 
     def build_forbidden_content(self) -> None:
         """Frame de bloqueio exibido quando não existem marcadores"""

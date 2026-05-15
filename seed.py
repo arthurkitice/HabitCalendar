@@ -14,10 +14,5 @@ if db_url.drivername == "sqlite":
 Base.metadata.create_all(bind=engine)
 print("Banco de dados recriado com sucesso!")
 
-try:
-    with get_db() as db:
-        tracker_service = TrackerService(db)
-        tracker_service.create_tracker(name="Marcador padrão")
-
-except Exception as e:
-    print(f"Erro ao popular banco: {e}")
+tracker_service = TrackerService()
+tracker_service.create_tracker(name="Marcador padrão")

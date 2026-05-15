@@ -1,4 +1,5 @@
 from functools import wraps
+import tkinter as tk
 from .alter_tracker_view import AlterTrackerFrame
 from .delete_tracker_view import DeleteTrackerView
 from .delete_year_view import DeleteYearView
@@ -23,7 +24,10 @@ def _show_popup(func):
         root.active_popup = popup
 
         popup.place(relx=0.5, rely=0.5, anchor="center")
-        popup.wait_visibility()
+        try:
+            popup.wait_visibility()
+        except tk.TclError:
+            return
         popup.grab_set()
         return popup
     return wrapper
@@ -46,8 +50,8 @@ def new_year_popup(parent, on_save, year):
     return NewYearView(parent.winfo_toplevel(), on_save, year)
 
 @_show_popup
-def tracker_popup(parent, tracker_name, tracker_id):
-    return TrackerFrame(parent.winfo_toplevel(), tracker_id, tracker_name)
+def tracker_popup(parent, tracker_name, tracker_id, on_year_remove):
+    return TrackerFrame(parent.winfo_toplevel(), tracker_id, tracker_name, on_year_remove)
 
 @_show_popup
 def year_popup(parent, on_select, tracker_id, year):

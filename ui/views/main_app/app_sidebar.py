@@ -8,7 +8,7 @@ from services import TrackerService
 from ..popups import PopupHandler
 
 class SidebarView(ctk.CTkFrame):
-    def __init__(self, parent, initial_tracker_id, on_tracker_change, on_color_change, on_toggle_visibility):
+    def __init__(self, parent, initial_tracker_id, on_tracker_change, on_color_change, on_toggle_visibility, on_year_remove):
         super().__init__(parent, fg_color="transparent")
         
         self.tracker_service = TrackerService()
@@ -19,6 +19,7 @@ class SidebarView(ctk.CTkFrame):
         self.on_tracker_change = on_tracker_change
         self.on_color_change = on_color_change
         self.on_toggle_visibility = on_toggle_visibility 
+        self.on_year_remove = on_year_remove
         
         self.sidebar_visible = True
         self.tracker_btn = {}
@@ -56,7 +57,7 @@ class SidebarView(ctk.CTkFrame):
             PopupHandler.alter_tracker_popup(self, on_save=self.create_new_tracker)
 
     def open_tracker_view_popup(self, tracker: TrackerDTO | None = None) -> None:
-        PopupHandler.tracker_popup(self, tracker.name, tracker.id)
+        PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
 
     def theme_popup(self):
         PopupHandler.theme_popup(self, self.on_color_change)

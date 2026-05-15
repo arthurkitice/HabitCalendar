@@ -62,11 +62,11 @@ class MainCalendarView(ctk.CTkFrame):
         self.day_service.check_day(day_id)
 
     def add_year(self, year: int) -> None:
-        self.year_service.add_tracker_year(tracker_id=self.current_tracker_id, year=year)
+        self.year_service.add_tracker_year(self.current_tracker_id, year)
         self._refresh_years()
         
-        self.current_year = year
         self.current_month = 12 if year < self.current_year else 1
+        self.current_year = year
         
         TrackerDateJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
         self.update_top_bar()
