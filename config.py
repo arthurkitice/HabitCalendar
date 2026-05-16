@@ -22,13 +22,14 @@ def _save_config_data(data: dict) -> None:
     with open(CONFIG_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-class TrackerDateJSON:
+class TrackerDataJSON:
     @staticmethod
     def save_current_date(tracker_id: int, month: int | None = None, year: int | None = None) -> None:
         data = _load_config_data()
         if month is None or year is None:
             month, year = 1, datetime.now().year
-        data["trackers"][str(tracker_id)] = {"month": month, "year": year}
+        data["trackers"][str(tracker_id)]["month"] = month
+        data["trackers"][str(tracker_id)]["year"] = year
         _save_config_data(data)
 
     @staticmethod
@@ -46,7 +47,20 @@ class TrackerDateJSON:
         return tracker_data.get("year", datetime.now().year)
     
     @staticmethod
-    def remove_tracker_date(tracker_id: int) -> bool:
+    def save_color(tracker_id: int, color: str) -> None:
+        data = _load_config_data()
+        data["trackers"][str(tracker_id)]["color"] = color
+        _save_config_data(data)
+
+    @staticmethod
+    def get_color(tracker_id: int) -> int:
+        data = _load_config_data()
+        tracker_data = data["trackers"].get(str(tracker_id), {})
+        if isinstance(tracker_data, int): return "Verde"
+        return tracker_data.get("color", "Verde")
+
+    @staticmethod
+    def remove_tracker_data(tracker_id: int) -> bool:
         data = _load_config_data()
         tracker = data["trackers"].pop(str(tracker_id), None)
         

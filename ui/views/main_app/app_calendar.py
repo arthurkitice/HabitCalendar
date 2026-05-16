@@ -2,7 +2,7 @@ import customtkinter as ctk
 from functools import partial
 from dtos import DayDTO
 from ..popups import PopupHandler
-from config import TrackerDateJSON
+from config import TrackerDataJSON
 from ui.widgets import NavigationButton, DayButton, CustomButton
 from constants import Direction, MONTHS, WEEK_DAYS
 from services import TrackerService, DayService, YearService, MonthService
@@ -21,8 +21,8 @@ class MainCalendarView(ctk.CTkFrame):
         self.month_service = MonthService()
 
         self.current_tracker_id = initial_tracker_id
-        self.current_month = TrackerDateJSON.get_last_month(self.current_tracker_id)
-        self.current_year = TrackerDateJSON.get_last_year(self.current_tracker_id)
+        self.current_month = TrackerDataJSON.get_last_month(self.current_tracker_id)
+        self.current_year = TrackerDataJSON.get_last_year(self.current_tracker_id)
 
         self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
         
@@ -38,8 +38,9 @@ class MainCalendarView(ctk.CTkFrame):
     def update_tracker_data(self, tracker_id: int):
         """Chamado pela Sidebar quando o marcador muda"""
         self.current_tracker_id = tracker_id
-        self.current_month = TrackerDateJSON.get_last_month(self.current_tracker_id)
-        self.current_year = TrackerDateJSON.get_last_year(self.current_tracker_id)
+        self.current_month = TrackerDataJSON.get_last_month(self.current_tracker_id)
+        self.current_year = TrackerDataJSON.get_last_year(self.current_tracker_id)
+        self.reload_colors()
 
         self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
         
@@ -47,7 +48,7 @@ class MainCalendarView(ctk.CTkFrame):
         if self.years and self.current_year not in self.years:
             self.current_year = self.years[0]
             self.current_month = 1
-            TrackerDateJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
+            TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
 
         self.update_top_bar()
         self.update_days_frame()
@@ -68,7 +69,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.current_month = 12 if year < self.current_year else 1
         self.current_year = year
         
-        TrackerDateJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
+        TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
         self.update_top_bar()
         self.update_days_frame()
 
@@ -115,7 +116,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.update_calendar()
 
     def update_calendar(self):
-        TrackerDateJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
+        TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
         self.update_top_bar()
         self.update_days_frame()
 
@@ -168,7 +169,8 @@ class MainCalendarView(ctk.CTkFrame):
                 self.days_frame, 
                 day=day.number, 
                 checked=day.checked, 
-                command=partial(self.check_day, day.id, i)
+                command=partial(self.check_day, day.id, i),
+                tracker_id=self.current_tracker_id
             )
             button.grid(row=row+1, column=col, padx=5, pady=5, sticky="nsew")
             self.day_buttons.append(button)
@@ -229,6 +231,7 @@ class MainCalendarView(ctk.CTkFrame):
 
     def reload_colors(self):
         for btn in self.day_buttons:
+            btn.tracker_id = self.current_tracker_id
             btn.reload_colors()
 
     def _get_condition(self, direction: Direction) -> bool | None:

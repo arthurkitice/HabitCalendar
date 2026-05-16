@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from functools import partial
-from config import LastTrackerJSON, TrackerDateJSON
+from config import LastTrackerJSON, TrackerDataJSON
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
 from constants import IconType
 from dtos import TrackerDTO
@@ -35,6 +35,7 @@ class SidebarView(ctk.CTkFrame):
     # ==================
     def edit_tracker(self, name: str, tracker_id: int) -> None:
         self.tracker_service.update_tracker(tracker_id, name)
+        self.on_color_change()
         self.build_sidebar_buttons()
         self.update_sidebar()
 
@@ -43,7 +44,7 @@ class SidebarView(ctk.CTkFrame):
         trackers = self.tracker_service.get_all_trackers()
         last_tracker_id = trackers[-1].id if trackers else 0
 
-        TrackerDateJSON.remove_tracker_date(tracker_id)
+        TrackerDataJSON.remove_tracker_data(tracker_id)
 
         if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
             self.change_tracker(last_tracker_id)
@@ -73,7 +74,7 @@ class SidebarView(ctk.CTkFrame):
 
     def create_new_tracker(self, tracker_name: str) -> None:
         new_tracker = self.tracker_service.create_tracker(tracker_name)
-        TrackerDateJSON.save_current_date(new_tracker.id)
+        TrackerDataJSON.save_current_date(new_tracker.id)
         self.build_sidebar_buttons()
 
         if self.current_tracker_id == 0:

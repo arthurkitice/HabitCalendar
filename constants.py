@@ -22,6 +22,41 @@ MAIN_COLORS = {
     }
 }
 
+TRACKER_COLORS = {
+    "Verde": {
+        "fg": "#2D634A", 
+        "hover": "#2A5A44"
+    },
+    "Azul": {
+        "fg": "#344F87", 
+        "hover": "#31497E"
+    },
+    "Roxo": {
+        "fg": "#7360A1", 
+        "hover": "#624F8E"
+    },
+    "Vermelho": {
+        "fg": "#A25353", 
+        "hover": "#925050"
+    },
+    "Amarelo": {
+        "fg": "#A38F49",
+        "hover": "#938040"
+    },
+    "Laranja": {
+        "fg": "#9C6B4B",
+        "hover": "#8C5E41"
+    },
+    "Rosa": {
+        "fg": "#9B637B",
+        "hover": "#8B576D"
+    },
+    "Ciano": {
+        "fg": "#447A82",
+        "hover": "#3C6E75"
+    }
+}
+
 SECONDARY_COLORS = {
     "default-theme": {
         "fg": "#333333",

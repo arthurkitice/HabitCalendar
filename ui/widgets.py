@@ -1,7 +1,7 @@
 import customtkinter as ctk
-from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME
+from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS
+from config import TrackerDataJSON
 
-FG_COLOR_DISABLED = "#2F2F2F"
 
 class CustomButton(ctk.CTkButton):
     def __init__(self, parent, text, command, font_size = 20, bold = True, main_color = True, **kwargs):
@@ -53,9 +53,21 @@ class NavigationButton(ctk.CTkButton):
         return ARROWS[self.direction] if not condition else ICONS[IconType.PLUS]
     
 class DayButton(ctk.CTkButton):
-    def __init__(self, parent, day, command, checked, **kwargs):
+    def __init__(self, parent, day, command, checked, tracker_id, **kwargs):
         self.day = str(day)
         self.checked = checked
+        self.tracker_id = tracker_id
+        self.color = TrackerDataJSON.get_color(self.tracker_id)
+
+        self.check_colors = {
+            "fg": TRACKER_COLORS[self.color]["fg"],
+            "hover": TRACKER_COLORS[self.color]["hover"]
+        }
+        self.base_colors = {
+            "fg": SECONDARY_THEME.fg_color(),
+            "hover": SECONDARY_THEME.hover_color()
+        }
+
         configs = self._get_button_configs()
 
         super().__init__(
@@ -74,6 +86,7 @@ class DayButton(ctk.CTkButton):
         return self._get_button_config() if self.day != "0" else self._get_disabled_button_config()
 
     def _get_disabled_button_config(self):
+        FG_COLOR_DISABLED = "#2F2F2F"
         return {
             "fg_color": FG_COLOR_DISABLED,
             "cursor": "arrow",
@@ -81,8 +94,8 @@ class DayButton(ctk.CTkButton):
         }
     
     def _get_button_config(self):
-        fg_color = PRIMARY_THEME.fg_color() if self.checked else SECONDARY_THEME.fg_color()
-        hover_color = PRIMARY_THEME.hover_color() if self.checked else SECONDARY_THEME.hover_color()
+        fg_color = self.check_colors["fg"] if self.checked else self.base_colors["fg"]
+        hover_color = self.check_colors["hover"] if self.checked else self.base_colors["hover"]
         return {
             "fg_color": fg_color,
             "hover_color": hover_color,
@@ -100,17 +113,23 @@ class DayButton(ctk.CTkButton):
 
     def check_day(self):
         self.checked = not self.checked
-        fg_color = PRIMARY_THEME.fg_color() if self.checked else SECONDARY_THEME.fg_color()
-        hover_color = PRIMARY_THEME.hover_color() if self.checked else SECONDARY_THEME.hover_color()
+        fg_color = self.check_colors["fg"] if self.checked else self.base_colors["fg"]
+        hover_color = self.check_colors["hover"] if self.checked else self.base_colors["hover"]
         self.configure(
             fg_color=fg_color,
             hover_color=hover_color
         )
 
     def reload_colors(self):
+        self.color = TrackerDataJSON.get_color(self.tracker_id)
+
+        self.check_colors = {
+            "fg": TRACKER_COLORS[self.color]["fg"],
+            "hover": TRACKER_COLORS[self.color]["hover"]
+        }
         if not self.checked:
             return
-        self.configure(fg_color=PRIMARY_THEME.fg_color(), hover_color=PRIMARY_THEME.hover_color())
+        self.configure(fg_color=self.check_colors["fg"], hover_color=self.check_colors["hover"])
 
 class SidebarButton(ctk.CTkButton):
     def __init__(self, parent, command, icon_type: IconType | None = None, tracker: str | None = None, **kwargs):

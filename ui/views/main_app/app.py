@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from config import LastTrackerJSON, CurrentThemeJSON, TrackerDateJSON
+from config import LastTrackerJSON, CurrentThemeJSON, TrackerDataJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
@@ -85,7 +85,7 @@ class CalendarApp(ctk.CTk):
         else:
             month, year = 1, year+1
 
-        TrackerDateJSON.save_current_date(self.calendar_view.current_tracker_id, month, year)
+        TrackerDataJSON.save_current_date(self.calendar_view.current_tracker_id, month, year)
         self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
 
     def build_forbidden_content(self) -> None:
