@@ -123,7 +123,7 @@ class SidebarView(ctk.CTkFrame):
     def update_sidebar(self) -> None:
         tracker = self.tracker_service.get_tracker_by_id(tracker_id=self.current_tracker_id)
         tracker_text = tracker.name if tracker is not None else "Nenhum"
-        self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text}")
+        self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text if len(tracker_text) < 50 else tracker_text[:47] + '...'}")
 
     def build_full_sidebar(self) -> None:
         self.sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
@@ -147,7 +147,7 @@ class SidebarView(ctk.CTkFrame):
         self.tracker_frame.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
         self.tracker_frame.grid_columnconfigure(0, weight=1)
 
-        self.tracker_label = ctk.CTkLabel(self.tracker_frame, text="", font=ctk.CTkFont(size=20, weight="bold"), text_color="white")
+        self.tracker_label = ctk.CTkLabel(self.tracker_frame, text="", font=ctk.CTkFont(size=20, weight="bold"), text_color="white", wraplength=325)
         self.tracker_label.grid(row=0, column=0, padx=5, pady=5, sticky="nswe")
 
         self.build_sidebar_buttons()

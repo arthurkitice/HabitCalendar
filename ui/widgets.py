@@ -120,6 +120,8 @@ class SidebarButton(ctk.CTkButton):
         self.icon_type = icon_type
         text = tracker or ""
         
+        text = text if len(text) < 15 else f"{text[:15]}..."
+
         image = self._get_image()
         icon_width = {"width": 40} if self.icon_type else {}
 

@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton
+from services import TrackerService
 
 class AlterTrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker_name=None, tracker_id=None):
@@ -22,7 +23,9 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.entry.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
     def ui_edit_tracker(self, tracker_name):
-        self.label = ctk.CTkLabel(self, text=f"Editar Marcador\n'{tracker_name}'\n", font=ctk.CTkFont(size=22, weight="bold"))
+        text = tracker_name if len(tracker_name) < 15 else f"{tracker_name[:15]}..."
+
+        self.label = ctk.CTkLabel(self, text=f"Editar Marcador\n'{text}'\n", font=ctk.CTkFont(size=22, weight="bold"))
         self.label.grid(row=1, column=1, padx=5, pady=10, sticky="nsew")
 
         self.entry = ctk.CTkEntry(self, placeholder_text="Digite o novo nome do marcador", height=35)
@@ -38,7 +41,7 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent", width=500)
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
-        self.button_frame.grid(row=3, column=1)
+        self.button_frame.grid(row=4, column=1)
 
         self.btn_return = CustomButton(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
@@ -46,14 +49,29 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.btn_confirm = CustomButton(self.button_frame, text="Salvar", font_size=15, command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
+        self.error_msg = ctk.CTkLabel(self, text="", font=ctk.CTkFont(size=15), text_color="grey")
+        self.error_msg.grid(row=3, column=1, padx=5, pady=(0, 5), sticky="w")
+
         if self.tracker_name:
             self.ui_edit_tracker(self.tracker_name)
         else:
             self.ui_new_tracker()
 
     def save(self):
+        text = self.entry.get().split()
+
+        if not text:
+            self.error_msg.configure(text="* O nome não pode ser vazio.")
+            return
+        
+        text = ' '.join(text)
+
+        if self.tracker_name != text and TrackerService().get_tracker_by_name(text):
+            self.error_msg.configure(text="* Já existe um marcador com este nome.")
+            return
+
         if self.tracker_id is not None:
-            self.on_save(self.entry.get(), self.tracker_id)
+            self.on_save(text, self.tracker_id)
         else:
-            self.on_save(self.entry.get())
+            self.on_save(text)
         self.destroy()

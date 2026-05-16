@@ -17,7 +17,7 @@ class DeleteTrackerView(ctk.CTkFrame):
 
         self.parent = parent
         self.on_save = on_save
-        self.tracker = tracker
+        self.tracker = tracker if len(tracker) < 15 else f"{tracker[:15]}..."
         self.build_ui()
 
     def ui(self):

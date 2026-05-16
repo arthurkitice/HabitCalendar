@@ -23,7 +23,7 @@ class TrackerFrame(ctk.CTkFrame):
 
         self.parent = parent
         self.tracker_id = tracker_id
-        self.tracker = tracker_name
+        self.tracker = tracker_name if len(tracker_name) < 15 else f"{tracker_name[:15]}..."
         self.on_year_remove = on_year_remove
         self._update_years()
 

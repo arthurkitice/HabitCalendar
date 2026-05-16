@@ -22,7 +22,6 @@ def _save_config_data(data: dict) -> None:
     with open(CONFIG_FILE, "w") as f:
         json.dump(data, f, indent=4)
 
-
 class TrackerDateJSON:
     @staticmethod
     def save_current_date(tracker_id: int, month: int | None = None, year: int | None = None) -> None:
