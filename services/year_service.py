@@ -45,3 +45,8 @@ class YearService:
         with get_db() as db:
             year_repository = YearRepository(db)
             return year_repository.delete_year(tracker_id, year_number)
+        
+    def get_checked_days_count(self, tracker_id: int, year: int) -> int | None:
+        with get_db() as db:
+            year_repository = YearRepository(db)
+            return year_repository.get_all_checked_days(tracker_id, year)

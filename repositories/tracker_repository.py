@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Tracker
+from models import Tracker, Month, Day, Year
 from .year_repository import YearRepository  # Importamos o repositório irmão
 from datetime import datetime
 
@@ -53,3 +53,14 @@ class TrackerRepository:
         self.db.delete(tracker)
         self.db.commit()
         return True
+    
+    def get_all_checked_days(self, tracker_id: int) -> int:
+        """Retorna a quantidade de dias marcados"""
+        return self.db.query(Day)\
+            .join(Month)\
+            .join(Year)\
+            .join(Tracker)\
+            .filter(
+                Tracker.id == tracker_id,
+                Day.checked == True
+            ).count()

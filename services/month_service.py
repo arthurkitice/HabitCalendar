@@ -50,3 +50,9 @@ class MonthService:
             if not month:
                 return None
             return MonthWithDaysDTO.from_entity(month)
+        
+    def get_checked_days_count(self, tracker_id: int, year: int, month: int) -> int | None:
+        with get_db() as db:
+            month_repository = MonthRepository(db)
+            return month_repository.get_all_checked_days(tracker_id, year, month)
+        

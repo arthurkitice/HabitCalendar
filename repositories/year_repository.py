@@ -1,6 +1,6 @@
 import calendar
 from sqlalchemy.orm import Session
-from models import Year, Month, Day
+from models import Year, Month, Day, Tracker
 from constants import MONTHS
 
 class YearRepository:
@@ -55,3 +55,15 @@ class YearRepository:
         self.db.delete(year)
         self.db.commit()
         return True
+    
+    def get_all_checked_days(self, tracker_id: int, year: int) -> int:
+        """Retorna a quantidade de dias marcados"""
+        return self.db.query(Day)\
+            .join(Month)\
+            .join(Year)\
+            .join(Tracker)\
+            .filter(
+                Tracker.id == tracker_id,
+                Year.number == year,
+                Day.checked == True
+            ).count()

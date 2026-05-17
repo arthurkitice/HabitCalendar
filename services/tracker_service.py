@@ -74,3 +74,10 @@ class TrackerService:
                 tracker_repository.delete_tracker(tracker_id)
                 return True
         return False
+    
+    def get_checked_days_count(self, tracker_id: int) -> int | None:
+        if self.get_tracker_by_id(tracker_id):
+            with get_db() as db:
+                tracker_repository = TrackerRepository(db)
+                return tracker_repository.get_all_checked_days(tracker_id)
+        return None

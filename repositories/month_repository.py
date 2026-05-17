@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models import Month, Year
+from models import Month, Year, Tracker, Day
 
 class MonthRepository:
     def __init__(self, db: Session):
@@ -18,3 +18,15 @@ class MonthRepository:
             Month.number == month_number
         ).first()
     
+    def get_all_checked_days(self, tracker_id: int, year: int, month: int) -> int:
+        """Retorna a quantidade de dias marcados"""
+        return self.db.query(Day)\
+            .join(Month)\
+            .join(Year)\
+            .join(Tracker)\
+            .filter(
+                Tracker.id == tracker_id,
+                Year.number == year,
+                Month.number == month,
+                Day.checked == True
+            ).count()

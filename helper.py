@@ -40,3 +40,19 @@ def get_reversed_days(month_number, year):
     else:
         starting_day = 31 if month_number in [1, 3, 5, 7, 8, 10, 12] else 30
     return list(reversed(range(1, starting_day + 1)))
+
+def format_month_text(checked_days: int) -> str:
+    """Formata o texto de estatísticas para os botões dos meses."""
+    if checked_days == 0:
+        return " "
+    elif checked_days == 1:
+        return "1 marcação"
+    return f"{checked_days} marcações"
+
+def format_year_text(checked_days: int) -> str:
+    """Formata o texto de estatísticas para o cabeçalho do ano."""
+    if checked_days == 0:
+        return "Sem marcações"
+    elif checked_days == 1:
+        return "Uma marcação"
+    return f"{checked_days} marcações"
