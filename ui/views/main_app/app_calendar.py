@@ -245,5 +245,4 @@ class MainCalendarView(ctk.CTkFrame):
             
     def build_ui(self) -> None:
         self.build_top_bar()
-        #self.build_week_days_frame()
         self.build_days_frame()

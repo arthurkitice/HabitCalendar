@@ -195,8 +195,10 @@ class SmartScrollableFrame(ctk.CTkScrollableFrame):
             self._parent_frame.grid_columnconfigure(0, weight=0)
             self._parent_frame.grid_columnconfigure(1, weight=1)
 
-            self._scrollbar.grid(row=1, column=0, sticky="ns", padx=(5, 0))
+            self._scrollbar.grid(row=1, column=0, sticky="ns", padx=0)
             self._parent_canvas.grid(row=1, column=1, sticky="nsew")
+        else:
+            self._scrollbar.grid(row=1, column=1, sticky="ns", padx=0)
 
         # Monitora mudanças de tamanho direto no Canvas (a tela de rolagem)
         self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")
@@ -209,14 +211,14 @@ class SmartScrollableFrame(ctk.CTkScrollableFrame):
     def _get_heights(self):
         """Calcula a altura real do conteúdo e a altura visível na tela."""
         self._parent_canvas.update_idletasks()
-        
+
         # bbox("all") retorna (x_inicial, y_inicial, x_final, y_final) de todos os itens
         bbox = self._parent_canvas.bbox("all") 
-        
+
         # Se tiver itens, a altura é y_final - y_inicial. Se estiver vazio, é 0.
         content_height = (bbox[3] - bbox[1]) if bbox else 0
         visible_height = self._parent_canvas.winfo_height()
-        
+
         return content_height, visible_height
 
     def _check_scrollbar(self, event=None):

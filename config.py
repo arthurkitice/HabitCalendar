@@ -28,8 +28,11 @@ class TrackerDataJSON:
         data = _load_config_data()
         if month is None or year is None:
             month, year = 1, datetime.now().year
-        data["trackers"][str(tracker_id)]["month"] = month
-        data["trackers"][str(tracker_id)]["year"] = year
+
+        tracker = data["trackers"].setdefault(str(tracker_id), {})
+
+        tracker["month"] = month
+        tracker["year"] = year
         _save_config_data(data)
 
     @staticmethod
