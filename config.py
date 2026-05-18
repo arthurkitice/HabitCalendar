@@ -83,7 +83,19 @@ class LastTrackerJSON:
     def get_last_tracker_id() -> int:
         data = _load_config_data()
         return data["config"].get("last_active_tracker", 0)
-    
+
+class SidebarStatusJSON:
+    @staticmethod
+    def save_sidebar_status(tracker_id: int) -> None:
+        data = _load_config_data()
+        data["config"]["sidebar_status"] = tracker_id
+        _save_config_data(data)
+
+    @staticmethod
+    def get_sidebar_status() -> int:
+        data = _load_config_data()
+        return data["config"].get("sidebar_status", True)
+
 class ThemeJSON:
     @staticmethod
     def save_current_color(color: str) -> None:

@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from functools import partial
-from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON
+from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON, SidebarStatusJSON
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
 from constants import IconType, MAIN_COLORS, TEXT_COLOR
 from dtos import TrackerDTO
@@ -31,7 +31,7 @@ class SidebarView(ctk.CTkFrame):
         self.on_year_remove = on_year_remove
         self.on_theme_change = on_theme_change
         
-        self.sidebar_visible = True
+        self.sidebar_visible = SidebarStatusJSON.get_sidebar_status()
         self.tracker_btn = {}
 
         self.grid_columnconfigure(0, weight=1)
@@ -39,6 +39,9 @@ class SidebarView(ctk.CTkFrame):
 
         self.build_ui()
         self.update_sidebar()
+        if not self.sidebar_visible:
+            self.sidebar_visible = not self.sidebar_visible
+            self.toggle_sidebar()
 
     # ==================
     # MÉTODOS DA SIDEBAR
@@ -113,8 +116,9 @@ class SidebarView(ctk.CTkFrame):
         else:
             self.reduced_sidebar_frame.grid_forget()
             self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-            
+
         self.sidebar_visible = not self.sidebar_visible
+        SidebarStatusJSON.save_sidebar_status(self.sidebar_visible)
         # Avisa o app.py para mudar os pesos (uniform="") da coluna principal
         self.on_toggle_visibility(self.sidebar_visible)
 
@@ -166,7 +170,7 @@ class SidebarView(ctk.CTkFrame):
     def update_sidebar(self) -> None:
         tracker = self.tracker_service.get_tracker_by_id(tracker_id=self.current_tracker_id)
         tracker_text = tracker.name if tracker is not None else "Nenhum"
-        self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text if len(tracker_text) < 50 else tracker_text[:47] + '...'}")
+        self.tracker_label.configure(text=f"Marcador atual:\n{tracker_text if len(tracker_text) < 50 else f'{tracker_text[:47]}...'}")
 
     def build_full_sidebar(self) -> None:
         self.sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
