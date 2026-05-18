@@ -2,10 +2,11 @@ import customtkinter as ctk
 from ui.widgets import CustomButton
 from services import TrackerService
 from config import TrackerDataJSON
+from constants import TEXT_COLOR
 
 class AlterTrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker_name=None, tracker_id=None):
-        super().__init__(parent, width=500, height=400, corner_radius=15, border_width=1, border_color="white")
+        super().__init__(parent, width=500, height=400, corner_radius=15, border_width=1, border_color=TEXT_COLOR)
 
         self.grid_propagate(False)
 

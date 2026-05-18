@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton, IconButton
 from functools import partial
-from constants import IconType
+from constants import IconType, TEXT_COLOR
 from .delete_year_view import DeleteYearView
 from services import YearService, TrackerService
 from helper import format_year_text
@@ -13,9 +13,8 @@ class TrackerFrame(ctk.CTkFrame):
             width=500, 
             height=400, 
             corner_radius=15,
-            fg_color="#242424",
             border_width=1, 
-            border_color="white"
+            border_color=TEXT_COLOR
         )
 
         self.grid_propagate(False)

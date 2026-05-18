@@ -1,15 +1,13 @@
 import customtkinter as ctk
-from config import LastTrackerJSON, CurrentThemeJSON, TrackerDataJSON
+from config import LastTrackerJSON, ThemeJSON, TrackerDataJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
 from functools import partial
-from constants import PRIMARY_THEME
+from constants import PRIMARY_THEME, IconImages # <-- Importado IconImages
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
-
-PRIMARY_THEME.set_theme(CurrentThemeJSON.get_current_theme())
 
 class CalendarApp(ctk.CTk):
     def __init__(self):
@@ -18,56 +16,69 @@ class CalendarApp(ctk.CTk):
         self.title("Calendário")
         self.geometry("1100x700")
         self.minsize(850, 450)
-        
         self.tracker_service = TrackerService()
 
-        # Grid Principal do App
-        self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
-        self.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window", minsize=500)
-        self.grid_rowconfigure(0, weight=1, minsize=400)
+        # 🔥 1. Carrega as imagens ASSIM QUE A JANELA NASCER, antes de criar a interface!
+
+
+        self.main_container = None
+        self.build_all_ui()
+
+    def build_all_ui(self, reopen_theme_popup=False):
+        # Destrói o contêiner antigo, limpando a tela
+        if self.main_container:
+            self.main_container.destroy()
+
+        # Cria o novo Contêiner Principal
+        self.main_container = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        self.main_container.pack(fill="both", expand=True)
+
+        self.main_container.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
+        self.main_container.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window", minsize=500)
+        self.main_container.grid_rowconfigure(0, weight=1, minsize=400)
+
+        PRIMARY_THEME.set_theme(ThemeJSON.get_current_color())
+        ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
         self.build_forbidden_content()
 
-        # Instancia a Sidebar passando os callbacks (funções que a sidebar vai "chamar" de volta)
+        # Instancia a Sidebar dentro do MAIN_CONTAINER
         initial_tracker_id = LastTrackerJSON.get_last_tracker_id()
         self.sidebar_view = SidebarView(
-            self, 
+            self.main_container, 
             initial_tracker_id=initial_tracker_id,
             on_tracker_change=self.handle_tracker_change,
             on_color_change=self.handle_color_change,
             on_toggle_visibility=self.handle_sidebar_toggle,
-            on_year_remove=self.handle_year_removal
+            on_year_remove=self.handle_year_removal,
+            on_theme_change=self.handle_theme_change
         )
         self.sidebar_view.grid(row=0, column=0, sticky="nsew")
 
-        # Instancia o Calendário
+        # Instancia o Calendário dentro do MAIN_CONTAINER
         self.calendar_view = MainCalendarView(
-            self, 
+            self.main_container, 
             initial_tracker_id=initial_tracker_id
         )
         
-        # Realiza a primeira checagem de estado para preencher os dados
         self.handle_tracker_change()
 
-    # ==========================
-    # GERENCIAMENTO DE ESTADO
-    # ==========================
+        if reopen_theme_popup:
+            self.sidebar_view.theme_popup()
+
     def handle_sidebar_toggle(self, is_visible: bool):
-        """Ajusta as colunas do app principal quando a sidebar expande/contrai"""
         if is_visible:
-            self.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
+            self.main_container.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
         else:
-            self.grid_columnconfigure(0, weight=0, uniform="", minsize=0)
+            self.main_container.grid_columnconfigure(0, weight=0, uniform="", minsize=0)
 
     def handle_tracker_change(self, tracker_id=None):
-        """Chamado sempre que o tracker atual muda ou a lista de trackers é alterada"""
         trackers = self.tracker_service.get_all_trackers()
         if tracker_id:
-            self.calendar_view.update_tracker_data(tracker_id=tracker_id) #Averiguar a parte do diálogo entre as views
+            self.calendar_view.update_tracker_data(tracker_id=tracker_id) 
         if trackers:
             self.forbidden_frame.grid_forget()
             self.calendar_view.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
-            
         else:
             self.calendar_view.grid_forget()
             self.forbidden_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
@@ -75,6 +86,9 @@ class CalendarApp(ctk.CTk):
     def handle_color_change(self):
         self.sidebar_view.reload_colors()
         self.calendar_view.reload_colors()
+
+    def handle_theme_change(self):
+        self.build_all_ui(reopen_theme_popup=True)
 
     def handle_year_removal(self, year: int, is_top_year: bool = True):
         if self.calendar_view.current_year != year:
@@ -89,8 +103,7 @@ class CalendarApp(ctk.CTk):
         self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
 
     def build_forbidden_content(self) -> None:
-        """Frame de bloqueio exibido quando não existem marcadores"""
-        self.forbidden_frame = ctk.CTkFrame(self, corner_radius=0)
+        self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=0)
         self.forbidden_frame.grid_columnconfigure(0, weight=1)
         self.forbidden_frame.grid_rowconfigure(0, weight=1)
 
@@ -101,7 +114,3 @@ class CalendarApp(ctk.CTk):
             text_color="gray"
         )
         forbidden_label.grid(row=0, column=0, sticky="nsew")
-
-if __name__ == "__main__":
-    app = CalendarApp()
-    app.mainloop()

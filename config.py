@@ -84,7 +84,13 @@ class LastTrackerJSON:
         data = _load_config_data()
         return data["config"].get("last_active_tracker", 0)
     
-class CurrentThemeJSON:
+class ThemeJSON:
+    @staticmethod
+    def save_current_color(color: str) -> None:
+        data = _load_config_data()
+        data["config"]["current_color"] = color
+        _save_config_data(data)
+
     @staticmethod
     def save_current_theme(theme: str) -> None:
         data = _load_config_data()
@@ -92,6 +98,11 @@ class CurrentThemeJSON:
         _save_config_data(data)
 
     @staticmethod
+    def get_current_color() -> str:
+        data = _load_config_data()
+        return data["config"].get("current_color", "hierophant-green (Default)")
+
+    @staticmethod
     def get_current_theme() -> str:
         data = _load_config_data()
-        return data["config"].get("current_theme", "hierophant-green (Default)")
+        return data["config"].get("current_theme", "dark")

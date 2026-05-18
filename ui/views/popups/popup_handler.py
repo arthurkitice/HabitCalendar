@@ -58,6 +58,6 @@ def year_popup(parent, on_select, tracker_id, year):
     return YearView(parent.winfo_toplevel(), tracker_id, on_select, year)
 
 @_show_popup
-def theme_popup(parent, on_color_change):
-    return ThemeView(parent.winfo_toplevel(), on_color_change)
+def theme_popup(parent, on_color_change, on_theme_change):
+    return ThemeView(parent.winfo_toplevel(), on_color_change, on_theme_change)
 

@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS
+from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
 
 
@@ -16,7 +16,7 @@ class CustomButton(ctk.CTkButton):
             command=command,
             fg_color= fg_color,
             hover_color= hover_color,
-            text_color="white",
+            text_color=TEXT_COLOR,
             cursor="hand2",
             font=ctk.CTkFont(size=font_size, weight="bold" if bold else "normal")
         )
@@ -37,7 +37,7 @@ class NavigationButton(ctk.CTkButton):
             command=command,
             image=self._get_image(condition),
             fg_color="transparent",
-            text_color="white",
+            text_color=TEXT_COLOR,
             hover_color= SECONDARY_THEME.hover_color(),
             cursor="hand2",
             height=height,
@@ -75,7 +75,7 @@ class DayButton(ctk.CTkButton):
             corner_radius=20, 
             text=self.day, 
             command=command,
-            text_color="white",
+            text_color=TEXT_COLOR,
             text_color_disabled="gray",
             font=ctk.CTkFont(size=15, weight="bold"),
             **configs
@@ -86,7 +86,7 @@ class DayButton(ctk.CTkButton):
         return self._get_button_config() if self.day != "0" else self._get_disabled_button_config()
 
     def _get_disabled_button_config(self):
-        FG_COLOR_DISABLED = "#2F2F2F"
+        FG_COLOR_DISABLED = ("#D4D4D4", "#2F2F2F")
         return {
             "fg_color": FG_COLOR_DISABLED,
             "cursor": "arrow",
@@ -150,7 +150,7 @@ class SidebarButton(ctk.CTkButton):
             image=image,
             command=command,
             fg_color=TERTIARY_THEME.fg_color(),
-            text_color="white",
+            text_color=TEXT_COLOR,
             hover_color=TERTIARY_THEME.hover_color(),
             cursor="hand2",
             height=40,
@@ -176,7 +176,7 @@ class IconButton(ctk.CTkButton):
             text="",
             command=command,
             fg_color=SECONDARY_THEME.fg_color(),
-            text_color="white",
+            text_color=TEXT_COLOR,
             hover_color=SECONDARY_THEME.hover_color(),
             cursor="hand2",
             height=40,
@@ -188,64 +188,86 @@ class IconButton(ctk.CTkButton):
         return ICONS[self.icon_type] if self.icon_type else None
 
 class SmartScrollableFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master, scroll_bar_on_right = True, **kwargs):
+    def __init__(self, master, scroll_bar_on_right=True, **kwargs):
         super().__init__(master, **kwargs)
 
-        if not scroll_bar_on_right:
-            self._parent_frame.grid_columnconfigure(0, weight=0)
-            self._parent_frame.grid_columnconfigure(1, weight=1)
-
-            self._scrollbar.grid(row=1, column=0, sticky="ns", padx=0)
-            self._parent_canvas.grid(row=1, column=1, sticky="nsew")
-        else:
-            self._scrollbar.grid(row=1, column=1, sticky="ns", padx=0)
-
-        # Monitora mudanças de tamanho direto no Canvas (a tela de rolagem)
-        self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")
+        self._check_job = None
+        self._scroll_on_right = scroll_bar_on_right
         
-        # O add="+" garante que não vamos sobrescrever outros eventos do sistema
+        # Captura a largura exata da barra de rolagem atual (geralmente 16) + 2px de respiro
+        self._sb_width = self._scrollbar.cget("width") + 2
+
+        # 1. Removemos do grid para evitar o loop de altura
+        self._scrollbar.grid_forget()
+
+        # 2. Canvas espalhado ocupando o espaço todo inicialmente
+        self._parent_canvas.grid(row=1, column=0, columnspan=2, sticky="nsew")
+
+        self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")
+        self.bind("<Configure>", self._check_scrollbar, add="+") 
+        
         self.bind_all("<MouseWheel>", self._force_mouse_scroll, add="+") 
         self.bind_all("<Button-4>", self._force_mouse_scroll, add="+")
         self.bind_all("<Button-5>", self._force_mouse_scroll, add="+")
 
     def _get_heights(self):
-        """Calcula a altura real do conteúdo e a altura visível na tela."""
-        self._parent_canvas.update_idletasks()
-
-        # bbox("all") retorna (x_inicial, y_inicial, x_final, y_final) de todos os itens
         bbox = self._parent_canvas.bbox("all") 
-
-        # Se tiver itens, a altura é y_final - y_inicial. Se estiver vazio, é 0.
         content_height = (bbox[3] - bbox[1]) if bbox else 0
         visible_height = self._parent_canvas.winfo_height()
-
         return content_height, visible_height
 
     def _check_scrollbar(self, event=None):
-        content_height, visible_height = self._get_heights()
+        if self._check_job is not None:
+            self.after_cancel(self._check_job)
+        
+        # REMOVIDO O DELAY EM MS!
+        # after_idle executa o código instantaneamente assim que o motor 
+        # gráfico tiver uma folga, impedindo lag sem precisar de cronômetro.
+        self._check_job = self.after_idle(self._apply_scrollbar_logic)
 
-        # Agora a matemática funciona perfeitamente!
+    def _apply_scrollbar_logic(self):
+        if not self.winfo_exists():
+            return
+
+        content_height, visible_height = self._get_heights()
+        scrollbar_visivel = self._scrollbar.winfo_ismapped()
+
+        if visible_height <= 1:
+            # Opcional: Garante que ela comece limpa e escondida no frame 1
+            if scrollbar_visivel:
+                self._scrollbar.place_forget()
+                self._parent_canvas.grid_configure(padx=0)
+            return
+
         if content_height > visible_height:
-            self._scrollbar.grid()
-        else:
-            self._scrollbar.grid_remove()
+            if scrollbar_visivel:
+                return
+            if self._scroll_on_right:
+                self._scrollbar.place(relx=1.0, rely=0.0, relheight=1.0, anchor="ne")
+                # Aplica padding dinâmico na direita, "empurrando" o conteúdo
+                self._parent_canvas.grid_configure(padx=(0, self._sb_width))
+            else:
+                self._scrollbar.place(relx=0.0, rely=0.0, relheight=1.0, anchor="nw")
+                # Aplica padding dinâmico na esquerda
+                self._parent_canvas.grid_configure(padx=(self._sb_width, 0))
+        elif scrollbar_visivel:
+            self._scrollbar.place_forget()
+            # Remove o padding quando a barra some, devolvendo a largura ao conteúdo
+            self._parent_canvas.grid_configure(padx=0)
 
     def _force_mouse_scroll(self, event):
         if not self.winfo_exists():
             return
 
-        # 1. Checa se o mouse está realmente em cima deste frame de rolagem
         x, y = self.winfo_pointerxy()
         widget_under_mouse = self.winfo_containing(x, y)
         
         if widget_under_mouse and str(widget_under_mouse).startswith(str(self)):
-            
-            # 2. A MÁGICA CONTRA O "SCROLL NO VAZIO" ACONTECE AQUI:
             content_height, visible_height = self._get_heights()
+            
             if content_height <= visible_height:
-                return # Interrompe a função. O scroll não faz nada!
+                return 
 
-            # 3. Se passou pela verificação acima, permite rolar a tela
             if event.num == 4 or event.delta > 0:
                 self._parent_canvas.yview_scroll(-1, "units")
             elif event.num == 5 or event.delta < 0:

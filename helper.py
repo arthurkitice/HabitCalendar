@@ -11,21 +11,23 @@ MESES_BR = (
         "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
     )
 
-def carregar_icone_svg(caminho_arquivo, tamanho_icone):
+def carregar_icone_svg(nome_arquivo, tamanho_icone):
     # Multiplicamos o tamanho desejado por 4 para garantir nitidez 
     largura_render = tamanho_icone[0] * 4
     altura_render = tamanho_icone[1] * 4
 
-    png_bytes = cairosvg.svg2png(
-        url=caminho_arquivo, 
-        output_width=largura_render, 
-        output_height=altura_render
-    )
+    imagem_pillow = {}
+    for i in ['dark', 'light']:
+        png_bytes = cairosvg.svg2png(
+            url=f"ui/icons/{i}/{nome_arquivo}.svg", 
+            output_width=largura_render, 
+            output_height=altura_render
+        )
+        
+        imagem_memoria = io.BytesIO(png_bytes)
+        imagem_pillow[i] = Image.open(imagem_memoria)
     
-    imagem_memoria = io.BytesIO(png_bytes)
-    imagem_pillow = Image.open(imagem_memoria)
-    
-    return ctk.CTkImage(light_image=imagem_pillow, dark_image=imagem_pillow, size=tamanho_icone)
+    return ctk.CTkImage(light_image=imagem_pillow['light'], dark_image=imagem_pillow['dark'], size=tamanho_icone)
 
 def get_days(year, month):
     # Retorna uma lista de listas (semanas)

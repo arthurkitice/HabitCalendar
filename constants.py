@@ -5,69 +5,69 @@ STARTING_YEAR = 2026
 
 MAIN_COLORS = {
     "hierophant-green (Default)": {
-        "fg": "#1A593D", 
-        "hover": "#14462F"
+        "fg": ("#85C7A3", "#1A593D"), 
+        "hover": ("#71B38F", "#14462F")
     },
     "blue-prince": {
-        "fg": "#27488F", 
-        "hover": "#233C73"
+        "fg": ("#8DA7DE", "#27488F"), 
+        "hover": ("#7995CD", "#233C73")
     },
     "purple-haze": {
-        "fg": "#4C1DB8", 
-        "hover": "#381685"
+        "fg": ("#B398F5", "#4C1DB8"), 
+        "hover": ("#9F82E6", "#381685")
     },
     "red-prince": {
-        "fg": "#BE1313", 
-        "hover": "#940707"
+        "fg": ("#ED8E8E", "#BE1313"), 
+        "hover": ("#DB7A7A", "#940707")
     }
 }
 
 TRACKER_COLORS = {
     "Verde": {
-        "fg": "#2D634A", 
-        "hover": "#2A5A44"
+        "fg": ("#7BC29A", "#2D634A"), 
+        "hover": ("#6AB089", "#2A5A44")
     },
     "Azul": {
-        "fg": "#344F87", 
-        "hover": "#31497E"
+        "fg": ("#7BA1E2", "#344F87"), 
+        "hover": ("#6A8DD1", "#31497E")
     },
     "Roxo": {
-        "fg": "#7360A1", 
-        "hover": "#624F8E"
+        "fg": ("#A891D9", "#7360A1"), 
+        "hover": ("#957EC4", "#624F8E")
     },
     "Vermelho": {
-        "fg": "#A25353", 
-        "hover": "#925050"
+        "fg": ("#D97B7B", "#A25353"), 
+        "hover": ("#C76969", "#925050")
     },
     "Amarelo": {
-        "fg": "#A38F49",
-        "hover": "#938040"
+        "fg": ("#D9C67A", "#A38F49"),
+        "hover": ("#C7B368", "#938040")
     },
     "Laranja": {
-        "fg": "#9C6B4B",
-        "hover": "#8C5E41"
+        "fg": ("#D99A7A", "#9C6B4B"),
+        "hover": ("#C78868", "#8C5E41")
     },
     "Rosa": {
-        "fg": "#9B637B",
-        "hover": "#8B576D"
+        "fg": ("#D68EAD", "#9B637B"),
+        "hover": ("#C47C9A", "#8B576D")
     },
     "Ciano": {
-        "fg": "#447A82",
-        "hover": "#3C6E75"
+        "fg": ("#70C4CE", "#006B7B"),
+        "hover": ("#61B0B9", "#3C6E75")
     }
 }
 
 SECONDARY_COLORS = {
     "default-theme": {
-        "fg": "#333333",
-        "hover": "#272727"
+        "fg": ("#C5C5C5", "#303030"),
+        "hover": ("#C0C0C0", "#272727")
     }
 }
 
 TERTIARY_COLORS = {
     "default-theme": {
-        "fg": "#242424",
-        "hover": "#1E1E1E"
+        "fg": ("#8D8D8D", "#242424"),
+        "hover": ("#707070", "#1E1E1E")
     }
 }
 
@@ -87,6 +87,8 @@ class Theme:
             self.current_color = theme_name
         else:
             print(f"Erro: Tema '{theme_name}' não encontrado!")
+
+TEXT_COLOR = ( "#1F1F1F","#FFFFFF")
 
 PRIMARY_THEME = Theme("hierophant-green (Default)", MAIN_COLORS)
 SECONDARY_THEME = Theme("default-theme", SECONDARY_COLORS)
@@ -122,14 +124,14 @@ class IconType(Enum):
     BIG_TRASH = auto()
 
 class IconImages:
-    LEFT_ARROW = carregar_icone_svg("ui/icons/left_arrow_dark.svg", (30, 30))
-    RIGHT_ARROW = carregar_icone_svg("ui/icons/right_arrow_dark.svg", (30, 30))
-    PLUS = carregar_icone_svg("ui/icons/plus_dark.svg", (30, 30))
-    EDIT = carregar_icone_svg("ui/icons/pencil_dark.svg", (30, 30))
-    TRASH = carregar_icone_svg("ui/icons/bin_dark.svg", (30, 30))
-    CONFIG = carregar_icone_svg("ui/icons/settings_dark.svg", (30, 30))
-    PALLETE = carregar_icone_svg("ui/icons/pallete_dark.svg", (20, 20))
-    BIG_TRASH = carregar_icone_svg("ui/icons/bin_dark.svg", (40, 40))
+    LEFT_ARROW = carregar_icone_svg("left_arrow", (30, 30))
+    RIGHT_ARROW = carregar_icone_svg("right_arrow", (30, 30))
+    PLUS = carregar_icone_svg("plus", (30, 30))
+    EDIT = carregar_icone_svg("pencil", (30, 30))
+    TRASH = carregar_icone_svg("bin", (30, 30))
+    CONFIG = carregar_icone_svg("settings", (30, 30))
+    PALLETE = carregar_icone_svg("pallete", (20, 20))
+    BIG_TRASH = carregar_icone_svg("bin", (40, 40))
 
 ARROWS = {Direction.NEXT: IconImages.RIGHT_ARROW, Direction.PREV: IconImages.LEFT_ARROW}
 
