@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton
 from constants import TEXT_COLOR
+import i18n
 
 class NewYearView(ctk.CTkFrame):
     def __init__(self, parent, on_save, year):
@@ -22,10 +23,10 @@ class NewYearView(ctk.CTkFrame):
 
     def ui(self):
         
-        self.label = ctk.CTkLabel(self, text=f"Novo Ano: {self.year}\n", font=ctk.CTkFont(size=22, weight="bold"))
+        self.label = ctk.CTkLabel(self, text=i18n.t('new_year.label', year=self.year), font=ctk.CTkFont(size=22, weight="bold"))
         self.label.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
-        self.label = ctk.CTkLabel(self, text=f"Confirmar criação do ano?\nEssa ação aumentará o\ntamanho do banco de dados\n", font=ctk.CTkFont(size=16), text_color="grey")
+        self.label = ctk.CTkLabel(self, text=i18n.t('new_year.warning'), font=ctk.CTkFont(size=16), text_color="grey")
         self.label.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent", width=500)
@@ -33,10 +34,10 @@ class NewYearView(ctk.CTkFrame):
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid(row=3, column=1)
 
-        self.btn_return = CustomButton(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
+        self.btn_return = CustomButton(self.button_frame, text=i18n.t('actions.cancel'), font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
 
-        self.btn_confirm = CustomButton(self.button_frame, text="Confirmar", font_size=15, command=self.save, height=35, width=250)
+        self.btn_confirm = CustomButton(self.button_frame, text=i18n.t('actions.confirm'), font_size=15, command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
     def build_ui(self):

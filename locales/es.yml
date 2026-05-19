@@ -1,0 +1,108 @@
+es:
+  sidebar:
+    top_label: Marcadores
+    bottom_label: |-
+      Marcador actual:
+      %{tracker}
+    empty_bottom_label: |-
+      Marcador actual:
+      Ninguno
+
+  calendar:
+    months:
+      "1": Enero
+      "2": Febrero
+      "3": Marzo
+      "4": Abril
+      "5": Mayo
+      "6": Junio
+      "7": Julio
+      "8": Agosto
+      "9": Septiembre
+      "10": Octubre
+      "11": Noviembre
+      "12": Diciembre
+    short_weekdays:
+      "0": Lun
+      "1": Mar
+      "2": Mié
+      "3": Jue
+      "4": Vie
+      "5": Sáb
+      "6": Dom
+
+  checks:
+    zero: Sin marcas
+    one: Una marca
+    many: "%{count} marcas"
+
+  actions:
+    cancel: Cancelar
+    save: Guardar
+    confirm: Confirmar
+    back: Volver
+
+  alter_tracker:
+    new_tracker: Nuevo Marcador
+    new_tracker_placeholder: Escribe el nombre del nuevo marcador
+    edit_tracker: |-
+      Editar Marcador
+      "%{tracker}"
+    edit_tracker_placeholder: Escribe el nombre del marcador
+    name: "Nombre del marcador:"
+    color: "Color del marcador:"
+    warning1: "* El nombre no puede estar vacío."
+    warning2: "* El nombre ya pertenece a otro marcador."
+
+  theme:
+    label: "Tema:"
+    light: Claro
+    dark: Oscuro
+    current_color: "Color actual:"
+    colors: "Colores:"
+    default: "(Por defecto)"
+    language: "Idioma:"
+    current_language: "Idioma actual:"
+    custom_themes: "Temas personalizados"
+    dark_mode_only: "Temas 'exclusivamente en modo oscuro':"
+    light_mode_only: "Temas 'exclusivamente en modo claro':"
+
+  delete:
+    tracker:
+      label: |- 
+        ¿Estás seguro de que
+        deseas eliminar el marcador
+        "%{tracker}"?
+      warning: |-
+        Perderás todos los años y marcas asociadas.
+
+        Esta acción es irreversible.
+    year:
+      label: |-
+        ¿Estás seguro de que deseas
+        eliminar el año %{year}?
+      warning: |-
+        Puedes volver a crear el año
+        pero perderás cualquier marca.
+
+        Esta acción es irreversible.
+
+  config:
+    tracker: "Marcador: %{tracker}"
+    year_number: "Cantidad de años en memoria: %{years}"
+    days_checked: "Días marcados: %{days}"
+    single_year: "Año: %{year}"
+    top_year: "Año más reciente: %{year}"
+    bottom_year: "Año más antiguo: %{year}"
+    single_year_warning: |-
+      Único año guardado en memoria.
+
+      Un marcador debe contener
+      al menos un año.
+
+  new_year:
+    label: "Nuevo Año: %{year}"
+    warning: |-
+      ¿Confirmar la creación del año?
+      Esta acción aumentará el tamaño
+      de la base de datos.

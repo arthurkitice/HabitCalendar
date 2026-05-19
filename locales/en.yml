@@ -1,0 +1,107 @@
+en:  
+  sidebar:
+    top_label: Trackers
+    bottom_label: |-
+      Current tracker:
+      %{tracker}
+    empty_bottom_label: |-
+      Current tracker:
+      None
+
+  calendar:
+    months:
+      "1": January
+      "2": February
+      "3": March
+      "4": April
+      "5": May
+      "6": June
+      "7": July
+      "8": August
+      "9": September
+      "10": October
+      "11": November
+      "12": December
+    short_weekdays:
+      "0": Mon
+      "1": Tue
+      "2": Wed
+      "3": Thu
+      "4": Fri
+      "5": Sat
+      "6": Sun
+
+  checks:
+    zero: No checks
+    one: One check
+    many: "%{count} checks"
+
+  actions:
+    cancel: Cancel
+    save: Save
+    confirm: Confirm
+    back: Back
+
+  alter_tracker:
+    new_tracker: New Tracker
+    new_tracker_placeholder: Type new tracker name
+    edit_tracker: |-
+      Edit Tracker
+      "%{tracker}"
+    edit_tracker_placeholder: Type tracker name
+    name: "Tracker name:"
+    color: "Tracker color:"
+    warning1: "* Name can not be empty."
+    warning2: "* Name already taken."
+
+  theme:
+    label: "Theme:"
+    light: Light
+    dark: Dark
+    current_color: "Current color:"
+    colors: "Colors:"
+    default: "(Default)"
+    language: "Language:"
+    current_language: "Current language:"
+    custom_themes: "Custom themes"
+    dark_mode_only: "'Dark mode only' themes:"
+    light_mode_only: "'Light mode only' themes:"
+
+  delete:
+    tracker:
+      label: |- 
+        Are you sure you want to 
+        delete tracker "%{tracker}"?
+      warning: |-
+        You will lose all years and their checks.
+
+        This action is irreversible.
+    year:
+      label: |- 
+        Are you sure you want to
+        delete the year %{year}?
+      warning: |-
+        You can recreate the year 
+        but will lose any of its checks.
+
+        This action is irreversible.
+
+  config:
+    tracker: "Tracker: %{tracker}"
+    year_number: "Number of years in memory: %{years}"
+    days_checked: "Number of days checked: %{days}"
+    single_year: "Year: %{year}"
+    top_year: "Latest year: %{year}"
+    bottom_year: "Earliest year: %{year}"
+    single_year_warning: |-
+      Only year saved in memory.
+
+      A tracker must contain
+      at least one year.
+
+  new_year:
+    label: "New Year: %{year}"
+    warning: |-
+      Confirm creation?
+      This action will increase
+      database's size.

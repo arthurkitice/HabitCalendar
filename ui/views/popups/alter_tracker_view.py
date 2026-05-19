@@ -3,6 +3,7 @@ from ui.widgets import CustomButton
 from services import TrackerService
 from config import TrackerDataJSON
 from constants import TEXT_COLOR
+import i18n
 
 class AlterTrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, on_save, tracker_name=None, tracker_id=None):
@@ -16,26 +17,32 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.tracker_name = tracker_name
 
         self.current_color = None
+        self._yml_path = 'alter_tracker'
 
         self.build_ui()
 
     def ui_new_tracker(self):
-        self.label = ctk.CTkLabel(self.main_frame, text=f"Novo Marcador\n", font=ctk.CTkFont(size=22, weight="bold"))
+        text = i18n.t(f'{self._yml_path}.new_tracker')
+        self.label = ctk.CTkLabel(self.main_frame, text=text, font=ctk.CTkFont(size=22, weight="bold"))
         self.label.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
-        self.entry = ctk.CTkEntry(self.main_frame, placeholder_text="Digite o nome do marcador", height=35)
+        text = i18n.t(f'{self._yml_path}.new_tracker_placeholder')
+        self.entry = ctk.CTkEntry(self.main_frame, placeholder_text=text, height=35)
         self.entry.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
     def ui_edit_tracker(self, tracker_name):
-        text = tracker_name if len(tracker_name) < 15 else f"{tracker_name[:15]}..."
+        tracker = tracker_name if len(tracker_name) < 15 else f"{tracker_name[:15]}..."
 
-        self.label = ctk.CTkLabel(self.main_frame, text=f"Editar Marcador\n'{text}'", font=ctk.CTkFont(size=22, weight="bold"))
+        text = i18n.t(f'{self._yml_path}.edit_tracker', tracker=tracker)
+        self.label = ctk.CTkLabel(self.main_frame, text=text, font=ctk.CTkFont(size=22, weight="bold"))
         self.label.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
-        self.name_label = ctk.CTkLabel(self.main_frame, text=f"Nome:", font=ctk.CTkFont(size=16, weight="bold"))
+        text = i18n.t(f'{self._yml_path}.name')
+        self.name_label = ctk.CTkLabel(self.main_frame, text=text, font=ctk.CTkFont(size=16, weight="bold"))
         self.name_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
 
-        self.entry = ctk.CTkEntry(self.main_frame, placeholder_text="Digite o novo nome do marcador", height=35)
+        text = i18n.t(f'{self._yml_path}.edit_tracker_placeholder')
+        self.entry = ctk.CTkEntry(self.main_frame, placeholder_text=text, height=35)
         self.entry.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
         self.build_color_buttons()
@@ -48,7 +55,8 @@ class AlterTrackerFrame(ctk.CTkFrame):
         from constants import TRACKER_COLORS
         from functools import partial
 
-        self.color_label = ctk.CTkLabel(self.main_frame, text=f"Cor do marcador:", font=ctk.CTkFont(size=16, weight="bold"))
+        text = i18n.t(f'{self._yml_path}.color')
+        self.color_label = ctk.CTkLabel(self.main_frame, text=text, font=ctk.CTkFont(size=16, weight="bold"))
         self.color_label.grid(row=4, column=0, padx=5, pady=5, sticky="w")
 
         MAX_COLUMNS = 4
@@ -97,10 +105,10 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid(row=2, column=1)
 
-        self.btn_return = CustomButton(self.button_frame, text="Cancelar", font_size=15, command=self.destroy, height=35, width=250, main_color=False)
+        self.btn_return = CustomButton(self.button_frame, text=i18n.t('actions.cancel'), font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
 
-        self.btn_confirm = CustomButton(self.button_frame, text="Salvar", font_size=15, command=self.save, height=35, width=250)
+        self.btn_confirm = CustomButton(self.button_frame, text=i18n.t('actions.save'), font_size=15, command=self.save, height=35, width=250)
         self.btn_confirm.grid(row=0, column=1, padx=5, pady=10)
 
         self.error_msg = ctk.CTkLabel(self.main_frame, text="", font=ctk.CTkFont(size=12), text_color="grey")
@@ -115,14 +123,14 @@ class AlterTrackerFrame(ctk.CTkFrame):
 
         if not text:
             self.error_msg.grid(row=3, column=0, padx=5, pady=0, sticky="w")
-            self.error_msg.configure(text="* O nome não pode ser vazio.")
+            self.error_msg.configure(text=i18n.t(f'{self._yml_path}.warning1'))
             return
         
         text = ' '.join(text)
 
         if self.tracker_name != text and TrackerService().get_tracker_by_name(text):
             self.error_msg.grid(row=3, column=0, padx=5, pady=0, sticky="w")
-            self.error_msg.configure(text="* Já existe um marcador com este nome.")
+            self.error_msg.configure(text=i18n.t(f'{self._yml_path}.warning2'))
             return
 
         if self.tracker_id is not None:

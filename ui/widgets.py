@@ -1,11 +1,12 @@
 import customtkinter as ctk
 from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
-
+import i18n
 
 class CustomButton(ctk.CTkButton):
-    def __init__(self, parent, text, command, font_size = 20, bold = True, main_color = True, **kwargs):
+    def __init__(self, parent, text, command, font_size = 20, bold = True, main_color = True, translation_path: str | None = None, **kwargs):
         self.main_color = main_color
+        self.translation_path = translation_path
         fg_color = PRIMARY_THEME.fg_color() if self.main_color else SECONDARY_THEME.fg_color()
         hover_color = PRIMARY_THEME.hover_color() if self.main_color else SECONDARY_THEME.hover_color()
 
@@ -26,6 +27,11 @@ class CustomButton(ctk.CTkButton):
         if not self.main_color:
             return
         self.configure(fg_color=PRIMARY_THEME.fg_color(), hover_color=PRIMARY_THEME.hover_color())
+    
+    # def reload_text(self):
+    #     if self.translation_path is None:
+    #         return
+    #     self.configure(text=i18n.t())
 
 class NavigationButton(ctk.CTkButton):
     def __init__(self, parent, direction, command, condition, height=50, width=65, **kwargs):

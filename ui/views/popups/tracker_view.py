@@ -4,7 +4,7 @@ from functools import partial
 from constants import IconType, TEXT_COLOR
 from .delete_year_view import DeleteYearView
 from services import YearService, TrackerService
-from helper import format_year_text
+import i18n
 
 class TrackerFrame(ctk.CTkFrame):
     def __init__(self, parent, tracker_id, tracker_name, on_year_remove):
@@ -26,6 +26,9 @@ class TrackerFrame(ctk.CTkFrame):
         self.tracker_id = tracker_id
         self.tracker = tracker_name if len(tracker_name) < 15 else f"{tracker_name[:15]}..."
         self.on_year_remove = on_year_remove
+        self._i18n_key = 'config'
+        self.popup_frame = None
+
         self._update_years()
 
         self.build_ui()
@@ -37,33 +40,35 @@ class TrackerFrame(ctk.CTkFrame):
 
     def remove_year(self, year):
         self.year_service.delete_year(tracker_id=self.tracker_id, year_number=year)
-        self.on_year_remove(year, is_top_year = True if year == self.top_year else False)
+        self.on_year_remove(year, is_top_year = (year == self.top_year))
         self._update_years()
-
-        checked_days = self.tracker_service.get_checked_days_count(self.tracker_id)
-        self.top_label.configure(text=f"Marcador: {self.tracker}")
-        self.top_label_info_1.configure(text=f"Quantidade de anos na memória: {len(self.years)}")
-        self.top_label_info_2.configure(text=f"Dias marcados: {checked_days}")
+        self.update_top_label()
 
         if len(self.years) == 1:
-            self.single_year_label.configure(text=f"Ano: {self.bottom_year}")
+            self.single_year_label.configure(text=self._single_year_text()['year'])
             self.show_single_year_frame()
 
         else:
-            self.top_year_label.configure(text=f"Maior ano: {self.top_year}")
-            self.bottom_year_label.configure(text=f"Menor ano: {self.bottom_year}")
+            self.update_double_year_frame()
 
-            checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.top_year)
-            self.top_year_info_label.configure(text=format_year_text(checked_days))
+    def update_top_label(self):
+        text = self._top_label_text()
+        self.top_label_info_1.configure(text=text["info_1"])
+        self.top_label_info_2.configure(text=text["info_2"])
 
-            checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.bottom_year)
-            self.bottom_year_info_label.configure(text=format_year_text(checked_days))
+    def update_double_year_frame(self):
+        text = self._double_year_text()
+        self.top_year_label.configure(text=text['top']['year'])
+        self.bottom_year_label.configure(text=text['bottom']['year'])
 
-            self.delete_top_year_btn.configure(command=partial(self.delete_year_popup, self.top_year))
-            self.delete_bottom_year_btn.configure(command=partial(self.delete_year_popup, self.bottom_year))
+        self.top_year_info_label.configure(text=text['top']['checks'])
+        self.bottom_year_info_label.configure(text=text['bottom']['checks'])
 
+        self.delete_top_year_btn.configure(command=partial(self.delete_year_popup, self.top_year))
+        self.delete_bottom_year_btn.configure(command=partial(self.delete_year_popup, self.bottom_year))
+        
     def delete_year_popup(self, year):
-        if hasattr(self, "popup_frame"):
+        if self.popup_frame is not None:
             self.popup_frame.destroy()
 
         self.popup_frame = DeleteYearView(
@@ -81,15 +86,14 @@ class TrackerFrame(ctk.CTkFrame):
         self.top_label_frame.grid(row=0, column=0, padx=15, pady=5, sticky="ew")
         self.top_label_frame.grid_columnconfigure(0, weight=1)
 
-        checked_days = self.tracker_service.get_checked_days_count(self.tracker_id)
-
-        self.top_label = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=20, weight="bold"), text=f"Marcador: {self.tracker}", corner_radius=10)
+        text = self._top_label_text()
+        self.top_label = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=20, weight="bold"), text=text["label"], corner_radius=10)
         self.top_label.grid(row=0, column=0, pady=5, sticky="we")
 
-        self.top_label_info_1 = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=18), text=f"Quantidade de anos na memória: {len(self.years)}", corner_radius=10)
+        self.top_label_info_1 = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=18), text=text["info_1"], corner_radius=10)
         self.top_label_info_1.grid(row=1, column=0, sticky="we")
 
-        self.top_label_info_2 = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=18), text=f"Dias marcados: {checked_days}", corner_radius=10)
+        self.top_label_info_2 = ctk.CTkLabel(self.top_label_frame, font=ctk.CTkFont(size=18), text=text["info_2"], corner_radius=10)
         self.top_label_info_2.grid(row=2, column=0, sticky="we")
     
     def build_top_year(self):
@@ -102,13 +106,12 @@ class TrackerFrame(ctk.CTkFrame):
         self.top_year_text_frame.grid(row=0, column=0, sticky="w")
         self.top_year_text_frame.grid_columnconfigure(0, weight=1)
         
-        self.top_year_label = ctk.CTkLabel(self.top_year_text_frame, font=ctk.CTkFont(size=20, weight="bold"), text=f"Maior ano: {self.top_year}", height=0)
+        text = self._double_year_text()
+
+        self.top_year_label = ctk.CTkLabel(self.top_year_text_frame, font=ctk.CTkFont(size=20, weight="bold"), text=text['top']['year'], height=0)
         self.top_year_label.grid(row=0, column=0, padx=20, sticky="w")
 
-        checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.top_year)
-        text = format_year_text(checked_days)
-
-        self.top_year_info_label = ctk.CTkLabel(self.top_year_text_frame, font=ctk.CTkFont(size=16), text=text, height=0)
+        self.top_year_info_label = ctk.CTkLabel(self.top_year_text_frame, font=ctk.CTkFont(size=16), text=text['top']['checks'], height=0)
         self.top_year_info_label.grid(row=1, column=0, padx=20, sticky="w")
 
         self.delete_top_year_btn = IconButton(
@@ -130,14 +133,13 @@ class TrackerFrame(ctk.CTkFrame):
         self.bottom_year_text_frame = ctk.CTkFrame(self.bottom_year_frame, fg_color="transparent", height=60)
         self.bottom_year_text_frame.grid(row=0, column=0, sticky="w")
         self.bottom_year_text_frame.grid_columnconfigure(0, weight=1)
+
+        text = self._double_year_text()
         
-        self.bottom_year_label = ctk.CTkLabel(self.bottom_year_text_frame, font=ctk.CTkFont(size=20, weight="bold"), text=f"Menor ano: {self.bottom_year}", height=0)
+        self.bottom_year_label = ctk.CTkLabel(self.bottom_year_text_frame, font=ctk.CTkFont(size=20, weight="bold"), text=text['bottom']['year'], height=0)
         self.bottom_year_label.grid(row=0, column=0, padx=20, sticky="w")
 
-        checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.bottom_year)
-        text = format_year_text(checked_days)
-
-        self.bottom_year_info_label = ctk.CTkLabel(self.bottom_year_text_frame, font=ctk.CTkFont(size=16), text=text, height=0)
+        self.bottom_year_info_label = ctk.CTkLabel(self.bottom_year_text_frame, font=ctk.CTkFont(size=16), text=text['bottom']['checks'], height=0)
         self.bottom_year_info_label.grid(row=1, column=0, padx=20, sticky="w")
 
         self.delete_bottom_year_btn = IconButton(
@@ -151,22 +153,23 @@ class TrackerFrame(ctk.CTkFrame):
         self.delete_bottom_year_btn.grid(row=0, column=1, padx=20, pady=5, sticky="w")
 
     def build_single_year(self):
-        self.single_year_frame = ctk.CTkFrame(self.main_frame, corner_radius=10, fg_color="transparent")
+        self.single_year_frame = ctk.CTkFrame(self.main_frame, corner_radius=10)
         self.single_year_frame.grid_columnconfigure(0, weight=1)
         self.single_year_frame.grid_rowconfigure(0, weight=1)
 
-        self.single_year_label_frame = ctk.CTkFrame(self.single_year_frame, corner_radius=10, fg_color="#333333")
+        self.single_year_label_frame = ctk.CTkFrame(self.single_year_frame, corner_radius=10, fg_color="transparent")
         self.single_year_label_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.single_year_label_frame.grid_columnconfigure(0, weight=1)
         
-        self.single_year_label = ctk.CTkLabel(self.single_year_label_frame, font=ctk.CTkFont(size=20, weight="bold"), text=f"Ano: {self.bottom_year}", height=0)
+        text = self._single_year_text()
+        self.single_year_label = ctk.CTkLabel(self.single_year_label_frame, font=ctk.CTkFont(size=20, weight="bold"), text=text['year'], height=0)
         self.single_year_label.grid(row=0, column=0, pady=20, sticky="nsew")
 
         self.warning_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.warning_frame.grid_columnconfigure(0, weight=1)
         self.warning_frame.grid_rowconfigure(0, weight=1)
 
-        self.warning_label = ctk.CTkLabel(self.warning_frame, font=ctk.CTkFont(size=20), text="Único ano salvo na memória.\n\nUm marcador deve\nconter pelo menos um ano.", text_color="grey")
+        self.warning_label = ctk.CTkLabel(self.warning_frame, font=ctk.CTkFont(size=20), text=text['warning'], text_color="grey")
         self.warning_label.grid(row=0, column=0, sticky="ew")
 
     def build_back_button(self):
@@ -175,7 +178,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = CustomButton(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
+        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def show_double_year_frame(self):
@@ -211,4 +214,30 @@ class TrackerFrame(ctk.CTkFrame):
             self.show_single_year_frame()
 
         self.build_back_button()
-        
+
+    def _top_label_text(self):
+        return {
+            "label": i18n.t(f'{self._i18n_key}.tracker', tracker=self.tracker),
+            "info_1": i18n.t(f'{self._i18n_key}.year_number', years=len(self.years)),
+            "info_2": i18n.t(f'{self._i18n_key}.days_checked', days=self.tracker_service.get_checked_days_count(self.tracker_id))
+        }
+    
+    def _double_year_text(self):
+        checked_days_top_year = self.year_service.get_checked_days_count(self.tracker_id, self.top_year)
+        checked_days_bottom_year = self.year_service.get_checked_days_count(self.tracker_id, self.bottom_year)
+        return {
+            "top": {
+                "year": i18n.t(f'{self._i18n_key}.top_year', year=self.top_year),
+                "checks": i18n.t('checks', count=checked_days_top_year),
+            },
+            "bottom": {
+                "year": i18n.t(f'{self._i18n_key}.bottom_year', year=self.bottom_year),
+                "checks": i18n.t('checks', count=checked_days_bottom_year)
+            }
+        }
+    
+    def _single_year_text(self):
+        return {
+            "year": i18n.t(f'{self._i18n_key}.single_year', year=self.bottom_year),
+            "warning": i18n.t(f'{self._i18n_key}.single_year_warning')
+        }

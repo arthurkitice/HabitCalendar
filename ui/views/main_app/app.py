@@ -5,6 +5,10 @@ from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
 from functools import partial
 from constants import PRIMARY_THEME, IconImages # <-- Importado IconImages
+import os
+import i18n
+
+# 1. Caminho absoluto seguro
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
@@ -17,9 +21,6 @@ class CalendarApp(ctk.CTk):
         self.geometry("1100x700")
         self.minsize(850, 450)
         self.tracker_service = TrackerService()
-
-        # 🔥 1. Carrega as imagens ASSIM QUE A JANELA NASCER, antes de criar a interface!
-
 
         self.main_container = None
         self.build_all_ui()
@@ -51,7 +52,8 @@ class CalendarApp(ctk.CTk):
             on_color_change=self.handle_color_change,
             on_toggle_visibility=self.handle_sidebar_toggle,
             on_year_remove=self.handle_year_removal,
-            on_theme_change=self.handle_theme_change
+            on_theme_change=self.handle_theme_change,
+            on_language_change=self.handle_language_change
         )
         self.sidebar_view.grid(row=0, column=0, sticky="nsew")
 
@@ -82,6 +84,12 @@ class CalendarApp(ctk.CTk):
         else:
             self.calendar_view.grid_forget()
             self.forbidden_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+
+    def handle_language_change(self):
+        i18n.set('locale', ThemeJSON.get_current_language())
+        self.calendar_view.reload_language()
+        self.sidebar_view.reload_language()
+        self.sidebar_view.theme_popup()
 
     def handle_color_change(self):
         self.sidebar_view.reload_colors()

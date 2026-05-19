@@ -110,9 +110,20 @@ class ThemeJSON:
         _save_config_data(data)
 
     @staticmethod
+    def save_current_language(language: str) -> None:
+        data = _load_config_data()
+        data["config"]["current_language"] = language
+        _save_config_data(data)
+
+    @staticmethod
+    def get_current_language() -> str:
+        data = _load_config_data()
+        return data["config"].get("current_language", None)
+
+    @staticmethod
     def get_current_color() -> str:
         data = _load_config_data()
-        return data["config"].get("current_color", "hierophant-green (Default)")
+        return data["config"].get("current_color", "hierophant-green")
 
     @staticmethod
     def get_current_theme() -> str:

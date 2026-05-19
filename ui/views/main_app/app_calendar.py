@@ -7,6 +7,7 @@ from ui.widgets import NavigationButton, DayButton, CustomButton
 from constants import Direction, MONTHS, WEEK_DAYS, TEXT_COLOR
 from services import TrackerService, DayService, YearService, MonthService
 import calendar
+import i18n
 
 CALENDAR_ROWS = 6
 CALENDAR_COLS = 7
@@ -159,9 +160,11 @@ class MainCalendarView(ctk.CTkFrame):
         all_cells = self._generate_month_cells()
         self.day_buttons.clear()
 
+        self.week_days = []
         for i, day in enumerate(WEEK_DAYS):
-            label = ctk.CTkLabel(self.days_frame, text=day, font=ctk.CTkFont(size=15, weight="bold"), text_color=TEXT_COLOR)
+            label = ctk.CTkLabel(self.days_frame, text=i18n.t(f'calendar.short_weekdays.{str((i+6)%7)}'), font=ctk.CTkFont(size=15, weight="bold"), text_color=TEXT_COLOR)
             label.grid(row=0, column=i, padx=5, pady=5)
+            self.week_days.append(label)
 
         for i, day in enumerate(all_cells):
             row, col = divmod(i, CALENDAR_COLS)
@@ -187,7 +190,7 @@ class MainCalendarView(ctk.CTkFrame):
         PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year)
 
     def update_top_bar(self) -> None:
-        month_text = MONTHS[self.current_month]
+        month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
         self.month_button.configure(
             text=f"{self.current_year}\n{month_text}", 
             command=partial(self.open_years_popup, self.current_year)
@@ -202,7 +205,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.top_frame.grid_columnconfigure((0, 1, 2), weight=1, uniform="main")
         self.top_frame.grid_rowconfigure(0 , weight=1)
 
-        month_text = MONTHS[self.current_month]
+        month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
 
         self.month_button = CustomButton(
             self.top_frame,
@@ -233,6 +236,12 @@ class MainCalendarView(ctk.CTkFrame):
         for btn in self.day_buttons:
             btn.tracker_id = self.current_tracker_id
             btn.reload_colors()
+    
+    def reload_language(self):
+        month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
+        self.month_button.configure(text=f"{self.current_year}\n{month_text}")
+        for i, label in enumerate(self.week_days):
+            label.configure(text=i18n.t(f'calendar.short_weekdays.{str((i+6)%7)}'))
 
     def _get_condition(self, direction: Direction) -> bool | None:
         match direction:

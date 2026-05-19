@@ -5,6 +5,7 @@ from constants import Direction, MONTHS, TEXT_COLOR, TERTIARY_THEME
 from .new_year_view import NewYearView
 from services import YearService, MonthService
 from helper import format_month_text, format_year_text
+import i18n
 
 class YearView(ctk.CTkFrame):
     def __init__(self, parent, tracker_id, on_select, year):
@@ -41,9 +42,10 @@ class YearView(ctk.CTkFrame):
             for j in range(4):
                 num = (4*i) + j + 1
                 checked_days = self.month_service.get_checked_days_count(self.tracker_id, self.year, num)
-                text = format_month_text(checked_days)
+                month = i18n.t(f'calendar.months.{str(num)}')
+                checks = i18n.t(f'checks', count=checked_days) if checked_days > 0 else ""
                 button = CustomButton(self.months, 
-                    text=f"{MONTHS[num]}\n{text}", 
+                    text=f"{month}\n{checks}", 
                     command=partial(self.select, num), 
                     font=ctk.CTkFont(size=13), 
                     main_color=False,
@@ -72,16 +74,17 @@ class YearView(ctk.CTkFrame):
         self.year_label.configure(text=self.year)
 
         checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.year)
-        text = format_year_text(checked_days)
-        self.year_info_label.configure(text=text)
+        checks = i18n.t(f'checks', count=checked_days)
+        self.year_info_label.configure(text=checks)
 
         self.btn_right.update_button(self.year+1 not in self.years)
         self.btn_left.update_button(self.year-1 not in self.years)
 
         for btn in self.months_dict.values():
             checked_days = self.month_service.get_checked_days_count(self.tracker_id, self.year, btn.number)
-            text = format_month_text(checked_days)
-            btn.configure(text=f"{MONTHS[btn.number]}\n{text}")
+            month = i18n.t(f'calendar.months.{str(btn.number)}')
+            checks = i18n.t(f'checks', count=checked_days) if checked_days > 0 else ""
+            btn.configure(text=f"{month}\n{checks}")
 
     def add_year(self, year: int):
         self.year_service.add_tracker_year(tracker_id=self.tracker_id, year_number=year)
@@ -118,9 +121,9 @@ class YearView(ctk.CTkFrame):
         self.year_label.place(relx=0.5, rely=0.4, anchor="center")
 
         checked_days = self.year_service.get_checked_days_count(self.tracker_id, self.year)
-        text = format_year_text(checked_days)
+        checks = i18n.t(f'checks', count=checked_days)
 
-        self.year_info_label = ctk.CTkLabel(self.year_frame, font=ctk.CTkFont(size=15), text=text, height=0)
+        self.year_info_label = ctk.CTkLabel(self.year_frame, font=ctk.CTkFont(size=15), text=checks, height=0)
         self.year_info_label.place(relx=0.5, rely=0.75, anchor="center")
 
         self.btn_right = NavigationButton(
@@ -149,7 +152,7 @@ class YearView(ctk.CTkFrame):
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
-        self.back_button = CustomButton(self.button_frame, text="Voltar", command=self.destroy, font_size=15, height=35)
+        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
         self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
     def build_ui(self):

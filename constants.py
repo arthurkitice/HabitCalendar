@@ -4,7 +4,7 @@ from helper import carregar_icone_svg
 STARTING_YEAR = 2026
 
 MAIN_COLORS = {
-    "hierophant-green (Default)": {
+    "hierophant-green": {
         "fg": ("#85C7A3", "#1A593D"), 
         "hover": ("#71B38F", "#14462F")
     },
@@ -71,6 +71,21 @@ TERTIARY_COLORS = {
     }
 }
 
+LANGUAGE = {
+    "pt": {
+        "sidebar": {
+            "top_label": "Marcadores",
+            "bottom_label": "Marcador atual:"
+        }
+    },
+    "en": {
+        "sidebar": {
+            "top_label": "Trackers",
+            "bottom_label": "Current tracker:"
+        }
+    },
+}
+
 class Theme:
     def __init__(self, default_theme, palette_dict):
         self.current_color = default_theme
@@ -109,6 +124,12 @@ MONTHS = {
     10: "Outubro",
     11: "Novembro",
     12: "Dezembro"
+}
+
+LANGUAGES = {
+    "en": "English",
+    "es": "Español",
+    "pt": "Português"
 }
 
 class Direction(Enum):
