@@ -1,7 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton, NavigationButton
 from functools import partial
-from constants import Direction, MONTHS, TEXT_COLOR, TERTIARY_THEME
+from constants import Direction, MONTHS, TEXT_COLOR, SECONDARY_THEME
 from .new_year_view import NewYearView
 from services import YearService, MonthService
 from helper import format_month_text, format_year_text
@@ -109,7 +109,7 @@ class YearView(ctk.CTkFrame):
         self.popup_frame.grab_set()
 
     def build_year(self):
-        self.top_bar = ctk.CTkFrame(self.main_frame, fg_color=TERTIARY_THEME.fg_color(), corner_radius=10)
+        self.top_bar = ctk.CTkFrame(self.main_frame, fg_color=SECONDARY_THEME.fg_color(), corner_radius=10)
         self.top_bar.grid(row=0, column=0, padx=15, pady=(10, 5), sticky="ew")
         self.top_bar.grid_columnconfigure((0, 1, 2), weight=1)
 
@@ -159,7 +159,7 @@ class YearView(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
+        self.main_frame = ctk.CTkFrame(self, corner_radius=10, fg_color=("#EBEBEB", "#242424"))
         self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
         self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(1, weight=1)

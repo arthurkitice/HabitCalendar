@@ -91,7 +91,7 @@ class DayButton(ctk.CTkButton):
         return self._get_button_config() if self.day != "0" else self._get_disabled_button_config()
 
     def _get_disabled_button_config(self):
-        FG_COLOR_DISABLED = ("#D4D4D4", "#2F2F2F")
+        FG_COLOR_DISABLED = ("#D2D2D2", "#2F2F2F")
         return {
             "fg_color": FG_COLOR_DISABLED,
             "cursor": "arrow",

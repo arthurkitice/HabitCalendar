@@ -94,24 +94,28 @@ class CalendarApp(ctk.CTk):
         self.calendar_view.reload_colors()
 
     def handle_theme_change(self):
-        # 1. PEGA A COR ATUAL DO FUNDO DO APP
+        import tkinter as tk
+
+        # 1. Pega a cor atual do fundo para a cortina
         cor_fundo_atual = self._apply_appearance_mode(self.cget("fg_color"))
         
-        # 2. DESCE A CORTINA (Um frame liso cobrindo 100% da tela)
-        cortina = ctk.CTkFrame(self, fg_color=cor_fundo_atual, corner_radius=0)
-        cortina.place(relx=0, rely=0, relwidth=1.0, relheight=1.0)
+        # 2. Desce a cortina sólida
+        cortina = tk.Frame(self, bg=cor_fundo_atual)
+        cortina.place(relwidth=1.0, relheight=1.0, x=0, y=0)
         
-        # Força o sistema operacional a desenhar a cortina AGORA, antes de travar
-        self.update() 
+        # O update() aqui é obrigatório para forçar a cortina a aparecer IMEDIATAMENTE
+        self.update()
 
-        # 3. TROCA O CENÁRIO POR TRÁS DA CORTINA (Recria a UI)
-        self.build_all_ui(reopen_theme_popup=True)
+        # 3. Manda o CustomTkinter mudar o tema de todos os widgets
+        # (Isso vai encher a fila do Tkinter com ordens de "mude de cor")
+        ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
-        # 4. GARANTE QUE A CORTINA CONTINUE NA FRENTE APÓS RECONSTRUIR A UI
-        cortina.lift()
-        self.update() # Força as novas cores a renderizarem quietinhas lá atrás
+        # 4. A MÁGICA DO BATCH RENDER:
+        # Isso obriga o Tkinter a resolver todas as mudanças de cor pendentes
+        # lá atrás da cortina, MAS não destrói a cortina ainda.
+        self.update_idletasks()
 
-        # 5. SOBE A CORTINA (Destrói o frame)
+        # 5. Após a fila estar limpa e tudo repintado no escuro, removemos a cortina
         cortina.destroy()
 
     def handle_year_removal(self, year: int, is_top_year: bool = True):

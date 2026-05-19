@@ -5,20 +5,36 @@ STARTING_YEAR = 2026
 
 MAIN_COLORS = {
     "hierophant-green": {
-        "fg": ("#85C7A3", "#1A593D"), 
-        "hover": ("#71B38F", "#14462F")
+        "fg": ("#4BB37A", "#1A593D"),
+        "hover": ("#3A9D66", "#14462F")
     },
     "blue-prince": {
-        "fg": ("#8DA7DE", "#27488F"), 
-        "hover": ("#7995CD", "#233C73")
+        "fg": ("#5C86E1", "#27488F"),
+        "hover": ("#4771CC", "#233C73")
     },
     "purple-haze": {
-        "fg": ("#B398F5", "#4C1DB8"), 
-        "hover": ("#9F82E6", "#381685")
+        "fg": ("#9B70F8", "#4C1DB8"),
+        "hover": ("#8554E3", "#381685")
     },
-    "red-prince": {
-        "fg": ("#ED8E8E", "#BE1313"), 
-        "hover": ("#DB7A7A", "#940707")
+    "red-dead": {
+        "fg": ("#FA5B5B", "#BE1313"),
+        "hover": ("#E04343", "#940707")
+    },
+    "pinkman": {
+        "fg": ("#FF6B9D", "#A82255"),
+        "hover": ("#E85587", "#8E1644")
+    },
+    "golden-order": {
+        "fg": ("#F7C948", "#B38A14"),
+        "hover": ("#F5B92B", "#96730E")
+    },
+    "radiance-orange": {
+        "fg": ("#FF8C42", "#B85714"),
+        "hover": ("#E6762D", "#96460F")
+    },
+    "authentic-cyan": {
+        "fg": ("#34B3C1", "#0E9DAF"),
+        "hover": ("#239BB0", "#0D5660")
     }
 }
 
@@ -59,15 +75,15 @@ TRACKER_COLORS = {
 
 SECONDARY_COLORS = {
     "default-theme": {
-        "fg": ("#C5C5C5", "#303030"),
-        "hover": ("#C0C0C0", "#272727")
+        "fg": ("#E4E4E4", "#303030"),
+        "hover": ("#E1E1E1", "#272727")
     }
 }
 
 TERTIARY_COLORS = {
     "default-theme": {
-        "fg": ("#8D8D8D", "#242424"),
-        "hover": ("#707070", "#1E1E1E")
+        "fg": ("#E8E8E8", "#242424"),
+        "hover": ("#D2D2D2", "#1E1E1E")
     }
 }
 

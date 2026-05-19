@@ -173,6 +173,7 @@ class ThemeView(ctk.CTkFrame):
             ThemeJSON.save_current_theme("light")
         else:
             ThemeJSON.save_current_theme("dark")
+        
         self.on_theme_change()
 
     def build_back_button(self):
