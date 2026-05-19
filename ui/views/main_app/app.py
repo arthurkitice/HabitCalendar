@@ -19,7 +19,7 @@ class CalendarApp(ctk.CTk):
 
         self.title("Calendário")
         self.geometry("1100x700")
-        self.minsize(850, 450)
+        self.minsize(850, 500)
         self.tracker_service = TrackerService()
         self.main_container = None
         self.build_all_ui()

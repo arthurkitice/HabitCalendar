@@ -134,7 +134,12 @@ LANGUAGES = {
     "en": "English",
     "es": "Español",
     "pt": "Português",
-    "ru": "Русский"
+    "it": "Italiano",
+    "fr": "Français",
+    "el": "Ελληνικά",
+    "ru": "Русский",
+    "zh": "中文",
+    "ko": "한국어"
 }
 
 class Direction(Enum):

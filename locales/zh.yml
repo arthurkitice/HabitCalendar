@@ -1,0 +1,107 @@
+zh:
+  sidebar:
+    top_label: 追踪器
+    bottom_label: |-
+      当前追踪器：
+      %{tracker}
+    empty_bottom_label: |-
+      当前追踪器：
+      未选择
+
+  calendar:
+    months:
+      "1": 一月
+      "2": 二月
+      "3": 三月
+      "4": 四月
+      "5": 五月
+      "6": 六月
+      "7": 七月
+      "8": 八月
+      "9": 九月
+      "10": 十月
+      "11": 十一月
+      "12": 十二月
+    short_weekdays:
+      "0": 周一
+      "1": 周二
+      "2": 周三
+      "3": 周四
+      "4": 周五
+      "5": 周六
+      "6": 周日
+
+  checks:
+    zero: 暂无打卡
+    one: 1 次打卡
+    many: "%{count} 次打卡"
+
+  actions:
+    cancel: 取消
+    save: 保存
+    confirm: 确认
+    back: 返回
+
+  alter_tracker:
+    new_tracker: 新建追踪器
+    new_tracker_placeholder: 请输入新追踪器名称
+    edit_tracker: |-
+      编辑追踪器
+      “%{tracker}”
+    edit_tracker_placeholder: 请输入追踪器名称
+    name: "追踪器名称："
+    color: "追踪器颜色："
+    warning1: "* 名称不能为空。"
+    warning2: "* 该名称已被使用。"
+
+  theme:
+    label: "主题："
+    light: 浅色
+    dark: 深色
+    current_color: "当前颜色："
+    colors: "颜色："
+    default: "(默认)"
+    language: "语言："
+    current_language: "当前语言："
+    custom_themes: "自定义主题"
+    dark_mode_only: "仅限深色模式主题："
+    light_mode_only: "仅限浅色模式主题："
+
+  delete:
+    tracker:
+      label: |- 
+        确定要删除追踪器
+        “%{tracker}”吗？
+      warning: |-
+        删除后将丢失所有年份
+        及相关的打卡记录。
+
+        此操作不可逆。
+    year:
+      label: |- 
+        确定要删除 %{year} 年吗？
+      warning: |-
+        您可以重新创建该年份，
+        但现有的打卡记录将丢失。
+
+        此操作不可逆。
+
+  config:
+    tracker: "追踪器：%{tracker}"
+    year_number: "内存中的年份数量：%{years}"
+    days_checked: "已打卡天数：%{days}"
+    single_year: "年份：%{year}"
+    top_year: "最新年份：%{year}"
+    bottom_year: "最早年份：%{year}"
+    single_year_warning: |-
+      内存中仅存的年份。
+
+      每个追踪器必须包含
+      至少一个年份。
+
+  new_year:
+    label: "新建年份：%{year}"
+    warning: |-
+      确认创建？
+      此操作会增加数据库
+      的占用空间。

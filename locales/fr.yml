@@ -1,0 +1,109 @@
+fr:
+  sidebar:
+    top_label: Suivis
+    bottom_label: |-
+      Suivi actuel :
+      %{tracker}
+    empty_bottom_label: |-
+      Suivi actuel :
+      Aucun
+
+  calendar:
+    months:
+      "1": Janvier
+      "2": Février
+      "3": Mars
+      "4": Avril
+      "5": Mai
+      "6": Juin
+      "7": Juillet
+      "8": Août
+      "9": Septembre
+      "10": Octobre
+      "11": Novembre
+      "12": Décembre
+    short_weekdays:
+      "0": Lun
+      "1": Mar
+      "2": Mer
+      "3": Jeu
+      "4": Ven
+      "5": Sam
+      "6": Dim
+
+  checks:
+    zero: Aucune marque
+    one: Une marque
+    many: "%{count} marques"
+
+  actions:
+    cancel: Annuler
+    save: Enregistrer
+    confirm: Confirmer
+    back: Retour
+
+  alter_tracker:
+    new_tracker: Nouveau Suivi
+    new_tracker_placeholder: Entrez le nom du suivi
+    edit_tracker: |-
+      Modifier le Suivi
+      "%{tracker}"
+    edit_tracker_placeholder: Entrez le nom du suivi
+    name: "Nom du suivi :"
+    color: "Couleur du suivi :"
+    warning1: "* Le nom ne peut pas être vide."
+    warning2: "* Ce nom est déjà utilisé."
+
+  theme:
+    label: "Thème :"
+    light: Clair
+    dark: Sombre
+    current_color: "Couleur actuelle :"
+    colors: "Couleurs :"
+    default: "(Par défaut)"
+    language: "Langue :"
+    current_language: "Langue actuelle :"
+    custom_themes: "Thèmes personnalisés"
+    dark_mode_only: "Thèmes mode sombre uniquement :"
+    light_mode_only: "Thèmes mode clair uniquement :"
+
+  delete:
+    tracker:
+      label: |- 
+        Êtes-vous sûr de vouloir
+        supprimer le suivi
+        "%{tracker}" ?
+      warning: |-
+        Vous perdrez toutes les années
+        et leurs marques.
+
+        Cette action est irréversible.
+    year:
+      label: |- 
+        Êtes-vous sûr de vouloir
+        supprimer l'année %{year} ?
+      warning: |-
+        Vous pouvez recréer l'année mais
+        vous perdrez toutes ses marques.
+
+        Cette action est irréversible.
+
+  config:
+    tracker: "Suivi : %{tracker}"
+    year_number: "Nombre d'années en mémoire : %{years}"
+    days_checked: "Jours marqués : %{days}"
+    single_year: "Année : %{year}"
+    top_year: "Année la plus récente : %{year}"
+    bottom_year: "Année la plus ancienne : %{year}"
+    single_year_warning: |-
+      Seule année sauvegardée.
+
+      Un suivi doit contenir
+      au moins une année.
+
+  new_year:
+    label: "Nouvelle Année : %{year}"
+    warning: |-
+      Confirmer la création ?
+      Cette action augmentera la
+      taille de la base de données.

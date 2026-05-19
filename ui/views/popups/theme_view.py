@@ -7,14 +7,14 @@ from dataclasses import dataclass
 import i18n
 
 DEFAULT_COLOR = 'hierophant-green'
-SCROLLABLE_FRAME_SIZE = 120
+SCROLLABLE_FRAME_SIZE = 100
 
 class ThemeView(ctk.CTkFrame):
     def __init__(self, parent, on_color_change, on_theme_change, on_language_change):
         super().__init__(
             parent, 
-            width=600, 
-            height=500,
+            width=550, 
+            height=450,
             corner_radius=15,
             border_width=1, 
             border_color=TEXT_COLOR
