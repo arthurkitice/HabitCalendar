@@ -24,9 +24,8 @@ class CustomButton(ctk.CTkButton):
         self.configure(**kwargs)
         
     def reload_colors(self):
-        if not self.main_color:
-            return
-        self.configure(fg_color=PRIMARY_THEME.fg_color(), hover_color=PRIMARY_THEME.hover_color())
+        color1, color2 = PRIMARY_THEME.get_colors() if self.main_color else SECONDARY_THEME.get_colors()
+        self.configure(fg_color=color1, hover_color=color2)
     
     # def reload_text(self):
     #     if self.translation_path is None:
@@ -145,7 +144,7 @@ class SidebarButton(ctk.CTkButton):
         self.icon_type = icon_type
         text = tracker or ""
         
-        text = text if len(text) < 15 else f"{text[:15]}..."
+        text = text if len(text) < 15 else f"{text[:12]}..."
 
         image = self._get_image()
         icon_width = {"width": 40} if self.icon_type else {}

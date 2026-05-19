@@ -71,9 +71,11 @@ pt:
     tracker:
       label: |- 
         Tem certeza que deseja
-        deletar o marcador "%{tracker}"?
+        deletar o marcador
+        "%{tracker}"?
       warning: |-
-        Você perderá todos os anos e marcações associadas.
+        Você perderá todos os anos
+        e marcações associadas.
 
         Essa ação é irreversível.
     year:
@@ -81,7 +83,8 @@ pt:
         Tem certeza que deseja
         deletar o ano %{year}?
       warning: |-
-        Você pode criar o ano novamente mas perderá qualquer marcação.
+        Você pode criar o ano novamente
+        mas perderá qualquer marcação.
 
         Essa ação é irreversível.
 

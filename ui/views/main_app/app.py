@@ -21,7 +21,6 @@ class CalendarApp(ctk.CTk):
         self.geometry("1100x700")
         self.minsize(850, 450)
         self.tracker_service = TrackerService()
-
         self.main_container = None
         self.build_all_ui()
 
@@ -89,14 +88,31 @@ class CalendarApp(ctk.CTk):
         i18n.set('locale', ThemeJSON.get_current_language())
         self.calendar_view.reload_language()
         self.sidebar_view.reload_language()
-        self.sidebar_view.theme_popup()
 
     def handle_color_change(self):
         self.sidebar_view.reload_colors()
         self.calendar_view.reload_colors()
 
     def handle_theme_change(self):
+        # 1. PEGA A COR ATUAL DO FUNDO DO APP
+        cor_fundo_atual = self._apply_appearance_mode(self.cget("fg_color"))
+        
+        # 2. DESCE A CORTINA (Um frame liso cobrindo 100% da tela)
+        cortina = ctk.CTkFrame(self, fg_color=cor_fundo_atual, corner_radius=0)
+        cortina.place(relx=0, rely=0, relwidth=1.0, relheight=1.0)
+        
+        # Força o sistema operacional a desenhar a cortina AGORA, antes de travar
+        self.update() 
+
+        # 3. TROCA O CENÁRIO POR TRÁS DA CORTINA (Recria a UI)
         self.build_all_ui(reopen_theme_popup=True)
+
+        # 4. GARANTE QUE A CORTINA CONTINUE NA FRENTE APÓS RECONSTRUIR A UI
+        cortina.lift()
+        self.update() # Força as novas cores a renderizarem quietinhas lá atrás
+
+        # 5. SOBE A CORTINA (Destrói o frame)
+        cortina.destroy()
 
     def handle_year_removal(self, year: int, is_top_year: bool = True):
         if self.calendar_view.current_year != year:

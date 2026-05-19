@@ -56,7 +56,7 @@ class SidebarView(ctk.CTkFrame):
         for frame in self.btn_list:
             if frame.tracker.id == tracker_id:
                 frame.tracker = tracker
-                frame.tracker_btn.configure(text=tracker.name if len(tracker.name) < 15 else f"{tracker.name[:15]}...")
+                frame.tracker_btn.configure(text=tracker.name if len(tracker.name) < 15 else f"{tracker.name[:12]}...")
         self.update_sidebar()
 
     def remove_tracker(self, tracker_id: int) -> None:

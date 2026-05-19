@@ -70,10 +70,12 @@ en:
   delete:
     tracker:
       label: |- 
-        Are you sure you want to 
-        delete tracker "%{tracker}"?
+        Are you sure you want
+        to delete tracker
+        "%{tracker}"?
       warning: |-
-        You will lose all years and their checks.
+        You will lose all years
+        and their checks.
 
         This action is irreversible.
     year:

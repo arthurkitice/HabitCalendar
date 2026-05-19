@@ -71,21 +71,6 @@ TERTIARY_COLORS = {
     }
 }
 
-LANGUAGE = {
-    "pt": {
-        "sidebar": {
-            "top_label": "Marcadores",
-            "bottom_label": "Marcador atual:"
-        }
-    },
-    "en": {
-        "sidebar": {
-            "top_label": "Trackers",
-            "bottom_label": "Current tracker:"
-        }
-    },
-}
-
 class Theme:
     def __init__(self, default_theme, palette_dict):
         self.current_color = default_theme
@@ -96,6 +81,9 @@ class Theme:
     
     def hover_color(self):
         return self.palette[self.current_color]["hover"]
+    
+    def get_colors(self):
+        return self.fg_color(), self.hover_color()
     
     def set_theme(self, theme_name):
         if theme_name in self.palette:
@@ -129,7 +117,8 @@ MONTHS = {
 LANGUAGES = {
     "en": "English",
     "es": "Español",
-    "pt": "Português"
+    "pt": "Português",
+    "ru": "Русский"
 }
 
 class Direction(Enum):
