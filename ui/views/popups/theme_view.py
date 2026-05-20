@@ -156,6 +156,8 @@ class ThemeView(ctk.CTkFrame):
         self.language_label.configure(text=self.text.LANGUAGE)
         self.theme_btns.configure(values=[self.text.LIGHT_LABEL, self.text.DARK_LABEL])
         self.theme_btns.set(self.text.LIGHT_LABEL if ThemeJSON.get_current_theme() == "light" else self.text.DARK_LABEL)
+        for widget in self.theme_btns.winfo_children():
+            widget.configure(cursor="hand2")
         self.back_button.configure(text=i18n.t('actions.back'))
 
         current_lang = ThemeJSON.get_current_language()

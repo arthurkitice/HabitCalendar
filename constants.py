@@ -40,43 +40,43 @@ MAIN_COLORS = {
 
 TRACKER_COLORS = {
     "Verde": {
-        "fg": ("#7BC29A", "#2D634A"), 
-        "hover": ("#6AB089", "#2A5A44")
+        "fg": ("#2ED169", "#17A34C"),
+        "hover": ("#28B85C", "#138A40")
     },
     "Azul": {
-        "fg": ("#7BA1E2", "#344F87"), 
-        "hover": ("#6A8DD1", "#31497E")
+        "fg": ("#42A5F5", "#1E78D6"),
+        "hover": ("#3893DE", "#1865B5")
     },
     "Roxo": {
-        "fg": ("#A891D9", "#7360A1"), 
-        "hover": ("#957EC4", "#624F8E")
+        "fg": ("#B755F5", "#8021D1"),
+        "hover": ("#A445E0", "#6A19B0")
     },
     "Vermelho": {
-        "fg": ("#D97B7B", "#A25353"), 
-        "hover": ("#C76969", "#925050")
+        "fg": ("#FF4757", "#D42031"),
+        "hover": ("#E63E4D", "#B31725")
     },
     "Amarelo": {
-        "fg": ("#D9C67A", "#A38F49"),
-        "hover": ("#C7B368", "#938040")
+        "fg": ("#FFD12A", "#D1A511"),
+        "hover": ("#E6BA1E", "#B08A09")
     },
     "Laranja": {
-        "fg": ("#D99A7A", "#9C6B4B"),
-        "hover": ("#C78868", "#8C5E41")
+        "fg": ("#FF7722", "#D65A11"),
+        "hover": ("#E66619", "#B3480B")
     },
     "Rosa": {
-        "fg": ("#D68EAD", "#9B637B"),
-        "hover": ("#C47C9A", "#8B576D")
+        "fg": ("#FF4D8C", "#D12163"),
+        "hover": ("#E6407B", "#B01951")
     },
     "Ciano": {
-        "fg": ("#70C4CE", "#006B7B"),
-        "hover": ("#61B0B9", "#3C6E75")
+        "fg": ("#17C9EB", "#0E9AB8"),
+        "hover": ("#13B1D1", "#0B8099")
     }
 }
 
 SECONDARY_COLORS = {
     "default-theme": {
         "fg": ("#E4E4E4", "#303030"),
-        "hover": ("#E1E1E1", "#272727")
+        "hover": ("#DEDEDE", "#272727")
     }
 }
 
