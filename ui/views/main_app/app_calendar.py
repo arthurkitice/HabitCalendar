@@ -4,7 +4,8 @@ from dtos import DayDTO
 from ..popups import PopupHandler
 from config import TrackerDataJSON, ThemeJSON
 from ui.widgets import NavigationButton, DayButton, CustomButton
-from constants import Direction, WEEK_DAYS, TEXT_COLOR
+from themes import TEXT_COLOR
+from icons import Direction
 from services import TrackerService, DayService, YearService, MonthService
 import calendar
 import i18n
@@ -160,7 +161,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.day_buttons.clear()
 
         self.week_days = []
-        for i, day in enumerate(WEEK_DAYS):
+        for i in range(7):
             label = ctk.CTkLabel(self.days_frame, text=i18n.t(f'calendar.short_weekdays.{str((i+6)%7)}'), font=ctk.CTkFont(size=15, weight="bold"), text_color=TEXT_COLOR)
             label.grid(row=0, column=i, padx=5, pady=5)
             self.week_days.append(label)

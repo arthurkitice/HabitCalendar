@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton, IconButton
 from functools import partial
-from constants import IconType, TEXT_COLOR
+from themes import TEXT_COLOR
+from icons import IconType
 from .delete_year_view import DeleteYearView
 from services import YearService, TrackerService
 import i18n

@@ -1,7 +1,7 @@
 import customtkinter as ctk
-from constants import IconType, ICONS, ARROWS, PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
+from icons import IconType, ICONS, ARROWS
+from themes import PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
-import i18n
 
 class CustomButton(ctk.CTkButton):
     def __init__(self, parent, text='', command=None, font_size = 20, bold = True, main_color = True, translation_path: str | None = None, **kwargs):

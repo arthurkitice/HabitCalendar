@@ -4,9 +4,7 @@ from config import ThemeJSON
 import i18n
 import os
 import locale
-from pathlib import Path
-
-DB_PATH = Path('database.db')
+from database import engine, Base
 
 def detectar_idioma_sistema() -> str:
     """
@@ -39,8 +37,7 @@ def detectar_idioma_sistema() -> str:
         return 'en'
 
 if __name__ == "__main__":
-    if not DB_PATH.exists():
-        import seed
+    Base.metadata.create_all(bind=engine)
         
     if ThemeJSON.get_current_language() == None:
         ThemeJSON.save_current_language(detectar_idioma_sistema())
@@ -49,11 +46,7 @@ if __name__ == "__main__":
     i18n.load_path.append(os.path.join(base_dir, 'locales'))
 
     i18n.set('filename_format', '{locale}.{format}')
-
-    # 3. Define o idioma atual (pode puxar de um arquivo de config depois)
     i18n.set('locale', ThemeJSON.get_current_language())
-
-    # 4. Opcional: Se faltar tradução em PT, ele tenta buscar no EN
     i18n.set('fallback', 'en')
 
     app = CalendarApp()

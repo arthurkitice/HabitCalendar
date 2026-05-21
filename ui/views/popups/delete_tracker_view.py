@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton
-from constants import TEXT_COLOR
+from themes import TEXT_COLOR
 import i18n
 
 class DeleteTrackerView(ctk.CTkFrame):

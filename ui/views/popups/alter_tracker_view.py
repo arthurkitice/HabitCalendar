@@ -2,7 +2,7 @@ import customtkinter as ctk
 from ui.widgets import CustomButton
 from services import TrackerService
 from config import TrackerDataJSON
-from constants import TEXT_COLOR
+from themes import TEXT_COLOR
 import i18n
 
 class AlterTrackerFrame(ctk.CTkFrame):
@@ -52,7 +52,7 @@ class AlterTrackerFrame(ctk.CTkFrame):
         self.main_frame.update_idletasks()
 
     def build_color_buttons(self):
-        from constants import TRACKER_COLORS
+        from themes import TRACKER_COLORS
         from functools import partial
 
         text = i18n.t(f'{self._yml_path}.color')

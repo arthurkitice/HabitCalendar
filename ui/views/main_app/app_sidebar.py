@@ -2,7 +2,8 @@ import customtkinter as ctk
 from functools import partial
 from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON, SidebarStatusJSON
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
-from constants import IconType, PRIMARY_THEME, TEXT_COLOR
+from icons import IconType
+from themes import PRIMARY_THEME, TEXT_COLOR
 from dtos import TrackerDTO
 from services import TrackerService
 from ..popups import PopupHandler

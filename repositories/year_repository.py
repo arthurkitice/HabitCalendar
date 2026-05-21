@@ -29,8 +29,8 @@ class YearRepository:
         self.db.add(new_year)
         self.db.flush() # Pega o ID do ano gerado
 
-        for month_number in range(1, 13):
-            new_month = Month(name=MONTHS[month_number], number=month_number, year_id=new_year.id)
+        for month_number, month_name in MONTHS.items():
+            new_month = Month(name=month_name, number=month_number, year_id=new_year.id)
             self.db.add(new_month)
             self.db.flush() # Pega o ID do mês gerado
 

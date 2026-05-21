@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton
-from constants import TEXT_COLOR, PRIMARY_THEME
+from themes import TEXT_COLOR, PRIMARY_THEME
 from config import ThemeJSON
 import i18n
 

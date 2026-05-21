@@ -3,9 +3,9 @@ from config import LastTrackerJSON, ThemeJSON, TrackerDataJSON, WindowSizeJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
-from constants import PRIMARY_THEME, TEXT_COLOR
+from themes import PRIMARY_THEME, TEXT_COLOR
 import i18n
-from ewmh import EWMH
+import sys
 from ui.widgets import SliderButton
 
 SIDEBAR_WEIGHT = 1
@@ -15,7 +15,7 @@ class CalendarApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("HabitTracker")
+        self.title("HabitCalendar")
         self.geometry("850x500")
 
         if WindowSizeJSON.is_window_maximized():
@@ -32,11 +32,18 @@ class CalendarApp(ctk.CTk):
         self.build_all_ui()
 
     def _maximize(self):
+        if sys.platform.startswith('linux'):
+            self._maximize_linux()
+        elif sys.platform == 'win32':
+            self.state('zoomed')
+        elif sys.platform == 'darwin':
+            self.attributes('-zoomed', True)
+
+    def _maximize_linux(self):
         try:
+            from ewmh import EWMH
             ewmh = EWMH()
             titulo = self.title().encode('utf-8')
-            
-            # A janela mais recente costuma ser a última da lista
             for w in reversed(ewmh.getClientList()):
                 try:
                     if ewmh.getWmName(w) and titulo in ewmh.getWmName(w):
@@ -45,15 +52,11 @@ class CalendarApp(ctk.CTk):
                         return
                 except:
                     continue
-        except Exception as e:
-            print(f"Erro: {e}")
+            self.attributes('-zoomed', True)
+        except:
+            self.attributes('-zoomed', True)
             
-    def build_all_ui(self, reopen_theme_popup=False):
-        # Destrói o contêiner antigo, limpando a tela
-        if self.main_container:
-            self.main_container.destroy()
-
-        # Cria o novo Contêiner Principal
+    def build_all_ui(self):
         self.main_container = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.main_container.pack(fill="both", expand=True)
 
@@ -63,8 +66,6 @@ class CalendarApp(ctk.CTk):
 
         PRIMARY_THEME.set_theme(ThemeJSON.get_current_color())
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
-
-        
 
         # Instancia a Sidebar dentro do MAIN_CONTAINER
         initial_tracker_id = LastTrackerJSON.get_last_tracker_id()
@@ -114,12 +115,7 @@ class CalendarApp(ctk.CTk):
         self.forbidden_label.configure(text=i18n.t('forbidden_frame.label'))
         self.forbidden_label_info.configure(text=i18n.t('forbidden_frame.info'))
 
-        values = [
-            i18n.t('forbidden_frame.example_trackers.job'), 
-            i18n.t('forbidden_frame.example_trackers.college'), 
-            i18n.t('forbidden_frame.example_trackers.medicine'), 
-            i18n.t('forbidden_frame.example_trackers.exercises'), 
-        ]
+        values = self._get_forbidden_values()
 
         self.example_trackers.change_values(values)
 
@@ -131,26 +127,17 @@ class CalendarApp(ctk.CTk):
     def handle_theme_change(self):
         import tkinter as tk
 
-        # 1. Pega a cor atual do fundo para a cortina
         cor_fundo_atual = self._apply_appearance_mode(self.cget("fg_color"))
-        
-        # 2. Desce a cortina sólida
+
         cortina = tk.Frame(self, bg=cor_fundo_atual)
         cortina.place(relwidth=1.0, relheight=1.0, x=0, y=0)
-        
-        # O update() aqui é obrigatório para forçar a cortina a aparecer IMEDIATAMENTE
-        self.update()
 
-        # 3. Manda o CustomTkinter mudar o tema de todos os widgets
-        # (Isso vai encher a fila do Tkinter com ordens de "mude de cor")
+        self.update() #Força o frame a aparecer na tela
+
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
-        # 4. A MÁGICA DO BATCH RENDER:
-        # Isso obriga o Tkinter a resolver todas as mudanças de cor pendentes
-        # lá atrás da cortina, MAS não destrói a cortina ainda.
-        self.update_idletasks()
+        self.update_idletasks() #Só passa para a próxima etapa quando a fila de execução limpar
 
-        # 5. Após a fila estar limpa e tudo repintado no escuro, removemos a cortina
         cortina.destroy()
 
     def handle_year_remove(self, year: int, is_top_year: bool = True):
@@ -204,12 +191,8 @@ class CalendarApp(ctk.CTk):
         )
         self.forbidden_label_info.grid(row=2, column=0, sticky="nsew")
         
-        values = [
-            i18n.t('forbidden_frame.example_trackers.job'), 
-            i18n.t('forbidden_frame.example_trackers.college'), 
-            i18n.t('forbidden_frame.example_trackers.medicine'), 
-            i18n.t('forbidden_frame.example_trackers.exercises'), 
-        ]
+        values = self._get_forbidden_values()
+
         self.example_trackers = SliderButton(
             self.forbidden_frame, 
             command=self.sidebar_view.create_new_tracker,
@@ -220,3 +203,10 @@ class CalendarApp(ctk.CTk):
         )
         self.example_trackers.grid(row=3, column=0, sticky='n', padx=5, pady=20)
 
+    def _get_forbidden_values(self):
+        return [
+            i18n.t('forbidden_frame.example_trackers.job'), 
+            i18n.t('forbidden_frame.example_trackers.college'), 
+            i18n.t('forbidden_frame.example_trackers.medicine'), 
+            i18n.t('forbidden_frame.example_trackers.exercises')
+        ]

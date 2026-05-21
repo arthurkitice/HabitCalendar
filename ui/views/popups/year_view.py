@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton, NavigationButton
 from functools import partial
-from constants import Direction, MONTHS, TEXT_COLOR, SECONDARY_THEME
+from themes import TEXT_COLOR, SECONDARY_THEME
+from icons import Direction
 from .new_year_view import NewYearView
 from services import YearService, MonthService
 from config import ThemeJSON
