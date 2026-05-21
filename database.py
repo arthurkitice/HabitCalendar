@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.engine import Engine
 from contextlib import contextmanager
+import logging
 import os
 
 def get_app_dir() -> str:
@@ -16,6 +17,7 @@ engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
 
+logger = logging.getLogger(__name__)
 @contextmanager
 def get_db():
     db = SessionLocal()
@@ -24,7 +26,7 @@ def get_db():
         db.commit()
     except Exception as e:
         db.rollback()
-        print(f"[Database Error]: Falha na operação. Detalhes: {e}")
+        logger.error(f"Falha na operação de banco: {e}", exc_info=True)
         raise
     finally:
         db.close()

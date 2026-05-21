@@ -1,11 +1,12 @@
 from ui.views.main_app.app import CalendarApp
+from database import engine, Base
 from constants import LANGUAGES
 from config import ThemeJSON
-import i18n
-import os
+import logging
 import locale
+import i18n
 import sys
-from database import engine, Base
+import os
 
 if getattr(sys, 'frozen', False):
     BASE_DIR = sys._MEIPASS
@@ -30,18 +31,31 @@ def detect_sys_language() -> str:
 
         # Extrai apenas as duas primeiras letras minúsculas (ex: 'pt', 'en', 'es')
         sigla = idioma_sistema[:2].lower()
-
-        # Se a sigla estiver nos idiomas que você traduziu, retorna ela
+        
         idiomas_suportados = [key for key in LANGUAGES.keys()]
         if sigla in idiomas_suportados:
             return sigla
         else:
-            return 'en' # Fallback para usuários de outros países (ex: França, Japão)
-            
+            return 'en'
     except Exception:
-        # Se absolutamente qualquer coisa der errado (ex: SO muito antigo), vai pro Inglês
         return 'en'
-    
+
+def setup_logging(app_dir: str) -> None:
+    log_path = os.path.join(app_dir, 'habitcalendar.log')
+    logging.basicConfig(
+        level=logging.ERROR,
+        format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+        handlers=[
+            logging.FileHandler(log_path, encoding='utf-8'),
+        ]
+    )
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logging.critical("Erro não tratado", exc_info=(exc_type, exc_value, exc_traceback))
+
 def gen_icon() -> None:
     icon_path = os.path.join(BASE_DIR, 'icon.png')
     svg_path = os.path.join(BASE_DIR, 'ui/icons/app_icon.svg')
@@ -56,6 +70,9 @@ def gen_icon() -> None:
         )
 
 if __name__ == "__main__":
+    from database import APP_DIR
+    setup_logging(APP_DIR)
+    sys.excepthook = handle_exception
     Base.metadata.create_all(bind=engine)
     gen_icon()
         
