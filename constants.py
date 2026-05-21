@@ -5,12 +5,12 @@ STARTING_YEAR = 2026
 
 MAIN_COLORS = {
     "hierophant-green": {
-        "fg": ("#4BB37A", "#1A593D"),
-        "hover": ("#3A9D66", "#14462F")
+        "fg": ("#4BB37A", "#1D7347"),
+        "hover": ("#3A9D66", "#145936")
     },
     "blue-prince": {
-        "fg": ("#5C86E1", "#27488F"),
-        "hover": ("#4771CC", "#233C73")
+        "fg": ("#5C86E1", "#2459B8"),
+        "hover": ("#4771CC", "#1B448C")
     },
     "purple-haze": {
         "fg": ("#9B70F8", "#4C1DB8"),
@@ -76,7 +76,7 @@ TRACKER_COLORS = {
 SECONDARY_COLORS = {
     "default-theme": {
         "fg": ("#E4E4E4", "#303030"),
-        "hover": ("#DEDEDE", "#272727")
+        "hover": ("#D1D1D1", "#272727")
     }
 }
 

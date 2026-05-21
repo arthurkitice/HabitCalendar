@@ -66,6 +66,7 @@ es:
     custom_themes: "Temas personalizados"
     dark_mode_only: "Temas 'exclusivamente en modo oscuro':"
     light_mode_only: "Temas 'exclusivamente en modo claro':"
+    option_switch: "Ocultar pop-ups de nuevo año:"
 
   delete:
     tracker:
@@ -106,3 +107,4 @@ es:
       ¿Confirmar la creación del año?
       Esta acción aumentará el tamaño
       de la base de datos.
+    checkbox: "No volver a preguntar"

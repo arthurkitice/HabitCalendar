@@ -7,7 +7,7 @@ from dataclasses import dataclass
 import i18n
 
 DEFAULT_COLOR = 'hierophant-green'
-SCROLLABLE_FRAME_SIZE = 100
+SCROLLABLE_FRAME_SIZE = 80
 
 class ThemeView(ctk.CTkFrame):
     def __init__(self, parent, on_color_change, on_theme_change, on_language_change):
@@ -36,12 +36,13 @@ class ThemeView(ctk.CTkFrame):
         self.current_theme_frame.grid(row=1, column=0, padx=0, pady=10, sticky="ew")
         self.current_theme_frame.grid_columnconfigure(1, weight=1)
 
-        self.theme_label = ctk.CTkLabel(self.current_theme_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.LABEL)
+        self.theme_label = ctk.CTkLabel(self.current_theme_frame, font=ctk.CTkFont(size=18, weight="bold"), textvariable=self.text.LABEL)
         self.theme_label.grid(row=0, column=0, padx=(15, 5),  sticky="w")
-
+        
+        light, dark = i18n.t('theme.light'), i18n.t('theme.dark')
         self.theme_btns = ctk.CTkSegmentedButton(
             self.current_theme_frame, 
-            values=[self.text.LIGHT_LABEL, self.text.DARK_LABEL], 
+            values=[light, dark], 
             command=self.change_theme, 
             text_color=TEXT_COLOR,
             font=ctk.CTkFont(size=15, weight="bold"),
@@ -53,7 +54,7 @@ class ThemeView(ctk.CTkFrame):
         )
         self.theme_btns.grid(row=0, column=1, padx=(5, 15), sticky="nsew")
 
-        self.theme_btns.set(self.text.LIGHT_LABEL if ThemeJSON.get_current_theme() == "light" else self.text.DARK_LABEL)
+        self.theme_btns.set(light if ThemeJSON.get_current_theme() == "light" else dark)
 
         for btn in self.theme_btns._buttons_dict.values():
             btn.configure(cursor="hand2")
@@ -73,7 +74,7 @@ class ThemeView(ctk.CTkFrame):
     def build_color(self):
         self.color_dict = {}
 
-        self.color_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.COLORS)
+        self.color_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), textvariable=self.text.COLORS)
         self.color_label.grid(row=4, column=0, padx=15, pady=(10, 0),  sticky="w")
 
         self.color_btns = SmartScrollableFrame(self.main_frame, height=SCROLLABLE_FRAME_SIZE)
@@ -101,7 +102,7 @@ class ThemeView(ctk.CTkFrame):
                 self.default_color_btn = btn
 
     def build_language(self):
-        self.language_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.LANGUAGE)
+        self.language_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), textvariable=self.text.LANGUAGE)
         self.language_label.grid(row=6, column=0, padx=15, pady=(10, 0),  sticky="w")
 
         self.language_btns = SmartScrollableFrame(self.main_frame, height=SCROLLABLE_FRAME_SIZE)
@@ -130,11 +131,26 @@ class ThemeView(ctk.CTkFrame):
             if current_lang == short_lang:
                 self.selected_lang_btn = btn
 
+    def build_new_year_options(self):
+        self.option_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        self.option_frame.grid(row=8, column=0, padx=0, pady=5, sticky="nsew")
+        self.option_frame.grid_columnconfigure(1, weight=1)
+
+        self.option_label = ctk.CTkLabel(self.option_frame, font=ctk.CTkFont(size=18, weight="bold"), textvariable=self.text.OPTION_SWITCH)
+        self.option_label.grid(row=0, column=0, padx=(15, 0), pady=5,  sticky="w")
+
+        self.option_switch = ctk.CTkSwitch(self.option_frame, progress_color=PRIMARY_THEME.fg_color(), text="", command=ThemeJSON.toggle_new_year_popup_status, cursor='hand2', switch_height=25, switch_width=50)
+        self.option_switch.grid(row=0, column=1, padx=20, pady=5,  sticky="w")
+        
+        if ThemeJSON.is_new_year_popup_hidden():
+            self.option_switch.select()
+
     def change_color(self, color):
         ThemeJSON.save_current_color(color)
         PRIMARY_THEME.set_theme(color)
         self.back_button.reload_colors()
         self.theme_btns.configure(selected_color=PRIMARY_THEME.fg_color(), selected_hover_color=PRIMARY_THEME.hover_color())
+        self.option_switch.configure(progress_color=PRIMARY_THEME.fg_color())
 
         # text = PRIMARY_THEME.current_color if PRIMARY_THEME.current_color != DEFAULT_COLOR else f"{PRIMARY_THEME.current_color} {self.text.DEFAULT}"
         # self.current_color.configure(text=text)
@@ -150,12 +166,12 @@ class ThemeView(ctk.CTkFrame):
     def change_language(self, language):
         ThemeJSON.save_current_language(language)
         self.on_language_change()
-        self.text = self._Theme_Texts()
-        self.theme_label.configure(text=self.text.LABEL)
-        self.color_label.configure(text=self.text.COLORS)
-        self.language_label.configure(text=self.text.LANGUAGE)
-        self.theme_btns.configure(values=[self.text.LIGHT_LABEL, self.text.DARK_LABEL])
-        self.theme_btns.set(self.text.LIGHT_LABEL if ThemeJSON.get_current_theme() == "light" else self.text.DARK_LABEL)
+        self.text.reload_language()
+        
+        light, dark = i18n.t('theme.light'), i18n.t('theme.dark')
+        self.theme_btns.configure(values=[light, dark])
+        self.theme_btns.set(light if ThemeJSON.get_current_theme() == "light" else dark)
+
         for widget in self.theme_btns.winfo_children():
             widget.configure(cursor="hand2")
         self.back_button.configure(text=i18n.t('actions.back'))
@@ -171,7 +187,7 @@ class ThemeView(ctk.CTkFrame):
         self.default_color_btn.configure(text=f'{DEFAULT_COLOR} {self.text.DEFAULT}')
 
     def change_theme(self, value):
-        if value == self.text.LIGHT_LABEL:
+        if value == i18n.t('theme.light'):
             ThemeJSON.save_current_theme("light")
         else:
             ThemeJSON.save_current_theme("dark")
@@ -180,7 +196,7 @@ class ThemeView(ctk.CTkFrame):
 
     def build_back_button(self):
         self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=8, column=0, padx=10, pady=(0, 10), sticky="nsew")
+        self.button_frame.grid(row=9, column=0, padx=10, pady=(0, 10), sticky="nsew")
         self.button_frame.grid_columnconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
 
@@ -199,15 +215,22 @@ class ThemeView(ctk.CTkFrame):
         # self.build_current_color()
         self.build_color()
         self.build_language()
+        self.build_new_year_options()
         self.build_back_button()
 
     class _Theme_Texts:
         def __init__(self):
-            self.LABEL = i18n.t('theme.label')
-            self.LIGHT_LABEL = i18n.t('theme.light')
-            self.DARK_LABEL = i18n.t('theme.dark')
-            self.CURRENT_COLOR = i18n.t('theme.current_color')
-            self.COLORS = i18n.t('theme.colors')
+            self.LABEL = ctk.StringVar(value=i18n.t('theme.label'))
+            self.CURRENT_COLOR = ctk.StringVar(value=i18n.t('theme.current_color'))
+            self.COLORS = ctk.StringVar(value=i18n.t('theme.colors'))
             self.DEFAULT = i18n.t('theme.default')
-            self.LANGUAGE = i18n.t('theme.language')
-            self.CURRENT_LANGUAGE = i18n.t('theme.current_language')
+            self.LANGUAGE = ctk.StringVar(value=i18n.t('theme.language'))
+            self.OPTION_SWITCH = ctk.StringVar(value=i18n.t('theme.option_switch'))
+
+        def reload_language(self):
+            self.LABEL.set(i18n.t('theme.label'))
+            self.CURRENT_COLOR.set(i18n.t('theme.current_color'))
+            self.COLORS.set(i18n.t('theme.colors'))
+            self.DEFAULT = i18n.t('theme.default')
+            self.LANGUAGE.set(i18n.t('theme.language'))
+            self.OPTION_SWITCH.set(i18n.t('theme.option_switch'))

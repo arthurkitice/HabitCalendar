@@ -68,6 +68,10 @@ class TrackerFrame(ctk.CTkFrame):
         self.delete_bottom_year_btn.configure(command=partial(self.delete_year_popup, self.bottom_year))
         
     def delete_year_popup(self, year):
+        if self.year_service.get_checked_days_count(self.tracker_id, year) == 0:
+            self.remove_year(year)
+            return
+        
         if self.popup_frame is not None:
             self.popup_frame.destroy()
 

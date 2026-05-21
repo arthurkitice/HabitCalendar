@@ -66,6 +66,7 @@ it:
     custom_themes: "Temi personalizzati"
     dark_mode_only: "Temi solo per modalità scura:"
     light_mode_only: "Temi solo per modalità chiara:"
+    option_switch: "Nascondi i pop-up del nuovo anno:"
 
   delete:
     tracker:
@@ -107,3 +108,4 @@ it:
       Confermi la creazione?
       Questa azione aumenterà le
       dimensioni del database.
+    checkbox: "Non chiedere più"

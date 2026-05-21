@@ -4,11 +4,11 @@ from functools import partial
 from constants import Direction, MONTHS, TEXT_COLOR, SECONDARY_THEME
 from .new_year_view import NewYearView
 from services import YearService, MonthService
-from helper import format_month_text, format_year_text
+from config import ThemeJSON
 import i18n
 
 class YearView(ctk.CTkFrame):
-    def __init__(self, parent, tracker_id, on_select, year):
+    def __init__(self, parent, tracker_id, on_select, year, on_new_year):
         super().__init__(
             parent, 
             width=500, 
@@ -28,6 +28,7 @@ class YearView(ctk.CTkFrame):
         self.on_select = on_select
         self.year: int = year
         self.years: list[int] = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
+        self.on_new_year = on_new_year
         self.build_ui()
 
     def build_months(self):
@@ -88,13 +89,16 @@ class YearView(ctk.CTkFrame):
 
     def add_year(self, year: int):
         self.year_service.add_tracker_year(tracker_id=self.tracker_id, year_number=year)
-
         self.year = year
         self.years = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
-
+        self.on_new_year()
         self.update_year()
 
     def new_year_popup(self, year):
+        if ThemeJSON.is_new_year_popup_hidden():
+            self.add_year(year)
+            return
+
         if hasattr(self, "popup_frame"):
             self.popup_frame.destroy()
 

@@ -66,6 +66,7 @@ en:
     custom_themes: "Custom themes"
     dark_mode_only: "'Dark mode only' themes:"
     light_mode_only: "'Light mode only' themes:"
+    option_switch: "Hide new year popups:"
 
   delete:
     tracker:
@@ -107,3 +108,4 @@ en:
       Confirm creation?
       This action will increase
       database's size.
+    checkbox: "Don't ask again"

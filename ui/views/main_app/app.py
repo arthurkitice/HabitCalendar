@@ -50,7 +50,7 @@ class CalendarApp(ctk.CTk):
             on_tracker_change=self.handle_tracker_change,
             on_color_change=self.handle_color_change,
             on_toggle_visibility=self.handle_sidebar_toggle,
-            on_year_remove=self.handle_year_removal,
+            on_year_remove=self.handle_year_remove,
             on_theme_change=self.handle_theme_change,
             on_language_change=self.handle_language_change
         )
@@ -118,8 +118,9 @@ class CalendarApp(ctk.CTk):
         # 5. Após a fila estar limpa e tudo repintado no escuro, removemos a cortina
         cortina.destroy()
 
-    def handle_year_removal(self, year: int, is_top_year: bool = True):
+    def handle_year_remove(self, year: int, is_top_year: bool = True):
         if self.calendar_view.current_year != year:
+            self.calendar_view.update_top_bar()
             return
    
         if is_top_year:

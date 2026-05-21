@@ -66,6 +66,7 @@ fr:
     custom_themes: "Thèmes personnalisés"
     dark_mode_only: "Thèmes mode sombre uniquement :"
     light_mode_only: "Thèmes mode clair uniquement :"
+    option_switch: "Masquer les pop-ups de nouvelle année :"
 
   delete:
     tracker:
@@ -107,3 +108,4 @@ fr:
       Confirmer la création ?
       Cette action augmentera la
       taille de la base de données.
+    checkbox: "Ne plus demander"

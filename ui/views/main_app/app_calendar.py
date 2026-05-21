@@ -2,9 +2,9 @@ import customtkinter as ctk
 from functools import partial
 from dtos import DayDTO
 from ..popups import PopupHandler
-from config import TrackerDataJSON
+from config import TrackerDataJSON, ThemeJSON
 from ui.widgets import NavigationButton, DayButton, CustomButton
-from constants import Direction, MONTHS, WEEK_DAYS, TEXT_COLOR
+from constants import Direction, WEEK_DAYS, TEXT_COLOR
 from services import TrackerService, DayService, YearService, MonthService
 import calendar
 import i18n
@@ -65,7 +65,6 @@ class MainCalendarView(ctk.CTkFrame):
 
     def add_year(self, year: int) -> None:
         self.year_service.add_tracker_year(self.current_tracker_id, year)
-        self._refresh_years()
         
         self.current_month = 12 if year < self.current_year else 1
         self.current_year = year
@@ -181,15 +180,20 @@ class MainCalendarView(ctk.CTkFrame):
         self.style_empty_buttons()
     
     def open_new_year_popup(self, year: int) -> None:
+        if ThemeJSON.is_new_year_popup_hidden():
+            self.add_year(year)
+            return
         PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
 
     # ===============================
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
     def open_years_popup(self, year: int):
-        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year)
+        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.update_top_bar)
 
     def update_top_bar(self) -> None:
+        self._refresh_years()
+
         month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
         self.month_button.configure(
             text=f"{self.current_year}\n{month_text}", 

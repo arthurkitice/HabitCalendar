@@ -114,6 +114,17 @@ class ThemeJSON:
         data = _load_config_data()
         data["config"]["current_language"] = language
         _save_config_data(data)
+    
+    @staticmethod
+    def toggle_new_year_popup_status() -> bool:
+        data = _load_config_data()
+        data["config"]["hide_new_year_popup"] = not ThemeJSON.is_new_year_popup_hidden()
+        _save_config_data(data)
+
+    @staticmethod
+    def is_new_year_popup_hidden() -> bool:
+        data = _load_config_data()
+        return data["config"].get("hide_new_year_popup", False)
 
     @staticmethod
     def get_current_language() -> str:

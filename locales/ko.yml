@@ -66,6 +66,7 @@ ko:
     custom_themes: "사용자 지정 테마"
     dark_mode_only: "다크 모드 전용 테마:"
     light_mode_only: "라이트 모드 전용 테마:"
+    option_switch: "새 연도 팝업 숨기기:"
 
   delete:
     tracker:
@@ -105,3 +106,4 @@ ko:
       생성하시겠습니까?
       이 작업은 데이터베이스
       크기를 증가시킵니다.
+    checkbox: "다시 묻지 않음"

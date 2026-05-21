@@ -66,6 +66,7 @@ pt:
     custom_themes: "Temas customizados"
     dark_mode_only: "Temas 'exclusivamente modo escuro':"
     light_mode_only: "Temas 'exclusivamente modo claro':"
+    option_switch: "Ocultar pop-ups de novo ano:"
 
   delete:
     tracker:
@@ -107,3 +108,4 @@ pt:
       Confirmar a criação do ano?
       Essa ação aumentará o tamanho
       do banco de dados.
+    checkbox: "Não perguntar novamente"

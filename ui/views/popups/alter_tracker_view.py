@@ -89,7 +89,7 @@ class AlterTrackerFrame(ctk.CTkFrame):
     def set_color(self, color):
         self.current_color = color
         for btn in self.btn_list:
-            btn.configure(border_width=2 if btn.color == color else 0)
+            btn.configure(border_width=3 if btn.color == color else 0)
 
     def build_ui(self):
         self.main_frame = ctk.CTkFrame(self, fg_color="transparent")

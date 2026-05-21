@@ -54,8 +54,8 @@ def tracker_popup(parent, tracker_name, tracker_id, on_year_remove):
     return TrackerFrame(parent.winfo_toplevel(), tracker_id, tracker_name, on_year_remove)
 
 @_show_popup
-def year_popup(parent, on_select, tracker_id, year):
-    return YearView(parent.winfo_toplevel(), tracker_id, on_select, year)
+def year_popup(parent, on_select, tracker_id, year, on_new_year):
+    return YearView(parent.winfo_toplevel(), tracker_id, on_select, year, on_new_year)
 
 @_show_popup
 def theme_popup(parent, on_color_change, on_theme_change, on_language_change):

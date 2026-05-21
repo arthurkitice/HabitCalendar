@@ -66,6 +66,7 @@ zh:
     custom_themes: "自定义主题"
     dark_mode_only: "仅限深色模式主题："
     light_mode_only: "仅限浅色模式主题："
+    option_switch: "隐藏新建年份弹窗："
 
   delete:
     tracker:
@@ -105,3 +106,4 @@ zh:
       确认创建？
       此操作会增加数据库
       的占用空间。
+    checkbox: "不再询问"

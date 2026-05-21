@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton
-from constants import TEXT_COLOR
+from constants import TEXT_COLOR, PRIMARY_THEME
+from config import ThemeJSON
 import i18n
 
 class NewYearView(ctk.CTkFrame):
@@ -32,7 +33,18 @@ class NewYearView(ctk.CTkFrame):
         self.button_frame = ctk.CTkFrame(self, fg_color="transparent", width=500)
         self.button_frame.grid_columnconfigure((0, 1), weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
-        self.button_frame.grid(row=3, column=1)
+        self.button_frame.grid(row=4, column=1)
+
+        self.check_hide_popup = ctk.CTkCheckBox(
+            self, 
+            text=f" {i18n.t('new_year.checkbox')}",
+            fg_color=PRIMARY_THEME.fg_color(),
+            hover_color=PRIMARY_THEME.hover_color(),
+            cursor="hand2",
+            font=ctk.CTkFont(size=15),
+            corner_radius=5
+        )
+        self.check_hide_popup.grid(row=3, column=1, padx=5, pady=10)
 
         self.btn_return = CustomButton(self.button_frame, text=i18n.t('actions.cancel'), font_size=15, command=self.destroy, height=35, width=250, main_color=False)
         self.btn_return.grid(row=0, column=0, padx=5, pady=10)
@@ -42,11 +54,12 @@ class NewYearView(ctk.CTkFrame):
 
     def build_ui(self):
         self.grid_columnconfigure((0, 2), weight=1, uniform="main")
-        self.grid_columnconfigure(1, weight=2, uniform="main")
+        self.grid_columnconfigure(1, weight=3, uniform="main")
         self.grid_rowconfigure((0, 5), weight=1, uniform="main")
 
         self.ui()
 
     def save(self):
+        if self.check_hide_popup.get() == 1: ThemeJSON.toggle_new_year_popup_status()
         self.on_save()
         self.destroy()

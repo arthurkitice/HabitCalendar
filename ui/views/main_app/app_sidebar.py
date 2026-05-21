@@ -93,7 +93,10 @@ class SidebarView(ctk.CTkFrame):
         PopupHandler.theme_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change)
 
     def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
-        PopupHandler.delete_tracker_popup(self, on_save=partial(self.remove_tracker, tracker.id), tracker_name=tracker.name)
+        if self.tracker_service.get_checked_days_count(tracker.id) == 0:
+            self.remove_tracker(tracker.id)
+        else:
+            PopupHandler.delete_tracker_popup(self, on_save=partial(self.remove_tracker, tracker.id), tracker_name=tracker.name)
 
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id
