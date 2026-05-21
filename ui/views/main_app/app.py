@@ -1,14 +1,11 @@
 import customtkinter as ctk
-from config import LastTrackerJSON, ThemeJSON, TrackerDataJSON
+from config import LastTrackerJSON, ThemeJSON, TrackerDataJSON, WindowSizeJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
-from functools import partial
-from constants import PRIMARY_THEME, IconImages # <-- Importado IconImages
-import os
+from constants import PRIMARY_THEME
 import i18n
-
-# 1. Caminho absoluto seguro
+from ewmh import EWMH
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
@@ -17,13 +14,39 @@ class CalendarApp(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("Calendário")
-        self.geometry("1100x700")
+        self.title("HabitTracker")
+        self.geometry("850x500")
+
+        if WindowSizeJSON.is_window_maximized():
+            self.after(1, self._maximize)
+        else:
+            width, height = WindowSizeJSON.get_window_size()
+            self.geometry(f"{width}x{height}")
+
+        self.protocol("WM_DELETE_WINDOW", self.on_exit)
+
         self.minsize(850, 500)
         self.tracker_service = TrackerService()
         self.main_container = None
         self.build_all_ui()
 
+    def _maximize(self):
+        try:
+            ewmh = EWMH()
+            titulo = self.title().encode('utf-8')
+            
+            # A janela mais recente costuma ser a última da lista
+            for w in reversed(ewmh.getClientList()):
+                try:
+                    if ewmh.getWmName(w) and titulo in ewmh.getWmName(w):
+                        ewmh.setWmState(w, 1, '_NET_WM_STATE_MAXIMIZED_VERT', '_NET_WM_STATE_MAXIMIZED_HORZ')
+                        ewmh.display.flush()
+                        return
+                except:
+                    continue
+        except Exception as e:
+            print(f"Erro: {e}")
+            
     def build_all_ui(self, reopen_theme_popup=False):
         # Destrói o contêiner antigo, limpando a tela
         if self.main_container:
@@ -130,6 +153,23 @@ class CalendarApp(ctk.CTk):
 
         TrackerDataJSON.save_current_date(self.calendar_view.current_tracker_id, month, year)
         self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
+
+    def on_exit(self):
+        is_maximized = False
+        try:
+            is_maximized = bool(self.attributes('-zoomed'))
+        except:
+            pass
+
+        if is_maximized:
+            WindowSizeJSON.maximize_window()
+        else:
+            medidas = self.geometry().split('+')[0]
+            largura, altura = medidas.split('x')
+            WindowSizeJSON.save_window_size(int(largura), int(altura))
+            WindowSizeJSON.unmaximize_window()
+
+        self.destroy()
 
     def build_forbidden_content(self) -> None:
         self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=0)

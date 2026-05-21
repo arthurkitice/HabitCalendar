@@ -140,3 +140,35 @@ class ThemeJSON:
     def get_current_theme() -> str:
         data = _load_config_data()
         return data["config"].get("current_theme", "dark")
+    
+class WindowSizeJSON:
+    @staticmethod
+    def unmaximize_window() -> bool:
+        data = _load_config_data()
+        data["config"]["window_maximized"] = False
+        _save_config_data(data)
+
+    @staticmethod
+    def maximize_window() -> bool:
+        data = _load_config_data()
+        data["config"]["window_maximized"] = True
+        _save_config_data(data)
+
+    @staticmethod
+    def save_window_size(width: int, height: int) -> bool:
+        data = _load_config_data()
+        data["config"]["window_width"] = width
+        data["config"]["window_height"] = height
+        _save_config_data(data)
+
+    @staticmethod
+    def is_window_maximized() -> bool:
+        data = _load_config_data()
+        return data["config"].get("window_maximized", False)
+
+    @staticmethod
+    def get_window_size() -> bool:
+        data = _load_config_data()
+        width = data["config"].get("window_width", 1100)
+        height = data["config"].get("window_height", 700)
+        return width, height
