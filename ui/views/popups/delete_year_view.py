@@ -25,7 +25,6 @@ class DeleteYearView(ctk.CTkFrame):
         self.label_1 = ctk.CTkLabel(self, text=i18n.t('delete.year.label', year=self.year), font=ctk.CTkFont(size=22, weight="bold"))
         self.label_1.grid(row=1, column=1, padx=5, pady=5, sticky="nsew")
 
-        text_label_2 = f"Você pode criar o ano novamente\nmas perderá qualquer marcação.\n\nEssa ação é irreversível.\n"
         self.label_2 = ctk.CTkLabel(self, text=i18n.t('delete.year.warning'), font=ctk.CTkFont(size=16), text_color="grey")
         self.label_2.grid(row=2, column=1, padx=5, pady=5, sticky="nsew")
 

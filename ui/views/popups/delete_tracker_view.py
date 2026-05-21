@@ -49,3 +49,9 @@ class DeleteTrackerView(ctk.CTkFrame):
     def save(self):
         self.on_save()
         self.destroy()
+
+    def _on_enter(self, event=None):
+        self.save()
+        
+    def _on_escape(self, event=None):
+        self.destroy()

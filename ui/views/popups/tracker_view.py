@@ -76,15 +76,12 @@ class TrackerFrame(ctk.CTkFrame):
         if self.popup_frame is not None:
             self.popup_frame.destroy()
 
-        self.popup_frame = DeleteYearView(
-            self.winfo_toplevel(), 
+        from . import PopupHandler
+        self.popup_frame = PopupHandler.delete_year_popup(
+            self, 
             on_save=partial(self.remove_year, year), 
             year=year
         )
-
-        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
-        self.popup_frame.wait_visibility()
-        self.popup_frame.grab_set()
 
     def build_top_label(self):
         self.top_label_frame = ctk.CTkFrame(self.main_frame, corner_radius=10, fg_color="transparent")

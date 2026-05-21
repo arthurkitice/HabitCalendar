@@ -8,27 +8,59 @@ from .tracker_view import TrackerFrame
 from .year_view import YearView
 from .theme_view import ThemeView
 
+def apply_popup_binds(popup):
+    """Gerencia uma pilha de popups para garantir que os atalhos afetem apenas o popup ativo."""
+    root = popup.winfo_toplevel()
+    
+    # Configura os binds globais e a pilha apenas na primeira vez
+    if not hasattr(root, "_popup_stack"):
+        root._popup_stack = []
+        
+        def handle_enter(event):
+            if root._popup_stack:
+                top_popup = root._popup_stack[-1]
+                # Se tiver 'save', salva. Se for popup de opção única, apenas fecha.
+                if hasattr(top_popup, 'save'):
+                    top_popup.save()
+                else:
+                    top_popup.destroy()
+                    
+        def handle_escape(event):
+            if root._popup_stack:
+                root._popup_stack[-1].destroy()
+                
+        root.bind('<Return>', handle_enter)
+        root.bind('<Escape>', handle_escape)
+        
+    # Adiciona o popup atual no topo da pilha
+    if popup not in root._popup_stack:
+        root._popup_stack.append(popup)
+    
+    # Intercepta o fechamento para remover este popup da pilha e devolver o controle ao popup de baixo
+    orig_destroy = popup.destroy
+    def new_destroy():
+        if popup in getattr(root, "_popup_stack", []):
+            root._popup_stack.remove(popup)
+        orig_destroy()
+    popup.destroy = new_destroy
+
 def _show_popup(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        parent = args[0] 
-        root = parent.winfo_toplevel()
-
-        if hasattr(root, "active_popup") and root.active_popup:
-            try:
-                root.active_popup.destroy()
-            except:
-                pass
-
+        # Cria a instância do popup
         popup = func(*args, **kwargs)
-        root.active_popup = popup
+        
+        # Aplica a nossa pilha de binds (a função que criamos na resposta anterior)
+        apply_popup_binds(popup)
 
+        # Exibe o popup
         popup.place(relx=0.5, rely=0.5, anchor="center")
         try:
             popup.wait_visibility()
         except tk.TclError:
             return
-        popup.grab_set()
+        
+        popup.grab_set() # Trava a janela de baixo
         return popup
     return wrapper
 

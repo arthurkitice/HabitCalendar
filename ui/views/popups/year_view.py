@@ -103,15 +103,12 @@ class YearView(ctk.CTkFrame):
         if hasattr(self, "popup_frame"):
             self.popup_frame.destroy()
 
-        self.popup_frame = NewYearView(
-            self.winfo_toplevel(), 
+        from . import PopupHandler
+        self.popup_frame = PopupHandler.new_year_popup(
+            self, 
             on_save=partial(self.add_year, year), 
             year=year
         )
-
-        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")
-        self.popup_frame.wait_visibility()
-        self.popup_frame.grab_set()
 
     def build_year(self):
         self.top_bar = ctk.CTkFrame(self.main_frame, fg_color=SECONDARY_THEME.fg_color(), corner_radius=10)
