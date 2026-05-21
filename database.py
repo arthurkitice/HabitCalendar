@@ -1,9 +1,16 @@
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.engine import Engine
-from contextlib import contextmanager  # ← ADICIONE ESTA LINHA
+from contextlib import contextmanager
+import os
 
-DATABASE_URL = "sqlite:///database.db"
+def get_app_dir() -> str:
+    app_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "HabitCalendar")
+    os.makedirs(app_dir, exist_ok=True)
+    return app_dir
+
+APP_DIR = get_app_dir()
+DATABASE_URL = f"sqlite:///{os.path.join(APP_DIR, 'database.db')}"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
@@ -17,10 +24,8 @@ def get_db():
         db.commit()
     except Exception as e:
         db.rollback()
-        # Tratamento centralizado! Você pode usar um logger real aqui no futuro
         print(f"[Database Error]: Falha na operação. Detalhes: {e}")
-        # traceback.print_exc() # Útil para debug no terminal
-        raise # Opcional: propaga o erro se você quiser que o Service saiba que falhou, ou remova o 'raise' para engolir o erro silenciosamente.
+        raise
     finally:
         db.close()
 

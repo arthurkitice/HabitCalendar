@@ -29,3 +29,11 @@ include/
 
 # Stored settings JSON
 app_settings.json
+
+# PyInstaller
+dist/
+build/
+*.spec
+
+# Ícones gerados (SVG vai, PNG gerado não precisa)
+icon.png

@@ -7,7 +7,7 @@ from config import ThemeJSON
 from dataclasses import dataclass
 import i18n
 
-DEFAULT_COLOR = 'hierophant-green'
+DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 80
 
 class ThemeView(ctk.CTkFrame):

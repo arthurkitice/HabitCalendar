@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 MONTHS = {
     1: "Janeiro", 
     2: "Fevereiro",

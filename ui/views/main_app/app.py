@@ -6,16 +6,20 @@ from .app_calendar import MainCalendarView
 from themes import PRIMARY_THEME, TEXT_COLOR
 import i18n
 import sys
+import os
 from ui.widgets import SliderButton
+from PIL import Image, ImageTk
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
 
 class CalendarApp(ctk.CTk):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, base_dir):
+        super().__init__(className='HabitCalendar')
+        self.base_dir = base_dir
 
         self.title("HabitCalendar")
+        self._set_icon()
         self.geometry("850x500")
 
         if WindowSizeJSON.is_window_maximized():
@@ -30,6 +34,19 @@ class CalendarApp(ctk.CTk):
         self.tracker_service = TrackerService()
         self.main_container = None
         self.build_all_ui()
+
+    def _set_icon(self):
+        icon_path = os.path.join(self.base_dir, 'icon.png')
+        if not os.path.exists(icon_path):
+            print(f"Ícone não encontrado em: {icon_path}")
+            return
+        
+        try:
+            img = Image.open(icon_path)
+            self._icon = ImageTk.PhotoImage(img)
+            self.wm_iconphoto(True, self._icon)
+        except Exception as e:
+            print(f"Erro ao setar ícone: {e}")
 
     def _maximize(self):
         if sys.platform.startswith('linux'):
@@ -171,7 +188,7 @@ class CalendarApp(ctk.CTk):
         self.destroy()
 
     def build_forbidden_content(self) -> None:
-        self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=0)
+        self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=10)
         self.forbidden_frame.grid_columnconfigure(0, weight=1)
         self.forbidden_frame.grid_rowconfigure((0, 99), weight=1)
 

@@ -3,17 +3,20 @@ from enum import Enum, auto
 import cairosvg
 import io
 from PIL import Image
+from constants import BASE_DIR
+import os
+
 
 def carregar_icone_svg(nome_arquivo, tamanho_icone):
-    # Multiplicamos o tamanho desejado por 4 para garantir nitidez 
     largura_render = tamanho_icone[0] * 4
     altura_render = tamanho_icone[1] * 4
 
     imagem_pillow = {}
     for i in ['dark', 'light']:
+        caminho = os.path.join(BASE_DIR, 'ui', 'icons', i, f'{nome_arquivo}.svg')
         png_bytes = cairosvg.svg2png(
-            url=f"ui/icons/{i}/{nome_arquivo}.svg", 
-            output_width=largura_render, 
+            url=f"file://{caminho}",  # file:// é obrigatório pro CairoSVG
+            output_width=largura_render,
             output_height=altura_render
         )
         

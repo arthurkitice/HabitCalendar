@@ -1,8 +1,9 @@
 import json
 import os
 from datetime import datetime
+from database import APP_DIR
 
-CONFIG_FILE = "app_settings.json"
+CONFIG_FILE = os.path.join(APP_DIR, "app_settings.json")
 
 def _load_config_data() -> dict:
     default_data = {"config": {}, "trackers": {}}
@@ -59,8 +60,8 @@ class TrackerDataJSON:
     def get_color(tracker_id: int) -> int:
         data = _load_config_data()
         tracker_data = data["trackers"].get(str(tracker_id), {})
-        if isinstance(tracker_data, int): return "Verde"
-        return tracker_data.get("color", "Verde")
+        if isinstance(tracker_data, int): return "Rosa"
+        return tracker_data.get("color", "Rosa")
 
     @staticmethod
     def remove_tracker_data(tracker_id: int) -> bool:
@@ -134,12 +135,12 @@ class ThemeJSON:
     @staticmethod
     def get_current_color() -> str:
         data = _load_config_data()
-        return data["config"].get("current_color", "hierophant-green")
+        return data["config"].get("current_color", "pink-man")
 
     @staticmethod
     def get_current_theme() -> str:
         data = _load_config_data()
-        return data["config"].get("current_theme", "dark")
+        return data["config"].get("current_theme", "light")
     
 class WindowSizeJSON:
     @staticmethod
