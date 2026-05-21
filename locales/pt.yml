@@ -109,3 +109,17 @@ pt:
       Essa ação aumentará o tamanho
       do banco de dados.
     checkbox: "Não perguntar novamente"
+
+  forbidden_frame: 
+    label: Você ainda não possui marcadores.
+    info: |-
+      Adicione um novo marcador,
+      clicando no botão '+' da barra lateral,
+      para visualizar algum calendário.
+      
+      Ou você pode utilizar algum dos exemplos abaixo.
+    example_trackers:
+      job: Trabalho
+      college: Faculdade
+      medicine: Remédios
+      exercises: Treinos

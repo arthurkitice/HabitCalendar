@@ -108,3 +108,17 @@ es:
       Esta acción aumentará el tamaño
       de la base de datos.
     checkbox: "No volver a preguntar"
+
+  forbidden_frame:
+    label: Aún no tienes registros.
+    info: |-
+      Añade un nuevo registro
+      haciendo clic en el botón '+' de la barra lateral
+      para ver un calendario.
+
+      O usa alguno de los ejemplos de abajo.
+    example_trackers:
+      job: Trabajo
+      college: Universidad
+      medicine: Medicamentos
+      exercises: Entrenamientos

@@ -1,5 +1,5 @@
 import os
-from database import get_db, engine, Base
+from database import engine, Base
 from services import TrackerService
 
 # Remove o banco de dados existente
@@ -14,5 +14,3 @@ if db_url.drivername == "sqlite":
 Base.metadata.create_all(bind=engine)
 print("Banco de dados recriado com sucesso!")
 
-tracker_service = TrackerService()
-tracker_service.create_tracker(name="Marcador padrão")

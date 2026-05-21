@@ -4,7 +4,7 @@ from config import TrackerDataJSON
 import i18n
 
 class CustomButton(ctk.CTkButton):
-    def __init__(self, parent, text, command, font_size = 20, bold = True, main_color = True, translation_path: str | None = None, **kwargs):
+    def __init__(self, parent, text='', command=None, font_size = 20, bold = True, main_color = True, translation_path: str | None = None, **kwargs):
         self.main_color = main_color
         self.translation_path = translation_path
         fg_color = PRIMARY_THEME.fg_color() if self.main_color else SECONDARY_THEME.fg_color()
@@ -277,3 +277,118 @@ class SmartScrollableFrame(ctk.CTkScrollableFrame):
                 self._parent_canvas.yview_scroll(-1, "units")
             elif event.num == 5 or event.delta < 0:
                 self._parent_canvas.yview_scroll(1, "units")
+
+class SliderButton(ctk.CTkFrame):
+    def __init__(
+            self, 
+            parent, 
+            values: list[str],
+            command, 
+            font_size = 20, 
+            bold = True,
+            width=200, 
+            height=30,
+            text_color=TEXT_COLOR,
+            corner_radius=0,
+            frame_fg_color=SECONDARY_THEME.fg_color(),
+            frame_border_width=0,
+            frame_border_color=TEXT_COLOR,
+            button_corner_radius=5,
+            button_fg_color=PRIMARY_THEME.fg_color(),
+            button_hover_color=PRIMARY_THEME.hover_color(),
+            button_border_width=0,
+            button_border_color=TEXT_COLOR
+        ):
+
+        if not values:
+            raise ValueError("values cannot be empty")
+
+        self.command = command
+
+        super().__init__(
+            parent, 
+            corner_radius=corner_radius, 
+            width=width, 
+            height=height,
+            fg_color=frame_fg_color,
+            border_width=frame_border_width,
+            border_color=frame_border_color
+        )
+        
+        self.grid_propagate(False)
+
+        self.grid_columnconfigure((0, 2), weight=1, uniform='main')
+        self.grid_columnconfigure(1, weight=3, uniform='main')
+        self.grid_rowconfigure(0, weight=1)        
+
+        self.values: list[str] = values
+        self.current_index = 0
+
+        font = ctk.CTkFont(size=font_size, weight='bold' if bold else 'normal')
+        button_style = {
+            "font": font,
+            "fg_color": button_fg_color,
+            "hover_color": button_hover_color,
+            "text_color": text_color,
+            "corner_radius": button_corner_radius,
+            "border_width": button_border_width,
+            "border_color": button_border_color
+        }
+
+        self.prev_btn = CustomButton(
+            self,
+            text='<', 
+            command=self.prev_button, 
+            **button_style
+        )
+        self.prev_btn.grid(row=0,column=0, padx=(0, 5), sticky="nsew")
+
+        self.button = CustomButton(
+            self, 
+            command=self.on_click, 
+            **button_style
+        )
+        self.button.grid(row=0,column=1, sticky="nsew")
+
+        self.next_btn = CustomButton(
+            self,
+            text='>', 
+            command=self.next_button, 
+            **button_style
+        )
+        self.next_btn.grid(row=0,column=2, padx=(5, 0), sticky="nsew")
+
+        self._update_value()
+
+    def next_button(self):
+        self.current_index = (self.current_index + 1) % len(self.values)
+        self._update_value()
+        
+    def prev_button(self):
+        self.current_index = (self.current_index - 1) % len(self.values)
+        self._update_value()
+
+    def on_click(self):
+        if self.command: self.command(self.values[self.current_index])
+
+    def get(self):
+        return self.values[self.current_index]
+
+    def set(self, value):
+        if value in self.values:
+            self.current_index = self.values.index(value)
+            self._update_value()
+
+    def _update_value(self):
+        self.button.configure(text=self.values[self.current_index])
+
+    def change_values(self, values: list[str]):
+        self.values = values
+        self.current_index = 0
+        self._update_value()
+
+    def reload_colors(self):
+        color1, color2 = PRIMARY_THEME.get_colors()
+        self.button.configure(fg_color=color1, hover_color=color2)
+        self.next_btn.configure(fg_color=color1, hover_color=color2)
+        self.prev_btn.configure(fg_color=color1, hover_color=color2)

@@ -109,3 +109,17 @@ fr:
       Cette action augmentera la
       taille de la base de données.
     checkbox: "Ne plus demander"
+
+  forbidden_frame:
+    label: Vous n'avez encore aucun suivi.
+    info: |-
+      Ajoutez un nouveau suivi
+      en cliquant sur le bouton '+' dans la barre latérale
+      pour afficher un calendrier.
+
+      Ou utilisez l’un des exemples ci-dessous.
+    example_trackers:
+      job: Travail
+      college: Université
+      medicine: Médicaments
+      exercises: Entraînements

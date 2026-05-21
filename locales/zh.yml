@@ -107,3 +107,17 @@ zh:
       此操作会增加数据库
       的占用空间。
     checkbox: "不再询问"
+
+  forbidden_frame:
+    label: 你还没有任何记录。
+    info: |-
+      通过点击侧边栏的“+”按钮
+      添加新的记录
+      以查看日历。
+
+      或者使用下面的示例。
+    example_trackers:
+      job: 工作
+      college: 学业
+      medicine: 用药
+      exercises: 锻炼

@@ -3,9 +3,10 @@ from config import LastTrackerJSON, ThemeJSON, TrackerDataJSON, WindowSizeJSON
 from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
-from constants import PRIMARY_THEME
+from constants import PRIMARY_THEME, TEXT_COLOR
 import i18n
 from ewmh import EWMH
+from ui.widgets import SliderButton
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
@@ -63,7 +64,7 @@ class CalendarApp(ctk.CTk):
         PRIMARY_THEME.set_theme(ThemeJSON.get_current_color())
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
-        self.build_forbidden_content()
+        
 
         # Instancia a Sidebar dentro do MAIN_CONTAINER
         initial_tracker_id = LastTrackerJSON.get_last_tracker_id()
@@ -84,11 +85,10 @@ class CalendarApp(ctk.CTk):
             self.main_container, 
             initial_tracker_id=initial_tracker_id
         )
-        
-        self.handle_tracker_change()
 
-        if reopen_theme_popup:
-            self.sidebar_view.theme_popup()
+        self.build_forbidden_content()
+
+        self.handle_tracker_change()
 
     def handle_sidebar_toggle(self, is_visible: bool):
         if is_visible:
@@ -111,10 +111,22 @@ class CalendarApp(ctk.CTk):
         i18n.set('locale', ThemeJSON.get_current_language())
         self.calendar_view.reload_language()
         self.sidebar_view.reload_language()
+        self.forbidden_label.configure(text=i18n.t('forbidden_frame.label'))
+        self.forbidden_label_info.configure(text=i18n.t('forbidden_frame.info'))
+
+        values = [
+            i18n.t('forbidden_frame.example_trackers.job'), 
+            i18n.t('forbidden_frame.example_trackers.college'), 
+            i18n.t('forbidden_frame.example_trackers.medicine'), 
+            i18n.t('forbidden_frame.example_trackers.exercises'), 
+        ]
+
+        self.example_trackers.change_values(values)
 
     def handle_color_change(self):
         self.sidebar_view.reload_colors()
         self.calendar_view.reload_colors()
+        self.example_trackers.reload_colors()
 
     def handle_theme_change(self):
         import tkinter as tk
@@ -174,12 +186,37 @@ class CalendarApp(ctk.CTk):
     def build_forbidden_content(self) -> None:
         self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=0)
         self.forbidden_frame.grid_columnconfigure(0, weight=1)
-        self.forbidden_frame.grid_rowconfigure(0, weight=1)
+        self.forbidden_frame.grid_rowconfigure((0, 99), weight=1)
 
-        forbidden_label = ctk.CTkLabel(
+        self.forbidden_label = ctk.CTkLabel(
             self.forbidden_frame, 
-            text="Adicione um novo marcador\nclicando no botão '+' da barra lateral\npara visualizar algum calendário",
+            text=i18n.t('forbidden_frame.label'),
             font=ctk.CTkFont(size=20),
+            text_color=TEXT_COLOR
+        )
+        self.forbidden_label.grid(row=1, column=0, pady=20, sticky="nsew")
+
+        self.forbidden_label_info = ctk.CTkLabel(
+            self.forbidden_frame, 
+            text=i18n.t('forbidden_frame.info'),
+            font=ctk.CTkFont(size=16),
             text_color="gray"
         )
-        forbidden_label.grid(row=0, column=0, sticky="nsew")
+        self.forbidden_label_info.grid(row=2, column=0, sticky="nsew")
+        
+        values = [
+            i18n.t('forbidden_frame.example_trackers.job'), 
+            i18n.t('forbidden_frame.example_trackers.college'), 
+            i18n.t('forbidden_frame.example_trackers.medicine'), 
+            i18n.t('forbidden_frame.example_trackers.exercises'), 
+        ]
+        self.example_trackers = SliderButton(
+            self.forbidden_frame, 
+            command=self.sidebar_view.create_new_tracker,
+            width=300,
+            values=values, 
+            font_size=15, 
+            bold=False
+        )
+        self.example_trackers.grid(row=3, column=0, sticky='n', padx=5, pady=20)
+

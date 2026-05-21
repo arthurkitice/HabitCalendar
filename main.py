@@ -4,6 +4,9 @@ from config import ThemeJSON
 import i18n
 import os
 import locale
+from pathlib import Path
+
+DB_PATH = Path('database.db')
 
 def detectar_idioma_sistema() -> str:
     """
@@ -36,6 +39,9 @@ def detectar_idioma_sistema() -> str:
         return 'en'
 
 if __name__ == "__main__":
+    if not DB_PATH.exists():
+        import seed
+        
     if ThemeJSON.get_current_language() == None:
         ThemeJSON.save_current_language(detectar_idioma_sistema())
 

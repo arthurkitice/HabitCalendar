@@ -109,3 +109,17 @@ it:
       Questa azione aumenterà le
       dimensioni del database.
     checkbox: "Non chiedere più"
+
+  forbidden_frame:
+    label: Non hai ancora nessun registro.
+    info: |-
+      Aggiungi un nuovo registro
+      cliccando sul pulsante '+' nella barra laterale
+      per visualizzare un calendario.
+
+      Oppure usa uno degli esempi qui sotto.
+    example_trackers:
+      job: Lavoro
+      college: Università
+      medicine: Farmaci
+      exercises: Allenamenti

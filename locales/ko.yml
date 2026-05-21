@@ -107,3 +107,17 @@ ko:
       이 작업은 데이터베이스
       크기를 증가시킵니다.
     checkbox: "다시 묻지 않음"
+
+  forbidden_frame:
+    label: 아직 트래커가 없습니다.
+    info: |-
+      새로운 트래커를 추가하려면
+      사이드바의 '+' 버튼을 클릭하여
+      캘린더를 확인하세요.
+
+      또는 아래 예시를 사용할 수 있습니다.
+    example_trackers:
+      job: 직장
+      college: 대학
+      medicine: 약
+      exercises: 운동

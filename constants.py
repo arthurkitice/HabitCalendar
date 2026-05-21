@@ -1,5 +1,6 @@
 from enum import Enum, auto
 from helper import carregar_icone_svg
+from config import ThemeJSON
 
 STARTING_YEAR = 2026
 
@@ -109,7 +110,7 @@ class Theme:
 
 TEXT_COLOR = ( "#1F1F1F","#FFFFFF")
 
-PRIMARY_THEME = Theme("hierophant-green (Default)", MAIN_COLORS)
+PRIMARY_THEME = Theme(ThemeJSON.get_current_color(), MAIN_COLORS)
 SECONDARY_THEME = Theme("default-theme", SECONDARY_COLORS)
 TERTIARY_THEME = Theme("default-theme", TERTIARY_COLORS)
 

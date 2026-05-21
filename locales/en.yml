@@ -109,3 +109,17 @@ en:
       This action will increase
       database's size.
     checkbox: "Don't ask again"
+
+  forbidden_frame:
+    label: You don't have any trackers yet.
+    info: |-
+      Add a new tracker
+      by clicking the '+' button in the sidebar
+      to view a calendar.
+
+      Or use one of the examples below.
+    example_trackers:
+      job: Work
+      college: College
+      medicine: Medications
+      exercises: Workouts

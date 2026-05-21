@@ -2,7 +2,7 @@ import customtkinter as ctk
 from functools import partial
 from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON, SidebarStatusJSON
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
-from constants import IconType, MAIN_COLORS, TEXT_COLOR
+from constants import IconType, PRIMARY_THEME, TEXT_COLOR
 from dtos import TrackerDTO
 from services import TrackerService
 from ..popups import PopupHandler
@@ -36,6 +36,7 @@ class SidebarView(ctk.CTkFrame):
         
         self.sidebar_visible = SidebarStatusJSON.get_sidebar_status()
         self.tracker_btn = {}
+        self.btn_list = [] 
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -65,6 +66,7 @@ class SidebarView(ctk.CTkFrame):
         last_tracker_id = trackers[-1].id if trackers else 0
 
         removed = False
+        removed_index = None
         for i, frame in enumerate(self.btn_list):
             if removed:
                 frame.grid(row=i-1, column=0, sticky="nsew")
@@ -73,7 +75,7 @@ class SidebarView(ctk.CTkFrame):
                 removed_index = i
                 removed = True
 
-        if removed_index: self.btn_list.pop(removed_index)
+        if removed_index is not None: self.btn_list.pop(removed_index)
         
         TrackerDataJSON.remove_tracker_data(tracker_id)
 
@@ -101,7 +103,6 @@ class SidebarView(ctk.CTkFrame):
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id
         LastTrackerJSON.save_current_tracker_id(self.current_tracker_id)
-        self.reload_colors()
         self.update_sidebar()
         self.on_tracker_change(tracker_id)
 
@@ -143,12 +144,8 @@ class SidebarView(ctk.CTkFrame):
 
         if not trackers: return
 
-        self.btn_list: list[ctk.CTkFrame] = []
-
         for i, tracker in enumerate(trackers):
             self.build_button_row(tracker, i)
-
-        self.reload_colors()
 
     def build_button_row(self, tracker, i):
         btn_frame = ctk.CTkFrame(self.sidebar_buttons_frame, fg_color="transparent")
@@ -156,7 +153,8 @@ class SidebarView(ctk.CTkFrame):
         btn_frame.grid_columnconfigure(1, weight=1)
         btn_frame.tracker = tracker
 
-        btn_frame.selected_line = ctk.CTkFrame(btn_frame, height=40, width=15, fg_color="transparent", corner_radius=0)
+        color = "transparent" if tracker.id != self.current_tracker_id else PRIMARY_THEME.fg_color()
+        btn_frame.selected_line = ctk.CTkFrame(btn_frame, height=40, width=15, fg_color=color, corner_radius=0)
         btn_frame.selected_line.grid(row=0, column=0, padx=5, pady=10, sticky="nsew")
 
         btn_frame.tracker_btn = SidebarButton(btn_frame, tracker=tracker.name, command=lambda f=btn_frame: self.change_tracker(f.tracker.id))
@@ -181,6 +179,8 @@ class SidebarView(ctk.CTkFrame):
         else: 
             tracker_text = i18n.t(f'sidebar.empty_bottom_label')
         self.tracker_label.configure(text=tracker_text)
+
+        self.reload_colors()
 
     def build_full_sidebar(self) -> None:
         self.sidebar_frame = ctk.CTkFrame(self, corner_radius=0)
@@ -234,7 +234,9 @@ class SidebarView(ctk.CTkFrame):
 
     def reload_colors(self):
         self.add_tracker_button.reload_colors()
-        color = MAIN_COLORS[ThemeJSON.get_current_color()]["fg"]
+        color = PRIMARY_THEME.fg_color()
+        if len(self.btn_list) == 0:
+            return
         for frame in self.btn_list:
             frame.selected_line.configure(fg_color=color if frame.tracker.id == self.current_tracker_id else "transparent")
         self.background_tracker_frame.configure(fg_color=color)
