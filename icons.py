@@ -34,6 +34,8 @@ class IconImages:
     CONFIG = carregar_icone_svg("settings", (30, 30))
     PALLETE = carregar_icone_svg("pallete", (20, 20))
     BIG_TRASH = carregar_icone_svg("bin", (40, 40))
+    SETTINGS = carregar_icone_svg("slide_settings", (20, 20))
+    DISK = carregar_icone_svg("disk", (20, 20))
 
 class Direction(Enum):
     PREV = auto()
@@ -46,6 +48,8 @@ class IconType(Enum):
     PALLETE = auto()
     PLUS = auto()
     BIG_TRASH = auto()
+    SETTINGS = auto()
+    DISK = auto()
 
 ARROWS = {
     Direction.NEXT: IconImages.RIGHT_ARROW, 
@@ -58,5 +62,7 @@ ICONS = {
     IconType.CONFIG: IconImages.CONFIG,
     IconType.PALLETE: IconImages.PALLETE,
     IconType.PLUS: IconImages.PLUS,
-    IconType.BIG_TRASH: IconImages.BIG_TRASH
+    IconType.BIG_TRASH: IconImages.BIG_TRASH,
+    IconType.SETTINGS: IconImages.SETTINGS,
+    IconType.DISK: IconImages.DISK
 }

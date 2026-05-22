@@ -4,9 +4,18 @@ from themes import PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLOR
 from config import TrackerDataJSON
 
 class CustomButton(ctk.CTkButton):
-    def __init__(self, parent, text='', command=None, font_size = 20, bold = True, main_color = True, translation_path: str | None = None, **kwargs):
+    def __init__(
+            self, 
+            parent, 
+            text=' ', 
+            text_var=None, 
+            command=None, 
+            font_size = 20, 
+            bold = True, 
+            main_color = True, 
+            **kwargs
+        ):
         self.main_color = main_color
-        self.translation_path = translation_path
         fg_color = PRIMARY_THEME.fg_color() if self.main_color else SECONDARY_THEME.fg_color()
         hover_color = PRIMARY_THEME.hover_color() if self.main_color else SECONDARY_THEME.hover_color()
 
@@ -14,6 +23,7 @@ class CustomButton(ctk.CTkButton):
             parent,
             corner_radius=5,
             text=text,
+            textvariable=text_var,
             command=command,
             fg_color= fg_color,
             hover_color= hover_color,
@@ -167,7 +177,7 @@ class SidebarButton(ctk.CTkButton):
         return ICONS[self.icon_type] if self.icon_type else None
             
 class IconButton(ctk.CTkButton):
-    def __init__(self, parent, command, icon_type: IconType, **kwargs):
+    def __init__(self, parent, command, icon_type: IconType, text=None, text_var=None, **kwargs):
         """
         Cria um botão com ícone. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
         """
@@ -175,10 +185,16 @@ class IconButton(ctk.CTkButton):
         
         image = self._get_image()
 
+        if text_var is not None and text is None:
+            text = " "
+        elif text is None:
+            text = ""
+
         super().__init__(
             parent,
             image=image,
-            text="",
+            text=text,
+            textvariable=text_var,
             command=command,
             fg_color=SECONDARY_THEME.fg_color(),
             text_color=TEXT_COLOR,

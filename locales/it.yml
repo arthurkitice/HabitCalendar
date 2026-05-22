@@ -61,12 +61,9 @@ it:
     current_color: "Colore attuale:"
     colors: "Colori:"
     default: "(Predefinito)"
-    language: "Lingua:"
-    current_language: "Lingua attuale:"
     custom_themes: "Temi personalizzati"
     dark_mode_only: "Temi solo per modalità scura:"
     light_mode_only: "Temi solo per modalità chiara:"
-    option_switch: "Nascondi i pop-up del nuovo anno:"
 
   delete:
     tracker:
@@ -123,3 +120,11 @@ it:
       college: Università
       medicine: Farmaci
       exercises: Allenamenti
+
+  settings:
+    language: "Lingua:"
+    current_language: "Lingua attuale:"
+    option_switch: "Nascondi i pop-up del nuovo anno:"
+    management: "Gestione:"
+    themes: "Temi"
+    backup: "Backup"

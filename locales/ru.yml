@@ -61,12 +61,9 @@ ru:
     current_color: "Текущий цвет:"
     colors: "Цвета:"
     default: "(По умолчанию)"
-    language: "Язык:"
-    current_language: "Текущий язык:"
     custom_themes: "Свои темы"
     dark_mode_only: "Темы только для темного режима:"
     light_mode_only: "Темы только для светлого режима:"
-    option_switch: "Скрыть всплывающие окна нового года:"
 
   delete:
     tracker:
@@ -123,3 +120,11 @@ ru:
       college: Учёба
       medicine: Лекарства
       exercises: Тренировки
+
+  settings:
+    language: "Язык:"
+    current_language: "Текущий язык:"
+    option_switch: "Скрыть окна нового года:"
+    management: "Управление:"
+    themes: "Темы"
+    backup: "Бэкап"

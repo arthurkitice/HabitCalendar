@@ -61,12 +61,10 @@ pt:
     current_color: "Cor atual:"
     colors: "Cores:"
     default: "(Padrão)"
-    language: "Idioma:"
-    current_language: "Idioma atual:"
     custom_themes: "Temas customizados"
     dark_mode_only: "Temas 'exclusivamente modo escuro':"
     light_mode_only: "Temas 'exclusivamente modo claro':"
-    option_switch: "Ocultar pop-ups de novo ano:"
+    
 
   delete:
     tracker:
@@ -123,3 +121,11 @@ pt:
       college: Faculdade
       medicine: Remédios
       exercises: Treinos
+
+  settings:
+    language: "Idioma:"
+    current_language: "Idioma atual:"
+    option_switch: "Ocultar pop-ups de novo ano:"
+    management: "Gerenciamento:"
+    themes: "Temas"
+    backup: "Backup"

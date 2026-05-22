@@ -61,12 +61,9 @@ fr:
     current_color: "Couleur actuelle :"
     colors: "Couleurs :"
     default: "(Par défaut)"
-    language: "Langue :"
-    current_language: "Langue actuelle :"
     custom_themes: "Thèmes personnalisés"
     dark_mode_only: "Thèmes mode sombre uniquement :"
     light_mode_only: "Thèmes mode clair uniquement :"
-    option_switch: "Masquer les pop-ups de nouvelle année :"
 
   delete:
     tracker:
@@ -123,3 +120,11 @@ fr:
       college: Université
       medicine: Médicaments
       exercises: Entraînements
+
+  settings:
+    language: "Langue :"
+    current_language: "Langue actuelle :"
+    option_switch: "Masquer les pop-ups de nouvelle année :"
+    management: "Gestion :"
+    themes: "Thèmes"
+    backup: "Sauvegarde"

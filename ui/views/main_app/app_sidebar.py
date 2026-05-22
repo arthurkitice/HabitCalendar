@@ -93,7 +93,7 @@ class SidebarView(ctk.CTkFrame):
         PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
 
     def theme_popup(self):
-        PopupHandler.theme_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change)
+        PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change)
 
     def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
         if self.tracker_service.get_checked_days_count(tracker.id) == 0:
@@ -192,7 +192,7 @@ class SidebarView(ctk.CTkFrame):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text=i18n.t(f'sidebar.top_label'), font=ctk.CTkFont(size=20, weight="bold"), text_color=TEXT_COLOR)
         self.sidebar_label.grid(row=0, column=0, padx=(25, 10), pady=5, sticky= "nsew")
 
-        self.spacer_button = IconButton(self.sidebar_frame, command=self.theme_popup, icon_type=IconType.PALLETE, height=30, width=44)
+        self.spacer_button = IconButton(self.sidebar_frame, command=self.theme_popup, icon_type=IconType.SETTINGS, height=30, width=44)
         self.spacer_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.add_tracker_button = CustomButton(self.sidebar_frame, text="+", command=self.open_new_tracker_popup, height=30, width=44)
@@ -207,7 +207,7 @@ class SidebarView(ctk.CTkFrame):
         self.background_tracker_frame.grid_columnconfigure(0, weight=1)
 
         self.tracker_frame = ctk.CTkFrame(self.background_tracker_frame, corner_radius=0)
-        self.tracker_frame.grid(row=2, column=0, columnspan=4, padx=0, pady=3, sticky="nsew")
+        self.tracker_frame.grid(row=2, column=0, columnspan=4, padx=0, pady=4, sticky="nsew")
         self.tracker_frame.grid_columnconfigure(0, weight=1)
 
         self.tracker_label = ctk.CTkLabel(self.tracker_frame, text="", font=ctk.CTkFont(size=20, weight="bold"), text_color=TEXT_COLOR, wraplength=325)

@@ -61,12 +61,9 @@ en:
     current_color: "Current color:"
     colors: "Colors:"
     default: "(Default)"
-    language: "Language:"
-    current_language: "Current language:"
     custom_themes: "Custom themes"
     dark_mode_only: "'Dark mode only' themes:"
     light_mode_only: "'Light mode only' themes:"
-    option_switch: "Hide new year popups:"
 
   delete:
     tracker:
@@ -123,3 +120,11 @@ en:
       college: College
       medicine: Medications
       exercises: Workouts
+
+  settings:
+    language: "Language:"
+    current_language: "Current language:"
+    option_switch: "Hide new year popups:"
+    management: "Management:"
+    themes: "Themes"
+    backup: "Backup"

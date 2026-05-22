@@ -61,12 +61,9 @@ el:
     current_color: "Τρέχον χρώμα:"
     colors: "Χρώματα:"
     default: "(Προεπιλογή)"
-    language: "Γλώσσα:"
-    current_language: "Τρέχουσα γλώσσα:"
     custom_themes: "Προσαρμοσμένα θέματα"
     dark_mode_only: "Θέματα μόνο για σκούρη λειτουργία:"
     light_mode_only: "Θέματα μόνο για ανοιχτή λειτουργία:"
-    option_switch: "Απόκρυψη επιβεβαίωσης νέου έτους:"
 
   delete:
     tracker:
@@ -123,3 +120,11 @@ el:
       college: Σπουδές
       medicine: Φάρμακα
       exercises: Προπονήσεις
+
+  settings:
+    language: "Γλώσσα:"
+    current_language: "Τρέχουσα γλώσσα:"
+    option_switch: "Απόκρυψη επιβεβαίωσης νέου έτους:"
+    management: "Διαχείριση:"
+    themes: "Θέματα"
+    backup: "Αντίγραφο"
