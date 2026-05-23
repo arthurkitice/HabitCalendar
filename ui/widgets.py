@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from icons import IconType, ICONS, ARROWS
+from icon_assets import PLUS
 from themes import PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
 
@@ -36,15 +36,10 @@ class CustomButton(ctk.CTkButton):
     def reload_colors(self):
         color1, color2 = PRIMARY_THEME.get_colors() if self.main_color else SECONDARY_THEME.get_colors()
         self.configure(fg_color=color1, hover_color=color2)
-    
-    # def reload_text(self):
-    #     if self.translation_path is None:
-    #         return
-    #     self.configure(text=i18n.t())
 
 class NavigationButton(ctk.CTkButton):
-    def __init__(self, parent, direction, command, condition, height=50, width=65, **kwargs):
-        self.direction = direction
+    def __init__(self, parent, command, condition, icon, height=50, width=65, **kwargs):
+        self.icon = icon
 
         super().__init__(
             parent, 
@@ -65,7 +60,7 @@ class NavigationButton(ctk.CTkButton):
         self.configure(image=self._get_image(condition), **kwargs)
 
     def _get_image(self, condition: bool):
-        return ARROWS[self.direction] if not condition else ICONS[IconType.PLUS]
+        return self.icon if not condition else PLUS
     
 class DayButton(ctk.CTkButton):
     def __init__(self, parent, day, command, checked, tracker_id, **kwargs):
@@ -147,22 +142,21 @@ class DayButton(ctk.CTkButton):
         self.configure(fg_color=self.check_colors["fg"], hover_color=self.check_colors["hover"])
 
 class SidebarButton(ctk.CTkButton):
-    def __init__(self, parent, command, icon_type: IconType | None = None, tracker: str | None = None, **kwargs):
+    def __init__(self, parent, command, icon = None, tracker: str | None = None, **kwargs):
         """
         Cria um botão da sidebar. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
         """
-        self.icon_type = icon_type
+        self.icon = icon
         text = tracker or ""
         
         text = text if len(text) < 15 else f"{text[:12]}..."
 
-        image = self._get_image()
-        icon_width = {"width": 40} if self.icon_type else {}
+        icon_width = {"width": 40} if self.icon else {}
 
         super().__init__(
             parent, 
             text=text,
-            image=image,
+            image=icon,
             command=command,
             fg_color=TERTIARY_THEME.fg_color(),
             text_color=TEXT_COLOR,
@@ -174,14 +168,14 @@ class SidebarButton(ctk.CTkButton):
         self.configure(**kwargs)
 
     def _get_image(self):
-        return ICONS[self.icon_type] if self.icon_type else None
+        return self.icon if self.icon else None
             
 class IconButton(ctk.CTkButton):
-    def __init__(self, parent, command, icon_type: IconType, text=None, text_var=None, **kwargs):
+    def __init__(self, parent, command, icon, text=None, text_var=None, **kwargs):
         """
         Cria um botão com ícone. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
         """
-        self.icon_type = icon_type
+        self.icon = icon
         
         image = self._get_image()
 
@@ -192,7 +186,7 @@ class IconButton(ctk.CTkButton):
 
         super().__init__(
             parent,
-            image=image,
+            image=icon,
             text=text,
             textvariable=text_var,
             command=command,
@@ -206,7 +200,7 @@ class IconButton(ctk.CTkButton):
         self.configure(**kwargs)
 
     def _get_image(self):
-        return ICONS[self.icon_type] if self.icon_type else None
+        return self.icon if self.icon else None
 
 class SmartScrollableFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, scroll_bar_on_right=True, **kwargs):

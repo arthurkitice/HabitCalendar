@@ -129,3 +129,24 @@ pt:
     management: "Gerenciamento:"
     themes: "Temas"
     backup: "Backup"
+
+  backup:
+    time: "%d/%m/%Y às %H:%M"
+    today_time: "Hoje às %H:%M"
+    yesterday_time: "Ontem às %H:%M"
+    last_backup: "Último backup:"
+    save: "Salvar"
+    restore: "Restaurar"
+    export: "Exportar"
+    import: "Importar"
+    title_save_restore: "Salvar/Restaurar backup:"
+    title_import_export: "Exportar/Importar backup:"
+    backup_info: |-
+      Você pode criar um ponto de restauração rápida dentro do
+      próprio aplicativo para evitar perder suas marcações.
+    export_info: |-
+      Você pode gerar uma cópia do banco de dados
+      para salvar localmente.
+    no_backup: "Nenhum"
+
+    

@@ -2,11 +2,10 @@ import customtkinter as ctk
 from ui.widgets import CustomButton, NavigationButton
 from functools import partial
 from themes import TEXT_COLOR, SECONDARY_THEME
-from icons import Direction
-from .new_year_view import NewYearView
 from services import YearService, MonthService
 from config import ThemeJSON
 import i18n
+from icon_assets import RIGHT_ARROW, LEFT_ARROW
 
 class YearView(ctk.CTkFrame):
     def __init__(self, parent, tracker_id, on_select, year, on_new_year):
@@ -130,7 +129,7 @@ class YearView(ctk.CTkFrame):
 
         self.btn_right = NavigationButton(
             parent=self.top_bar, 
-            direction=Direction.NEXT, 
+            icon=RIGHT_ARROW, 
             command=self.next_year, 
             condition=self.year+1 not in self.years,
             height=40,
@@ -140,7 +139,7 @@ class YearView(ctk.CTkFrame):
 
         self.btn_left = NavigationButton(
             parent=self.top_bar, 
-            direction=Direction.PREV, 
+            icon=LEFT_ARROW, 
             command=self.prev_year, 
             condition=self.year-1 not in self.years,
             height=40,

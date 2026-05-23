@@ -2,8 +2,7 @@ import customtkinter as ctk
 from ui.widgets import CustomButton, IconButton
 from functools import partial
 from themes import TEXT_COLOR
-from icons import IconType
-from .delete_year_view import DeleteYearView
+from icon_assets import BIG_TRASH
 from services import YearService, TrackerService
 import i18n
 
@@ -119,7 +118,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.delete_top_year_btn = IconButton(
             parent=self.top_year_frame,
             command=partial(self.delete_year_popup, self.top_year),
-            icon_type=IconType.BIG_TRASH,
+            icon=BIG_TRASH,
             fg_color="transparent",
             height=60,
             width=60
@@ -147,7 +146,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.delete_bottom_year_btn = IconButton(
             parent=self.bottom_year_frame,
             command=partial(self.delete_year_popup, self.bottom_year),
-            icon_type=IconType.BIG_TRASH,
+            icon=BIG_TRASH,
             fg_color="transparent",
             height=60,
             width=60

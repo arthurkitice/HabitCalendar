@@ -94,7 +94,8 @@ class CalendarApp(ctk.CTk):
             on_toggle_visibility=self.handle_sidebar_toggle,
             on_year_remove=self.handle_year_remove,
             on_theme_change=self.handle_theme_change,
-            on_language_change=self.handle_language_change
+            on_language_change=self.handle_language_change,
+            on_restore_backup=self.handle_backup_restore
         )
         self.sidebar_view.grid(row=0, column=0, sticky="nsew")
 
@@ -186,6 +187,13 @@ class CalendarApp(ctk.CTk):
             WindowSizeJSON.unmaximize_window()
 
         self.destroy()
+
+    def handle_backup_restore(self):
+        self.sidebar_view.build_sidebar_buttons()
+        self.sidebar_view.change_to_first_tracker()
+        #self.calendar_view.update_days_frame()
+        self.calendar_view.update_calendar()
+        self.handle_tracker_change()
 
     def build_forbidden_content(self) -> None:
         self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=10)

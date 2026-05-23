@@ -8,6 +8,7 @@ from .tracker_view import TrackerFrame
 from .year_view import YearView
 from .theme_view import ThemeView
 from .settings_view import SettingsView
+from .backup_view import BackupView
 
 def apply_popup_binds(popup):
     """Gerencia uma pilha de popups para garantir que os atalhos afetem apenas o popup ativo."""
@@ -95,5 +96,9 @@ def theme_popup(parent, on_color_change, on_theme_change):
     return ThemeView(parent.winfo_toplevel(), on_color_change, on_theme_change)
 
 @_show_popup
-def settings_popup(parent, on_color_change, on_theme_change, on_language_change):
-    return SettingsView(parent.winfo_toplevel(), on_color_change, on_theme_change, on_language_change)
+def settings_popup(parent, on_color_change, on_theme_change, on_language_change, on_restore_backup):
+    return SettingsView(parent.winfo_toplevel(), on_color_change, on_theme_change, on_language_change, on_restore_backup)
+
+@_show_popup
+def backup_popup(parent, on_restore_backup):
+    return BackupView(parent.winfo_toplevel(), on_restore_backup)

@@ -128,3 +128,22 @@ en:
     management: "Management:"
     themes: "Themes"
     backup: "Backup"
+
+  backup:
+    time: "%Y-%m-%d at %H:%M"
+    today_time: "Today at %H:%M"
+    yesterday_time: "Yesterday at %H:%M"
+    last_backup: "Last backup:"
+    save: "Save"
+    restore: "Restore"
+    export: "Export"
+    import: "Import"
+    title_save_restore: "Save/Restore backup:"
+    title_import_export: "Import/Export backup:"
+    backup_info: |-
+      You can create a quick restore point within the
+      app itself to avoid losing your tracked data.
+    export_info: |-
+      You can generate a copy of the database
+      to save locally.
+    no_backup: "None"

@@ -128,3 +128,22 @@ fr:
     management: "Gestion :"
     themes: "Thèmes"
     backup: "Sauvegarde"
+
+  backup:
+    time: "%d/%m/%Y à %H:%M"
+    today_time: "Aujourd'hui à %H:%M"
+    yesterday_time: "Hier à %H:%M"
+    last_backup: "Dernière sauvegarde :"
+    save: "Enregistrer"
+    restore: "Restaurer"
+    export: "Exporter"
+    import: "Importer"
+    title_save_restore: "Enregistrer/Restaurer la sauvegarde :"
+    title_import_export: "Importer/Exporter la sauvegarde :"
+    backup_info: |-
+      Vous pouvez créer un point de restauration rapide dans
+      l'application elle-même pour éviter de perdre vos données.
+    export_info: |-
+      Vous pouvez générer une copie de la base de données
+      à enregistrer localement.
+    no_backup: "Aucune"

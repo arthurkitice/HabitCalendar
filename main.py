@@ -1,12 +1,8 @@
-from ui.views.main_app.app import CalendarApp
+
 from database import engine, Base
 from constants import LANGUAGES
 from config import ThemeJSON
-import logging
-import locale
-import i18n
-import sys
-import os
+import logging, locale, i18n, sys, os
 
 if getattr(sys, 'frozen', False):
     BASE_DIR = sys._MEIPASS
@@ -62,8 +58,13 @@ def gen_icon() -> None:
     
     if not os.path.exists(icon_path) and os.path.exists(svg_path):
         import cairosvg
+        
+        # Lê os bytes de forma segura
+        with open(svg_path, 'rb') as f:
+            svg_bytes = f.read()
+            
         cairosvg.svg2png(
-            url=f"file://{svg_path}",
+            bytestring=svg_bytes, # Substitui a url quebrada
             output_width=256,
             output_height=256,
             write_to=icon_path
@@ -73,6 +74,7 @@ if __name__ == "__main__":
     from database import APP_DIR
     setup_logging(APP_DIR)
     sys.excepthook = handle_exception
+    from ui.views.main_app.app import CalendarApp
     Base.metadata.create_all(bind=engine)
     gen_icon()
         

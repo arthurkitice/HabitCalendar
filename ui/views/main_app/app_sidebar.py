@@ -2,7 +2,7 @@ import customtkinter as ctk
 from functools import partial
 from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON, SidebarStatusJSON
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
-from icons import IconType
+from icon_assets import SETTINGS, EDIT, TRASH, CONFIG
 from themes import PRIMARY_THEME, TEXT_COLOR
 from dtos import TrackerDTO
 from services import TrackerService
@@ -19,7 +19,8 @@ class SidebarView(ctk.CTkFrame):
         on_toggle_visibility, 
         on_year_remove,
         on_theme_change,
-        on_language_change
+        on_language_change,
+        on_restore_backup
     ):
         super().__init__(parent, fg_color="transparent")
         
@@ -34,6 +35,7 @@ class SidebarView(ctk.CTkFrame):
         self.on_year_remove = on_year_remove
         self.on_theme_change = on_theme_change
         self.on_language_change = on_language_change
+        self.on_restore_backup = on_restore_backup
         
         self.sidebar_visible = SidebarStatusJSON.get_sidebar_status()
         self.tracker_btn = {}
@@ -92,8 +94,8 @@ class SidebarView(ctk.CTkFrame):
     def open_tracker_view_popup(self, tracker: TrackerDTO | None = None) -> None:
         PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
 
-    def theme_popup(self):
-        PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change)
+    def settings_popup(self):
+        PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change, self.on_restore_backup)
 
     def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
         if self.tracker_service.get_checked_days_count(tracker.id) == 0:
@@ -107,9 +109,16 @@ class SidebarView(ctk.CTkFrame):
         self.update_sidebar()
         self.on_tracker_change(tracker_id)
 
+    def change_to_first_tracker(self):
+        if len(self.btn_list) > 0:
+            tracker_id = self.btn_list[0].tracker.id
+        else:
+            tracker_id = 0
+        self.change_tracker(tracker_id)
+
     def create_new_tracker(self, tracker_name: str) -> None:
         new_tracker = self.tracker_service.create_tracker(tracker_name)
-        TrackerDataJSON.save_current_date(new_tracker.id)
+        TrackerDataJSON.populate_tracker_data(new_tracker.id)
         self.build_button_row(new_tracker, len(self.btn_list))
 
         if self.current_tracker_id == 0:
@@ -137,6 +146,7 @@ class SidebarView(ctk.CTkFrame):
         trackers = self.tracker_service.get_all_trackers()
 
         if getattr(self, "sidebar_buttons_frame", None):
+            self.btn_list = []
             self.sidebar_buttons_frame.destroy()
 
         self.sidebar_buttons_frame = SmartScrollableFrame(self.sidebar_frame, corner_radius=0)
@@ -161,13 +171,13 @@ class SidebarView(ctk.CTkFrame):
         btn_frame.tracker_btn = SidebarButton(btn_frame, tracker=tracker.name, command=lambda f=btn_frame: self.change_tracker(f.tracker.id))
         btn_frame.tracker_btn.grid(row=0, column=1, padx=(0, 10), pady=10, sticky="we")
 
-        btn_frame.edit_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_new_tracker_popup(f.tracker), icon_type=IconType.EDIT)
+        btn_frame.edit_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_new_tracker_popup(f.tracker), icon=EDIT)
         btn_frame.edit_btn.grid(row=0, column=2, padx=5, pady=10, sticky="we")
 
-        btn_frame.remove_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_delete_tracker_popup(f.tracker), icon_type=IconType.REMOVE)
+        btn_frame.remove_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_delete_tracker_popup(f.tracker), icon=TRASH)
         btn_frame.remove_btn.grid(row=0, column=3, padx=5, pady=10, sticky="we")
 
-        btn_frame.config_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_tracker_view_popup(f.tracker), icon_type=IconType.CONFIG)
+        btn_frame.config_btn = SidebarButton(btn_frame, command=lambda f=btn_frame: self.open_tracker_view_popup(f.tracker), icon=CONFIG)
         btn_frame.config_btn.grid(row=0, column=4, padx=(5, 20), pady=10, sticky="we")
 
         self.btn_list.append(btn_frame)
@@ -192,7 +202,7 @@ class SidebarView(ctk.CTkFrame):
         self.sidebar_label = ctk.CTkLabel(self.sidebar_frame, text=i18n.t(f'sidebar.top_label'), font=ctk.CTkFont(size=20, weight="bold"), text_color=TEXT_COLOR)
         self.sidebar_label.grid(row=0, column=0, padx=(25, 10), pady=5, sticky= "nsew")
 
-        self.spacer_button = IconButton(self.sidebar_frame, command=self.theme_popup, icon_type=IconType.SETTINGS, height=30, width=44)
+        self.spacer_button = IconButton(self.sidebar_frame, command=self.settings_popup, icon=SETTINGS, height=30, width=44)
         self.spacer_button.grid(row=0, column=2, padx=5, pady=5)
 
         self.add_tracker_button = CustomButton(self.sidebar_frame, text="+", command=self.open_new_tracker_popup, height=30, width=44)

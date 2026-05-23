@@ -5,7 +5,7 @@ from ..popups import PopupHandler
 from config import TrackerDataJSON, ThemeJSON
 from ui.widgets import NavigationButton, DayButton, CustomButton
 from themes import TEXT_COLOR
-from icons import Direction
+from icon_assets import RIGHT_ARROW, LEFT_ARROW
 from services import TrackerService, DayService, YearService, MonthService
 import calendar
 import i18n
@@ -34,6 +34,8 @@ class MainCalendarView(ctk.CTkFrame):
         self.grid_rowconfigure(0, weight=0)
         self.grid_rowconfigure(1, weight=0)
         self.grid_rowconfigure(2, weight=1)
+
+        self.days_frame = None
 
         self.build_ui()
 
@@ -201,8 +203,8 @@ class MainCalendarView(ctk.CTkFrame):
             command=partial(self.open_years_popup, self.current_year)
         )
 
-        self.prev_button.update_button(condition=self._get_condition(Direction.PREV))
-        self.next_button.update_button(condition=self._get_condition(Direction.NEXT))
+        self.prev_button.update_button(condition=self._get_condition(LEFT_ARROW))
+        self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))
 
     def build_top_bar(self) -> None:
         self.top_frame = ctk.CTkFrame(self, corner_radius=10)
@@ -223,17 +225,17 @@ class MainCalendarView(ctk.CTkFrame):
 
         self.prev_button = NavigationButton(
             parent=self.top_frame, 
-            direction=Direction.PREV, 
+            icon=LEFT_ARROW, 
             command=partial(self.previous_month),
-            condition=self._get_condition(Direction.PREV)
+            condition=self._get_condition(LEFT_ARROW)
         )
         self.prev_button.grid(row=0, column=0, padx=5, pady=5, sticky="w")
 
         self.next_button = NavigationButton(
             parent=self.top_frame, 
-            direction=Direction.NEXT, 
+            icon=RIGHT_ARROW, 
             command=partial(self.next_month),
-            condition=self._get_condition(Direction.NEXT)
+            condition=self._get_condition(RIGHT_ARROW)
         )
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
 
@@ -248,15 +250,11 @@ class MainCalendarView(ctk.CTkFrame):
         for i, label in enumerate(self.week_days):
             label.configure(text=i18n.t(f'calendar.short_weekdays.{str((i+6)%7)}'))
 
-    def _get_condition(self, direction: Direction) -> bool | None:
-        match direction:
-            case Direction.NEXT:
-                return self.current_year +1 not in self.years and self.current_month == 12
-            case Direction.PREV:
-                return self.current_year -1 not in self.years and self.current_month == 1
-            case _:
-                return None
-            
+    def _get_condition(self, icon) -> bool | None:
+        if icon == RIGHT_ARROW:
+            return self.current_year +1 not in self.years and self.current_month == 12
+        return self.current_year -1 not in self.years and self.current_month == 1
+
     def build_ui(self) -> None:
         self.build_top_bar()
         self.build_days_frame()

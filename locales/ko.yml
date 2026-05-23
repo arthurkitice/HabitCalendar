@@ -126,3 +126,22 @@ ko:
     management: "관리:"
     themes: "테마"
     backup: "백업"
+
+  backup:
+    time: "%Y년 %m월 %d일 %H:%M"
+    today_time: "오늘 %H:%M"
+    yesterday_time: "어제 %H:%M"
+    last_backup: "마지막 백업:"
+    save: "저장"
+    restore: "복원"
+    export: "내보내기"
+    import: "가져오기"
+    title_save_restore: "백업 저장/복원:"
+    title_import_export: "백업 가져오기/내보내기:"
+    backup_info: |-
+      앱 내에서 빠른 복원 지점을 생성하여 
+      기록이 손실되는 것을 방지할 수 있습니다.
+    export_info: |-
+      데이터베이스 사본을 생성하여
+      로컬에 저장할 수 있습니다.
+    no_backup: "없음"

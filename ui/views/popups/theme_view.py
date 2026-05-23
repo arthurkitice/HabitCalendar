@@ -2,9 +2,7 @@ import customtkinter as ctk
 from ui.widgets import CustomButton, SmartScrollableFrame
 from functools import partial
 from themes import PRIMARY_THEME, MAIN_COLORS, TERTIARY_THEME, TEXT_COLOR, SECONDARY_THEME
-from constants import LANGUAGES
 from config import ThemeJSON
-from dataclasses import dataclass
 import i18n
 
 DEFAULT_COLOR = 'pink-man'

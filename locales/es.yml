@@ -127,3 +127,22 @@ es:
     management: "Gestión:"
     themes: "Temas"
     backup: "Respaldo"
+
+  backup:
+    time: "%d/%m/%Y a las %H:%M"
+    today_time: "Hoy a las %H:%M"
+    yesterday_time: "Ayer a las %H:%M"
+    last_backup: "Último respaldo:"
+    save: "Guardar"
+    restore: "Restaurar"
+    export: "Exportar"
+    import: "Importar"
+    title_save_restore: "Guardar/Restaurar respaldo:"
+    title_import_export: "Importar/Exportar respaldo:"
+    backup_info: |-
+      Puedes crear un punto de restauración rápida dentro de la
+      propia aplicación para evitar perder tus registros.
+    export_info: |-
+      Puedes generar una copia de la base de datos
+      para guardarla localmente.
+    no_backup: "Ninguno"

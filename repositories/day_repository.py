@@ -13,7 +13,7 @@ class DayRepository:
 
     def check_day(self, day_id: int):
         day = self.get_day_by_id(day_id)
-        day.checked = False if day.checked else True
+        day.checked = not day.checked
         self.db.commit()
         self.db.refresh(day)
         

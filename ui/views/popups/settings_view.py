@@ -1,18 +1,17 @@
 import customtkinter as ctk
 from ui.widgets import CustomButton, SmartScrollableFrame, IconButton
 from functools import partial
-from icons import IconType
-from themes import PRIMARY_THEME, MAIN_COLORS, TERTIARY_THEME, TEXT_COLOR, SECONDARY_THEME
+from icon_assets import PALLETE, DISK
+from themes import PRIMARY_THEME, TEXT_COLOR
 from constants import LANGUAGES
 from config import ThemeJSON
-from dataclasses import dataclass
 import i18n
 
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85
 
 class SettingsView(ctk.CTkFrame):
-    def __init__(self, parent, on_color_change, on_theme_change, on_language_change):
+    def __init__(self, parent, on_color_change, on_theme_change, on_language_change, on_restore_backup):
         super().__init__(
             parent, 
             width=500, 
@@ -28,6 +27,7 @@ class SettingsView(ctk.CTkFrame):
         self.on_color_change = on_color_change
         self.on_theme_change = on_theme_change
         self.on_language_change = on_language_change
+        self.on_restore_backup = on_restore_backup
         self.popup_frame = None
 
         self.text = self._Theme_Texts()
@@ -41,24 +41,27 @@ class SettingsView(ctk.CTkFrame):
         self.buttons_frame = ctk.CTkFrame(self.main_frame)
         self.buttons_frame.grid(row=2, column=0, padx=15, pady=(5,10), sticky="nsew")
         self.buttons_frame.grid_columnconfigure((0, 1), weight=1)
+        
+        buttons_config = {
+            "parent":self.buttons_frame,
+            "font":ctk.CTkFont(size=15),
+            "height":40,
+            "width":125
+        }
 
         self.theme_button = IconButton(
-            self.buttons_frame, 
-            command=self.open_backcup_popup, 
-            text_var=self.text.THEMES, 
-            icon_type=IconType.PALLETE,
-            font=ctk.CTkFont(size=15),
-            height=40
+            command=self.open_theme_popup, 
+            text_var=self.text.THEMES,
+            icon=PALLETE,
+            **buttons_config
         )
         self.theme_button.grid(row=0, column=0, padx=(10, 5), pady=5,  sticky="nsew")
 
         self.backup_button = IconButton(
-            self.buttons_frame, 
-            command=None, 
+            command=self.open_backup_popup, 
             text_var=self.text.BACKUP, 
-            icon_type=IconType.DISK,
-            font=ctk.CTkFont(size=15),
-            height=40
+            icon=DISK,
+            **buttons_config
         )
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
@@ -117,15 +120,14 @@ class SettingsView(ctk.CTkFrame):
             on_theme_change=self.on_theme_change
         )
 
-    def open_backcup_popup(self):
+    def open_backup_popup(self):
         if self.popup_frame is not None:
             self.popup_frame.destroy()
 
         from . import PopupHandler
-        self.popup_frame = PopupHandler.theme_popup(
-            self, 
-            on_color_change=self.change_color,
-            on_theme_change=self.on_theme_change
+        self.popup_frame = PopupHandler.backup_popup(
+            self,
+            on_restore_backup=self.on_restore_backup
         )
 
     def change_language(self, language):

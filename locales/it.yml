@@ -128,3 +128,22 @@ it:
     management: "Gestione:"
     themes: "Temi"
     backup: "Backup"
+
+  backup:
+    time: "%d/%m/%Y alle %H:%M"
+    today_time: "Oggi alle %H:%M"
+    yesterday_time: "Ieri alle %H:%M"
+    last_backup: "Ultimo backup:"
+    save: "Salva"
+    restore: "Ripristina"
+    export: "Esporta"
+    import: "Importa"
+    title_save_restore: "Salva/Ripristina backup:"
+    title_import_export: "Importa/Esporta backup:"
+    backup_info: |-
+      Puoi creare un punto di ripristino rapido all'interno
+      dell'app per evitare di perdere le tue registrazioni.
+    export_info: |-
+      Puoi generare una copia del database
+      da salvare localmente.
+    no_backup: "Nessuno"

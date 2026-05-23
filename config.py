@@ -25,6 +25,17 @@ def _save_config_data(data: dict) -> None:
 
 class TrackerDataJSON:
     @staticmethod
+    def populate_tracker_data(tracker_id: int) -> None:
+        data = _load_config_data()
+
+        tracker = data["trackers"].setdefault(str(tracker_id), {})
+
+        tracker["month"] = 1
+        tracker["year"] = datetime.now().year
+        tracker["color"] = "Rosa"
+        _save_config_data(data)
+
+    @staticmethod
     def save_current_date(tracker_id: int, month: int | None = None, year: int | None = None) -> None:
         data = _load_config_data()
         if month is None or year is None:

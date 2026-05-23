@@ -126,3 +126,22 @@ zh:
     management: "管理："
     themes: "主题"
     backup: "备份"
+
+  backup:
+    time: "%Y年%m月%d日 %H:%M"
+    today_time: "今天 %H:%M"
+    yesterday_time: "昨天 %H:%M"
+    last_backup: "上次备份："
+    save: "保存"
+    restore: "恢复"
+    export: "导出"
+    import: "导入"
+    title_save_restore: "保存/恢复备份："
+    title_import_export: "导入/导出备份："
+    backup_info: |-
+      您可以在应用内创建一个快速恢复点，
+      以避免丢失您的记录。
+    export_info: |-
+      您可以生成数据库的副本
+      并将其保存在本地。
+    no_backup: "无"
