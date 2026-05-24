@@ -29,6 +29,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install cairo pango pkg-config
+          echo "DYLD_LIBRARY_PATH=$(brew --prefix cairo)/lib:$(brew --prefix pango)/lib" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$(brew --prefix cairo)/lib/pkgconfig:$(brew --prefix pango)/lib/pkgconfig" >> $GITHUB_ENV
 
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
