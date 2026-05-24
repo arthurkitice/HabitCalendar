@@ -1,0 +1,60 @@
+name: Build HabitCalendar
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          pyinstaller --onefile --windowed \
+            --name "HabitCalendar" \
+            --icon "icon.png" \
+            --add-data "locales:locales" \
+            --add-data "ui/icons:ui/icons" \
+            --add-data "icon.png:." \
+            --hidden-import "PIL._tkinter_finder" \
+            --hidden-import "PIL._imagingtk" \
+            main.py
+
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pyinstaller --onefile --windowed `
+            --name "HabitCalendar" `
+            --icon "icon.png" `
+            --add-data "locales;locales" `
+            --add-data "ui/icons;ui/icons" `
+            --add-data "icon.png;." `
+            --hidden-import "PIL._tkinter_finder" `
+            --hidden-import "PIL._imagingtk" `
+            main.py
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/HabitCalendar*

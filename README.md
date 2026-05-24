@@ -131,3 +131,7 @@ It runs PyInstaller with all required flags and outputs a single executable to `
 ## 📄 License
 
 MIT License — do whatever you want with it.
+
+## 📄 Credits
+
+Icons by [Lucide](https://lucide.dev) — ISC License.
