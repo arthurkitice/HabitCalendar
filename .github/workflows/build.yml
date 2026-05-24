@@ -108,7 +108,16 @@ jobs:
           cp dist/HabitCalendar-linux pkg/usr/bin/habitcalendar
           chmod +x pkg/usr/bin/habitcalendar
 
-          cp ui/icons/app_icon.svg pkg/usr/share/icons/hicolor/256x256/apps/habitcalendar.png
+          python3 -c "
+          import cairosvg
+          cairosvg.svg2png(
+            url='file://'+__import__('os').path.abspath('ui/icons/app_icon.svg'),
+            output_width=256,
+            output_height=256,
+            write_to='pkg/usr/share/icons/hicolor/256x256/apps/habitcalendar.png'
+          )
+          "
+          sudo gtk-update-icon-cache /usr/share/icons/hicolor/ 2>/dev/null || true
 
           cat > pkg/usr/share/applications/habitcalendar.desktop << EOF
           [Desktop Entry]
