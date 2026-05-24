@@ -34,23 +34,55 @@ A minimalist desktop calendar app for tracking daily habits — built with Pytho
 
 ## 🚀 Getting Started
 
-### Option 1 — Download the executable (Linux)
+Download the latest release from the [Releases](../../releases) page.
 
-Download the latest release from the [Releases](../../releases) page and run:
+### 🐧 Linux
+
+**Option 1 — .deb package (Ubuntu, Debian, Pop!_OS)**
+
+Download `habitcalendar_x.x.x_amd64.deb` and install:
 
 ```bash
-chmod +x HabitCalendar
-./HabitCalendar
+sudo dpkg -i habitcalendar_*.deb
 ```
 
-No Python, no pip, no setup required.
+Or double-click the file in your file manager.
 
-### Option 2 — Run from source
+**Option 2 — Standalone executable (any distro)**
+
+Download `HabitCalendar-linux`, mark as executable and run:
+
+```bash
+chmod +x HabitCalendar-linux
+./HabitCalendar-linux
+```
+
+### 🪟 Windows
+
+Download `HabitCalendar-windows.exe` and run it. No installation required.
+
+### 🍎 macOS
+
+Download `HabitCalendar-macos`. On first launch, macOS will block it because the app is not signed with an Apple Developer certificate. To run it:
+
+```bash
+xattr -cr HabitCalendar-macos
+chmod +x HabitCalendar-macos
+./HabitCalendar-macos
+```
+
+Or right-click the file → **Open** → **Open Anyway**.
+
+This is a one-time step. The app is open source — you can verify the code yourself.
+
+---
+
+### Run from source
 
 **Requirements:** Python 3.11+
 
 ```bash
-git clone https://github.com/your-username/HabitCalendar.git
+git clone https://github.com/arthurkitice/HabitCalendar.git
 cd HabitCalendar
 python3 -m venv .venv
 source .venv/bin/activate       # Linux/macOS
@@ -59,7 +91,7 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Option 3 — Build the executable yourself
+### Build the executable yourself
 
 ```bash
 ./build.sh
@@ -72,11 +104,20 @@ python main.py
 
 All data is stored locally at:
 
+**Linux/macOS**
 ```
 ~/.local/share/HabitCalendar/
 ├── database.db          # Your habit data
 ├── database.habitbackup # Internal backup
 └── app_settings.json    # App preferences
+```
+
+**Windows**
+```
+C:\Users\<you>\AppData\Local\HabitCalendar\
+├── database.db
+├── database.habitbackup
+└── app_settings.json
 ```
 
 ---
@@ -111,20 +152,6 @@ All data is stored locally at:
 | `ko` | 한국어 |
 
 Language is detected automatically from the system on first launch and can be changed anytime in settings.
-
----
-
-## 📦 Building from Source
-
-Dependencies are managed via pip. The full list is in `requirements.txt`.
-
-The `build.sh` script handles everything:
-
-```bash
-./build.sh
-```
-
-It runs PyInstaller with all required flags and outputs a single executable to `dist/HabitCalendar`.
 
 ---
 
