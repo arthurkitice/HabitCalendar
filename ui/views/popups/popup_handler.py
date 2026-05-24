@@ -1,14 +1,14 @@
 from functools import wraps
 import tkinter as tk
 from .alter_tracker_view import AlterTrackerFrame
-from .delete_tracker_view import DeleteTrackerView
-from .delete_year_view import DeleteYearView
 from .new_year_view import NewYearView
 from .tracker_view import TrackerFrame
 from .year_view import YearView
 from .theme_view import ThemeView
 from .settings_view import SettingsView
 from .backup_view import BackupView
+from .confirmation_view import ConfirmationView
+import i18n
 
 def apply_popup_binds(popup):
     """Gerencia uma pilha de popups para garantir que os atalhos afetem apenas o popup ativo."""
@@ -72,16 +72,48 @@ def alter_tracker_popup(parent, on_save, tracker_name=None, tracker_id=None):
 
 @_show_popup
 def delete_tracker_popup(parent, on_save, tracker_name):
-    """args -> on_save: callable, tracker_name: str"""
-    return DeleteTrackerView(parent.winfo_toplevel(), on_save, tracker_name)
+    label = i18n.t('delete.tracker.label', tracker=tracker_name)
+    message = i18n.t('delete.tracker.warning')
+    return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup
 def delete_year_popup(parent, on_save, year):
-    return DeleteYearView(parent.winfo_toplevel(), on_save, year)
+    label = i18n.t('delete.year.label', year=year)
+    message = i18n.t('delete.year.warning')
+    return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup
 def new_year_popup(parent, on_save, year):
-    return NewYearView(parent.winfo_toplevel(), on_save, year)
+    label = i18n.t('new_year.label', year=year)
+    message = i18n.t('new_year.warning')
+    return NewYearView(parent.winfo_toplevel(), on_save, label, message)
+
+@_show_popup
+def save_backup_popup(parent, on_save):
+    label = "Salvar backup"
+    message = "Essa ação irá substituir o backup local\npelos dados atuais."
+    return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
+
+@_show_popup
+def restore_backup_popup(parent, on_save):
+    label = "Restaurar backup"
+
+    message = (
+        "Essa ação irá substituir os dados atuais\npelos salvos no backup.\n\n"
+        "Qualquer alteração feita após\na criação do backup será perdida.\n\n"
+        "Certifique-se de exportar seus dados\npara não perder nada importante."
+    )
+    return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
+
+@_show_popup
+def import_popup(parent, on_save):
+    label = "Importar dados"
+
+    message = (
+        "Essa ação irá substituir os dados atuais\npelos salvos no arquivo enviado.\n\n"
+        "Certifique-se de exportar seus dados\npara não perder nada importante."
+    )
+    return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup
 def tracker_popup(parent, tracker_name, tracker_id, on_year_remove):

@@ -2,9 +2,10 @@ import customtkinter as ctk
 from ui.widgets import CustomButton, IconButton
 from icon_assets import DISK, CALENDAR_REFRESH, EXPORT, IMPORT
 from themes import PRIMARY_THEME, TEXT_COLOR
-from database_manager import create_backup, restore_backup, get_backup_info
-import i18n
+from database_manager import create_backup, restore_backup, get_backup_info, export_database, import_database
+import i18n, platform, subprocess
 from datetime import datetime, timedelta
+from functools import partial
 
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85
@@ -54,10 +55,11 @@ class BackupView(ctk.CTkFrame):
             "width":125
         }
 
-        self.backup_button = IconButton(command=self.on_save_backup, text=self.text.SAVE, icon=DISK, fg_color=PRIMARY_THEME.fg_color(), **buttons_config)
+        fg, hover = PRIMARY_THEME.get_colors()
+        self.backup_button = IconButton(command=self._show_save_popup, text=self.text.SAVE, icon=DISK, fg_color=fg, hover_color=hover, **buttons_config)
         self.backup_button.grid(row=0, column=0, padx=(10, 5), pady=5,  sticky="nsew")
 
-        self.backup_button = IconButton(command=self.on_restore, text=self.text.RESTORE, icon=CALENDAR_REFRESH, **buttons_config)
+        self.backup_button = IconButton(command=self._show_restore_popup, text=self.text.RESTORE, icon=CALENDAR_REFRESH, **buttons_config)
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
         self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.BACKUP_INFO, text_color='grey')
@@ -78,10 +80,11 @@ class BackupView(ctk.CTkFrame):
             "width":125
         }
 
-        self.backup_button = IconButton(command=None, text=self.text.EXPORT, icon=EXPORT, fg_color=PRIMARY_THEME.fg_color(), **buttons_config)
+        fg, hover = PRIMARY_THEME.get_colors()
+        self.backup_button = IconButton(command=self.button_export_click, text=self.text.EXPORT, icon=EXPORT, fg_color=fg, hover_color=hover, **buttons_config)
         self.backup_button.grid(padx=(10, 5), pady=5,  sticky="nsew")
 
-        self.backup_button = IconButton(command=None, text=self.text.IMPORT, icon=IMPORT, **buttons_config)
+        self.backup_button = IconButton(command=self.button_import_click, text=self.text.IMPORT, icon=IMPORT, **buttons_config)
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
         text='Você pode gerar uma cópia do banco de dados\nque ficará salva no seu computador ou pen drive.'
@@ -107,6 +110,10 @@ class BackupView(ctk.CTkFrame):
         restore_backup()
         self.on_restore_backup()
 
+    def on_import(self, file_path):
+        import_database(file_path)
+        self.on_restore_backup()
+
     def _get_correct_time_format(self):
         timestamp = get_backup_info()
 
@@ -123,6 +130,18 @@ class BackupView(ctk.CTkFrame):
         else:
             return self.text.NO_BACKUP
 
+    def _show_save_popup(self):
+        from .popup_handler import save_backup_popup
+        self.popup_frame = save_backup_popup(self, on_save=self.on_save_backup)
+
+    def _show_restore_popup(self):
+        from .popup_handler import restore_backup_popup
+        self.popup_frame = restore_backup_popup(self, on_save=self.on_restore)
+
+    def _show_import_popup(self, file_path):
+        from .popup_handler import import_popup
+        self.popup_frame = import_popup(self, on_save=partial(self.on_import, file_path))
+
     def build_ui(self):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -134,6 +153,33 @@ class BackupView(ctk.CTkFrame):
         self.build_button_row_1()
         self.build_button_row_2()
         self.build_back_button()
+
+    def button_export_click(self):
+        # Abre a janela para o usuário escolher a pasta e o nome do arquivo
+        caminho_destino = DialogHelper.ask_save_file(
+            title="Exportar Backup",
+            defaultextension=".habitbackup",
+            filetypes=[("Backup HabitCalendar", "*.habitbackup"), ("Todos os arquivos", "*.*")],
+            initialfile="meu_backup_habitos" # Nome sugerido que aparece preenchido
+        )
+
+        # Se o usuário fechar a janela ou clicar em Cancelar, retorna vazio ("")
+        if caminho_destino:
+            # Aqui você chama aquela função de exportar passando o caminho_destino
+            sucesso = export_database(caminho_destino)
+            if sucesso:
+                print("Exportado com sucesso!")
+
+    def button_import_click(self):
+        # Abre a janela pedindo para ele selecionar um arquivo existente
+        caminho_arquivo = DialogHelper.ask_open_file(
+            title="Importar Backup",
+            filetypes=[("Backup HabitCalendar", "*.habitbackup")]
+        )
+
+        # Se ele selecionou um arquivo e não cancelou
+        if caminho_arquivo:
+            self._show_import_popup(caminho_arquivo)
 
     class _Theme_Texts:
         def __init__(self):
@@ -151,3 +197,51 @@ class BackupView(ctk.CTkFrame):
             self.EXPORT_INFO = i18n.t('backup.export_info')
             self.NO_BACKUP = i18n.t('backup.no_backup')
 
+class DialogHelper:
+    @staticmethod
+    def ask_save_file(title: str, initialfile: str, filetypes: list, defaultextension: str) -> str:
+        if platform.system() == "Linux":
+            try:
+                # Chama o Zenity para gerar a janela GTK nativa no Linux
+                process = subprocess.run(
+                    [
+                        'zenity', '--file-selection', '--save', '--confirm-overwrite',
+                        f'--title={title}',
+                        f'--filename={initialfile}{defaultextension}',
+                        '--file-filter=*.habitbackup'
+                    ],
+                    capture_output=True, text=True
+                )
+                if process.returncode == 0:
+                    return process.stdout.strip()
+                return "" # O utilizador cancelou a janela
+            except FileNotFoundError:
+                pass # Se o Zenity não estiver instalado (raro), avança para o fallback do Tkinter
+        
+        # Windows, macOS ou fallback de emergência para Linux
+        return ctk.filedialog.asksaveasfilename(
+            title=title,
+            initialfile=initialfile,
+            filetypes=filetypes,
+            defaultextension=defaultextension
+        )
+
+    @staticmethod
+    def ask_open_file(title: str, filetypes: list) -> str:
+        if platform.system() == "Linux":
+            try:
+                process = subprocess.run(
+                    [
+                        'zenity', '--file-selection', 
+                        f'--title={title}', 
+                        '--file-filter=*.habitbackup'
+                    ],
+                    capture_output=True, text=True
+                )
+                if process.returncode == 0:
+                    return process.stdout.strip()
+                return "" # O utilizador cancelou a janela
+            except FileNotFoundError:
+                pass
+        
+        return ctk.filedialog.askopenfilename(title=title, filetypes=filetypes)
