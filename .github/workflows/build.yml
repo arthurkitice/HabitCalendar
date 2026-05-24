@@ -37,7 +37,10 @@ jobs:
       - name: Install system dependencies (Windows)
         if: runner.os == 'Windows'
         run: |
-          choco install pkgconfiglite
+          $url = "https://github.com/tschoonj/GTK-for-Windows-Runtime-Environment-Installer/releases/download/2022-01-04/gtk3-runtime-3.24.31-2022-01-04-ts-win64.exe"
+          Invoke-WebRequest -Uri $url -OutFile gtk-installer.exe
+          Start-Process -FilePath gtk-installer.exe -ArgumentList "/S" -Wait
+          echo "C:\Program Files\GTK3-Runtime Win64\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
