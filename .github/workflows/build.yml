@@ -97,7 +97,46 @@ jobs:
             --hidden-import "PIL._imagingtk" `
             main.py
 
+      - name: Create .deb package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo gem install fpm
+          mkdir -p pkg/usr/bin
+          mkdir -p pkg/usr/share/applications
+          mkdir -p pkg/usr/share/icons/hicolor/256x256/apps
+
+          cp dist/HabitCalendar-linux pkg/usr/bin/habitcalendar
+          chmod +x pkg/usr/bin/habitcalendar
+
+          cp ui/icons/app_icon.svg pkg/usr/share/icons/hicolor/256x256/apps/habitcalendar.png
+
+          cat > pkg/usr/share/applications/habitcalendar.desktop << EOF
+          [Desktop Entry]
+          Name=HabitCalendar
+          Comment=Track your daily habits
+          Exec=/usr/bin/habitcalendar
+          Icon=habitcalendar
+          Terminal=false
+          Type=Application
+          Categories=Utility;
+          StartupWMClass=HabitCalendar
+          EOF
+
+          fpm -s dir -t deb \
+            -n habitcalendar \
+            -v ${{ github.ref_name }} \
+            --architecture amd64 \
+            --description "A minimalist desktop app for tracking daily habits" \
+            --maintainer "arthurkitice" \
+            --url "https://github.com/arthurkitice/HabitCalendar" \
+            -C pkg \
+            .
+
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/HabitCalendar*
+          files: |
+            dist/HabitCalendar-linux
+            dist/HabitCalendar-macos
+            dist/HabitCalendar-windows.exe
+            *.deb
