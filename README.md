@@ -1,14 +1,133 @@
-# 📅 Daily Habit Tracker
+# HabitCalendar
 
-A minimalist desktop calendar application to monitor daily habits and medications.
+A minimalist desktop calendar app for tracking daily habits — built with Python and CustomTkinter.
 
-## 🚀 Features
-- **Persistent Data:** Uses SQLite to ensure your tracking survives app restarts.
-- **Modern UI:** Built with CustomTkinter for a sleek, dark-themed experience.
-- **Smart Grid:** Automatically fills empty calendar days from previous/next months for a complete visual experience.
-- **Architecture:** Implements the Repository Pattern with DTOs for clean and maintainable code.
+![HabitCalendar](ui/icons/app_icon.svg)
 
-## 🛠️ Tech Stack
-- **Language:** Python 3.x
-- **GUI:** CustomTkinter
-- **Database:** SQLite
+---
+
+## ✨ Features
+
+**Habit Tracking**
+- Create multiple trackers, each with its own calendar and color
+- Mark days with a single click — unmark by clicking again
+- Navigate between months and years freely
+- Each tracker stores its own history across multiple years
+
+**Customization**
+- 8 app color themes — from pink to purple to green
+- Light and dark mode
+- 9 languages: English, Portuguese, Spanish, French, Italian, Russian, Greek, Chinese, Korean
+
+**Data & Backup**
+- Internal backup with one click — restore to any previous save point
+- Export your database to any folder for external backup
+- Import a backup file from anywhere to restore your data
+- All data stored locally — no accounts, no cloud, no tracking
+
+**App**
+- Remembers window size and maximized state between sessions
+- Collapsible sidebar
+- Runs as a native desktop app on Linux, Windows, and macOS
+
+---
+
+## 🚀 Getting Started
+
+### Option 1 — Download the executable (Linux)
+
+Download the latest release from the [Releases](../../releases) page and run:
+
+```bash
+chmod +x HabitCalendar
+./HabitCalendar
+```
+
+No Python, no pip, no setup required.
+
+### Option 2 — Run from source
+
+**Requirements:** Python 3.11+
+
+```bash
+git clone https://github.com/your-username/HabitCalendar.git
+cd HabitCalendar
+python3 -m venv .venv
+source .venv/bin/activate       # Linux/macOS
+# .venv\Scripts\activate        # Windows
+pip install -r requirements.txt
+python main.py
+```
+
+### Option 3 — Build the executable yourself
+
+```bash
+./build.sh
+# Output: dist/HabitCalendar
+```
+
+---
+
+## 🗂 Data Location
+
+All data is stored locally at:
+
+```
+~/.local/share/HabitCalendar/
+├── database.db          # Your habit data
+├── database.habitbackup # Internal backup
+└── app_settings.json    # App preferences
+```
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Python 3.11+ |
+| GUI | CustomTkinter |
+| Database | SQLite via SQLAlchemy |
+| Icons | CairoSVG + Pillow |
+| i18n | python-i18n |
+| Packaging | PyInstaller |
+
+**Architecture:** Repository Pattern with DTOs for clean separation between data and UI layers.
+
+---
+
+## 🌍 Supported Languages
+
+| Code | Language |
+|---|---|
+| `en` | English |
+| `pt` | Português |
+| `es` | Español |
+| `fr` | Français |
+| `it` | Italiano |
+| `ru` | Русский |
+| `el` | Ελληνικά |
+| `zh` | 中文 |
+| `ko` | 한국어 |
+
+Language is detected automatically from the system on first launch and can be changed anytime in settings.
+
+---
+
+## 📦 Building from Source
+
+Dependencies are managed via pip. The full list is in `requirements.txt`.
+
+The `build.sh` script handles everything:
+
+```bash
+./build.sh
+```
+
+It runs PyInstaller with all required flags and outputs a single executable to `dist/HabitCalendar`.
+
+---
+
+## 📄 License
+
+MIT License — do whatever you want with it.
