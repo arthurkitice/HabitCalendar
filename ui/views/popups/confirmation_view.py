@@ -42,7 +42,7 @@ class ConfirmationView(ctk.CTkFrame):
 
     def build_ui(self):
         self.grid_columnconfigure((0, 2), weight=1, uniform="main")
-        self.grid_columnconfigure(1, weight=5, uniform="main")
+        self.grid_columnconfigure(1, weight=6, uniform="main")
         self.grid_rowconfigure((0, 99), weight=1, uniform="main")
 
         self.ui()

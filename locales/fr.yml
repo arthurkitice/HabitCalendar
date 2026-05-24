@@ -147,3 +147,30 @@ fr:
       Vous pouvez générer une copie de la base de données
       à enregistrer localement.
     no_backup: "Aucune"
+
+  save_backup:
+    label: Enregistrer la sauvegarde
+    message: |-
+      Cette action remplacera la sauvegarde
+      locale par les données actuelles.
+  
+  restore_backup:
+    label: Restaurer la sauvegarde
+    message: |-
+      Cette action remplacera les données actuelles
+      par celles enregistrées dans la sauvegarde.
+
+      Toute modification effectuée après la
+      création de la sauvegarde sera perdue.
+      
+      Assurez-vous d'exporter vos données
+      pour ne rien perdre d'important.
+
+  import_backup:
+    label: Importer des données
+    message: |-
+      Cette action remplacera les données actuelles
+      par celles enregistrées dans le fichier.
+
+      Assurez-vous d'exporter vos données
+      pour ne rien perdre d'important.

@@ -147,3 +147,30 @@ en:
       You can generate a copy of the database
       to save locally.
     no_backup: "None"
+
+  save_backup:
+    label: Save backup
+    message: |-
+      This action will replace the local backup
+      with the current data.
+  
+  restore_backup:
+    label: Restore backup
+    message: |-
+      This action will replace the current data
+      with the data saved in the backup.
+
+      Any changes made after the backup
+      was created will be lost.
+      
+      Make sure to export your data
+      so you don't lose anything important.
+
+  import_backup:
+    label: Import data
+    message: |-
+      This action will replace the current data
+      with the data saved in the uploaded file.
+
+      Make sure to export your data
+      so you don't lose anything important.

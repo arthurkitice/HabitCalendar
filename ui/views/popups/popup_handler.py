@@ -90,29 +90,20 @@ def new_year_popup(parent, on_save, year):
 
 @_show_popup
 def save_backup_popup(parent, on_save):
-    label = "Salvar backup"
-    message = "Essa ação irá substituir o backup local\npelos dados atuais."
+    label = i18n.t('save_backup.label')
+    message = i18n.t('save_backup.message')
     return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup
 def restore_backup_popup(parent, on_save):
-    label = "Restaurar backup"
-
-    message = (
-        "Essa ação irá substituir os dados atuais\npelos salvos no backup.\n\n"
-        "Qualquer alteração feita após\na criação do backup será perdida.\n\n"
-        "Certifique-se de exportar seus dados\npara não perder nada importante."
-    )
+    label = i18n.t('restore_backup.label')
+    message = i18n.t('restore_backup.message')
     return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup
 def import_popup(parent, on_save):
-    label = "Importar dados"
-
-    message = (
-        "Essa ação irá substituir os dados atuais\npelos salvos no arquivo enviado.\n\n"
-        "Certifique-se de exportar seus dados\npara não perder nada importante."
-    )
+    label = i18n.t('import_backup.label')
+    message = i18n.t('import_backup.message')
     return ConfirmationView(parent.winfo_toplevel(), on_save, label, message)
 
 @_show_popup

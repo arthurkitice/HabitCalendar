@@ -149,4 +149,31 @@ pt:
       para salvar localmente.
     no_backup: "Nenhum"
 
+  save_backup:
+    label: Salvar backup
+    message: |-
+      Essa ação irá substituir o backup local
+      pelos dados atuais.
+  
+  restore_backup:
+    label: Restaurar backup
+    message: |-
+      Essa ação irá substituir os dados atuais
+      pelos salvos no backup.
+
+      Qualquer alteração feita após
+      a criação do backup será perdida.
+      
+      Certifique-se de exportar seus dados
+      para não perder nada importante.
+
+  import_backup:
+    label: Importar dados
+    message: |-
+      Essa ação irá substituir os dados atuais
+      pelos salvos no arquivo enviado.
+
+      Certifique-se de exportar seus dados
+      para não perder nada importante.
+
     

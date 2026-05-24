@@ -146,3 +146,30 @@ es:
       Puedes generar una copia de la base de datos
       para guardarla localmente.
     no_backup: "Ninguno"
+
+  save_backup:
+    label: Guardar respaldo
+    message: |-
+      Esta acción reemplazará el respaldo local
+      con los datos actuales.
+  
+  restore_backup:
+    label: Restaurar respaldo
+    message: |-
+      Esta acción reemplazará los datos actuales
+      con los guardados en el respaldo.
+
+      Cualquier cambio realizado después de
+      la creación del respaldo se perderá.
+      
+      Asegúrate de exportar tus datos
+      para no perder nada importante.
+
+  import_backup:
+    label: Importar datos
+    message: |-
+      Esta acción reemplazará los datos actuales
+      con los guardados en el archivo subido.
+
+      Asegúrate de exportar tus datos
+      para no perder nada importante.

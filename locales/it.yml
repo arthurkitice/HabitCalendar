@@ -147,3 +147,30 @@ it:
       Puoi generare una copia del database
       da salvare localmente.
     no_backup: "Nessuno"
+
+  save_backup:
+    label: Salva backup
+    message: |-
+      Questa azione sostituirà il backup locale
+      con i dati attuali.
+  
+  restore_backup:
+    label: Ripristina backup
+    message: |-
+      Questa azione sostituirà i dati attuali
+      con quelli salvati nel backup.
+
+      Qualsiasi modifica apportata dopo
+      la creazione del backup andrà persa.
+      
+      Assicurati di esportare i tuoi dati
+      per non perdere nulla di importante.
+
+  import_backup:
+    label: Importa dati
+    message: |-
+      Questa azione sostituirà i dati attuali
+      con quelli salvati nel file caricato.
+
+      Assicurati di esportare i tuoi dati
+      per non perdere nulla di importante.
