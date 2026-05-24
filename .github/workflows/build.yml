@@ -58,11 +58,24 @@ jobs:
         run: |
           python -c "import cairosvg, os; cairosvg.svg2png(url='file:///'+os.path.abspath('ui/icons/app_icon.svg').replace(chr(92), '/'), output_width=256, output_height=256, write_to='icon.png')"
 
-      - name: Build (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
         run: |
           pyinstaller --onefile --windowed \
-            --name "HabitCalendar" \
+            --name "HabitCalendar-linux" \
+            --icon "icon.png" \
+            --add-data "locales:locales" \
+            --add-data "ui/icons:ui/icons" \
+            --add-data "icon.png:." \
+            --hidden-import "PIL._tkinter_finder" \
+            --hidden-import "PIL._imagingtk" \
+            main.py
+
+      - name: Build (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          pyinstaller --onefile --windowed \
+            --name "HabitCalendar-macos" \
             --icon "icon.png" \
             --add-data "locales:locales" \
             --add-data "ui/icons:ui/icons" \
@@ -75,7 +88,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pyinstaller --onefile --windowed `
-            --name "HabitCalendar" `
+            --name "HabitCalendar-windows" `
             --icon "icon.png" `
             --add-data "locales;locales" `
             --add-data "ui/icons;ui/icons" `
