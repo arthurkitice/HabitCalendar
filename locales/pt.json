@@ -1,0 +1,135 @@
+{
+  "pt": {
+    "sidebar": {
+      "top_label": "Marcadores",
+      "bottom_label": "Marcador atual:\n%{tracker}",
+      "empty_bottom_label": "Marcador atual:\nNenhum"
+    },
+    "calendar": {
+      "months": {
+        "1": "Janeiro",
+        "2": "Fevereiro",
+        "3": "Março",
+        "4": "Abril",
+        "5": "Maio",
+        "6": "Junho",
+        "7": "Julho",
+        "8": "Agosto",
+        "9": "Setembro",
+        "10": "Outubro",
+        "11": "Novembro",
+        "12": "Dezembro"
+      },
+      "short_weekdays": {
+        "0": "Seg",
+        "1": "Ter",
+        "2": "Qua",
+        "3": "Qui",
+        "4": "Sex",
+        "5": "Sáb",
+        "6": "Dom"
+      }
+    },
+    "checks": {
+      "zero": "Sem marcações",
+      "one": "Uma marcação",
+      "many": "%{count} marcações"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "confirm": "Confirmar",
+      "back": "Voltar"
+    },
+    "alter_tracker": {
+      "new_tracker": "Novo Marcador",
+      "new_tracker_placeholder": "Digite o nome do novo marcador",
+      "edit_tracker": "Editar Marcador\n\"%{tracker}\"",
+      "edit_tracker_placeholder": "Digite o nome do marcador",
+      "name": "Nome do marcador:",
+      "color": "Cor do marcador:",
+      "warning1": "* O nome não pode ser vazio.",
+      "warning2": "* O nome já pertence a outro marcador."
+    },
+    "theme": {
+      "label": "Tema:",
+      "light": "Claro",
+      "dark": "Escuro",
+      "current_color": "Cor atual:",
+      "colors": "Cores:",
+      "default": "(Padrão)",
+      "custom_themes": "Temas customizados",
+      "dark_mode_only": "Temas 'exclusivamente modo escuro':",
+      "light_mode_only": "Temas 'exclusivamente modo claro':"
+    },
+    "delete": {
+      "tracker": {
+        "label": "Tem certeza que deseja\ndeletar o marcador\n\"%{tracker}\"?",
+        "warning": "Você perderá todos os anos\ne marcações associadas.\n\nEssa ação é irreversível."
+      },
+      "year": {
+        "label": "Tem certeza que deseja\ndeletar o ano %{year}?",
+        "warning": "Você pode criar o ano novamente\nmas perderá qualquer marcação.\n\nEssa ação é irreversível."
+      }
+    },
+    "config": {
+      "tracker": "Marcador: %{tracker}",
+      "year_number": "Quantidade de anos na memória: %{years}",
+      "days_checked": "Dias marcados: %{days}",
+      "single_year": "Ano: %{year}",
+      "top_year": "Maior ano: %{year}",
+      "bottom_year": "Menor ano: %{year}",
+      "single_year_warning": "Único ano salvo na memória.\n\nUm marcador deve conter\npelo menos um ano."
+    },
+    "new_year": {
+      "label": "Novo Ano: %{year}",
+      "warning": "Confirmar a criação do ano?\nEssa ação aumentará o tamanho\ndo banco de dados.",
+      "checkbox": "Não perguntar novamente"
+    },
+    "forbidden_frame": {
+      "label": "Você ainda não possui marcadores.",
+      "info": "Adicione um novo marcador,\nclicando no botão '+' da barra lateral,\npara visualizar algum calendário.\n\nOu você pode utilizar algum dos exemplos abaixo.",
+      "example_trackers": {
+        "job": "Trabalho",
+        "college": "Faculdade",
+        "medicine": "Remédios",
+        "exercises": "Treinos"
+      }
+    },
+    "settings": {
+      "language": "Idioma:",
+      "current_language": "Idioma atual:",
+      "option_switch": "Ocultar pop-ups de novo ano:",
+      "management": "Gerenciamento:",
+      "themes": "Temas",
+      "backup": "Backup"
+    },
+    "backup": {
+      "time": "%d/%m/%Y às %H:%M",
+      "today_time": "Hoje às %H:%M",
+      "yesterday_time": "Ontem às %H:%M",
+      "last_backup": "Último backup:",
+      "save": "Salvar",
+      "restore": "Restaurar",
+      "export": "Exportar",
+      "import": "Importar",
+      "title_save_restore": "Salvar/Restaurar backup:",
+      "title_import_export": "Exportar/Importar backup:",
+      "backup_info": "Você pode criar um ponto de restauração rápida dentro do\npróprio aplicativo para evitar perder suas marcações.",
+      "export_info": "Você pode gerar uma cópia do banco de dados\npara salvar localmente.",
+      "no_backup": "Nenhum"
+    },
+    "save_backup": {
+      "label": "Salvar backup",
+      "message": "Essa ação irá substituir o backup local\npelos dados atuais."
+    },
+    "restore_backup": {
+      "label": "Restaurar backup",
+      "message": "Essa ação irá substituir os dados atuais\npelos salvos no backup.\n\nQualquer alteração feita após\na criação do backup será perdida.\n\nCertifique-se de exportar seus dados\npara não perder nada importante."
+    },
+    "import_backup": {
+      "label": "Importar dados",
+      "message": "Essa ação irá substituir os dados atuais\npelos salvos no arquivo enviado.\n\nCertifique-se de exportar seus dados\npara não perder nada importante."
+    }
+  }
+}

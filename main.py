@@ -63,7 +63,8 @@ if __name__ == "__main__":
         ThemeJSON.save_current_language(detect_sys_language())
 
     i18n.load_path.append(os.path.join(BASE_DIR, 'locales'))
-
+    
+    i18n.set('file_format', 'json')
     i18n.set('filename_format', '{locale}.{format}')
     i18n.set('locale', ThemeJSON.get_current_language())
     i18n.set('fallback', 'en')

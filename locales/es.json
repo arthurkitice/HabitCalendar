@@ -1,0 +1,135 @@
+{
+  "es": {
+    "sidebar": {
+      "top_label": "Marcadores",
+      "bottom_label": "Marcador actual:\n%{tracker}",
+      "empty_bottom_label": "Marcador actual:\nNinguno"
+    },
+    "calendar": {
+      "months": {
+        "1": "Enero",
+        "2": "Febrero",
+        "3": "Marzo",
+        "4": "Abril",
+        "5": "Mayo",
+        "6": "Junio",
+        "7": "Julio",
+        "8": "Agosto",
+        "9": "Septiembre",
+        "10": "Octubre",
+        "11": "Noviembre",
+        "12": "Diciembre"
+      },
+      "short_weekdays": {
+        "0": "Lun",
+        "1": "Mar",
+        "2": "Mié",
+        "3": "Jue",
+        "4": "Vie",
+        "5": "Sáb",
+        "6": "Dom"
+      }
+    },
+    "checks": {
+      "zero": "Sin marcas",
+      "one": "Una marca",
+      "many": "%{count} marcas"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "confirm": "Confirmar",
+      "back": "Volver"
+    },
+    "alter_tracker": {
+      "new_tracker": "Nuevo Marcador",
+      "new_tracker_placeholder": "Escribe el nombre del nuevo marcador",
+      "edit_tracker": "Editar Marcador\n\"%{tracker}\"",
+      "edit_tracker_placeholder": "Escribe el nombre del marcador",
+      "name": "Nombre del marcador:",
+      "color": "Color del marcador:",
+      "warning1": "* El nombre no puede estar vacío.",
+      "warning2": "* El nombre ya pertenece a otro marcador."
+    },
+    "theme": {
+      "label": "Tema:",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "current_color": "Color actual:",
+      "colors": "Colores:",
+      "default": "(Por defecto)",
+      "custom_themes": "Temas personalizados",
+      "dark_mode_only": "Temas 'exclusivamente en modo oscuro':",
+      "light_mode_only": "Temas 'exclusivamente en modo claro':"
+    },
+    "delete": {
+      "tracker": {
+        "label": "¿Estás seguro de que\ndeseas eliminar el marcador\n\"%{tracker}\"?",
+        "warning": "Perderás todos los años y marcas asociadas.\n\nEsta acción es irreversible."
+      },
+      "year": {
+        "label": "¿Estás seguro de que deseas\neliminar el año %{year}?",
+        "warning": "Puedes volver a crear el año\npero perderás cualquier marca.\n\nEsta acción es irreversible."
+      }
+    },
+    "config": {
+      "tracker": "Marcador: %{tracker}",
+      "year_number": "Cantidad de años en memoria: %{years}",
+      "days_checked": "Días marcados: %{days}",
+      "single_year": "Año: %{year}",
+      "top_year": "Año más reciente: %{year}",
+      "bottom_year": "Año más antiguo: %{year}",
+      "single_year_warning": "Único año guardado en memoria.\n\nUn marcador debe contener\nal menos un año."
+    },
+    "new_year": {
+      "label": "Nuevo Año: %{year}",
+      "warning": "¿Confirmar la creación del año?\nEsta acción aumentará el tamaño\nde la base de datos.",
+      "checkbox": "No volver a preguntar"
+    },
+    "forbidden_frame": {
+      "label": "Aún no tienes registros.",
+      "info": "Añade un nuevo registro\nhaciendo clic en el botón '+' de la barra lateral\npara ver un calendario.\n\nO usa alguno de los ejemplos de abajo.",
+      "example_trackers": {
+        "job": "Trabajo",
+        "college": "Universidad",
+        "medicine": "Medicamentos",
+        "exercises": "Entrenamientos"
+      }
+    },
+    "settings": {
+      "language": "Idioma:",
+      "current_language": "Idioma actual:",
+      "option_switch": "Ocultar pop-ups de nuevo año:",
+      "management": "Gestión:",
+      "themes": "Temas",
+      "backup": "Respaldo"
+    },
+    "backup": {
+      "time": "%d/%m/%Y a las %H:%M",
+      "today_time": "Hoy a las %H:%M",
+      "yesterday_time": "Ayer a las %H:%M",
+      "last_backup": "Último respaldo:",
+      "save": "Guardar",
+      "restore": "Restaurar",
+      "export": "Exportar",
+      "import": "Importar",
+      "title_save_restore": "Guardar/Restaurar respaldo:",
+      "title_import_export": "Importar/Exportar respaldo:",
+      "backup_info": "Puedes crear un punto de restauración rápida dentro de la\npropia aplicación para evitar perder tus registros.",
+      "export_info": "Puedes generar una copia de la base de datos\npara guardarla localmente.",
+      "no_backup": "Ninguno"
+    },
+    "save_backup": {
+      "label": "Guardar respaldo",
+      "message": "Esta acción reemplazará el respaldo local\ncon los datos actuales."
+    },
+    "restore_backup": {
+      "label": "Restaurar respaldo",
+      "message": "Esta acción reemplazará los datos actuales\ncon los guardados en el respaldo.\n\nCualquier cambio realizado después de\nla creación del respaldo se perderá.\n\nAsegúrate de exportar tus datos\npara no perder nada importante."
+    },
+    "import_backup": {
+      "label": "Importar datos",
+      "message": "Esta acción reemplazará los datos actuales\ncon los guardados en el archivo subido.\n\nAsegúrate de exportar tus datos\npara no perder nada importante."
+    }
+  }
+}

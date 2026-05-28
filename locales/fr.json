@@ -1,0 +1,135 @@
+{
+  "fr": {
+    "sidebar": {
+      "top_label": "Suivis",
+      "bottom_label": "Suivi actuel :\n%{tracker}",
+      "empty_bottom_label": "Suivi actuel :\nAucun"
+    },
+    "calendar": {
+      "months": {
+        "1": "Janvier",
+        "2": "Février",
+        "3": "Mars",
+        "4": "Avril",
+        "5": "Mai",
+        "6": "Juin",
+        "7": "Juillet",
+        "8": "Août",
+        "9": "Septembre",
+        "10": "Octobre",
+        "11": "Novembre",
+        "12": "Décembre"
+      },
+      "short_weekdays": {
+        "0": "Lun",
+        "1": "Mar",
+        "2": "Mer",
+        "3": "Jeu",
+        "4": "Ven",
+        "5": "Sam",
+        "6": "Dim"
+      }
+    },
+    "checks": {
+      "zero": "Aucune marque",
+      "one": "Une marque",
+      "many": "%{count} marques"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "confirm": "Confirmer",
+      "back": "Retour"
+    },
+    "alter_tracker": {
+      "new_tracker": "Nouveau Suivi",
+      "new_tracker_placeholder": "Entrez le nom du suivi",
+      "edit_tracker": "Modifier le Suivi\n\"%{tracker}\"",
+      "edit_tracker_placeholder": "Entrez le nom du suivi",
+      "name": "Nom du suivi :",
+      "color": "Couleur du suivi :",
+      "warning1": "* Le nom ne peut pas être vide.",
+      "warning2": "* Ce nom est déjà utilisé."
+    },
+    "theme": {
+      "label": "Thème :",
+      "light": "Clair",
+      "dark": "Sombre",
+      "current_color": "Couleur actuelle :",
+      "colors": "Couleurs :",
+      "default": "(Par défaut)",
+      "custom_themes": "Thèmes personnalisés",
+      "dark_mode_only": "Thèmes mode sombre uniquement :",
+      "light_mode_only": "Thèmes mode clair uniquement :"
+    },
+    "delete": {
+      "tracker": {
+        "label": "Êtes-vous sûr de vouloir\nsupprimer le suivi\n\"%{tracker}\" ?",
+        "warning": "Vous perdrez toutes les années\net leurs marques.\n\nCette action est irréversible."
+      },
+      "year": {
+        "label": "Êtes-vous sûr de vouloir\nsupprimer l'année %{year} ?",
+        "warning": "Vous pouvez recréer l'année mais\nvous perdrez toutes ses marques.\n\nCette action est irréversible."
+      }
+    },
+    "config": {
+      "tracker": "Suivi : %{tracker}",
+      "year_number": "Nombre d'années en mémoire : %{years}",
+      "days_checked": "Jours marqués : %{days}",
+      "single_year": "Année : %{year}",
+      "top_year": "Année la plus récente : %{year}",
+      "bottom_year": "Année la plus ancienne : %{year}",
+      "single_year_warning": "Seule année sauvegardée.\n\nUn suivi doit contenir\nau moins une année."
+    },
+    "new_year": {
+      "label": "Nouvelle Année : %{year}",
+      "warning": "Confirmer la création ?\nCette action augmentera la\ntaille de la base de données.",
+      "checkbox": "Ne plus demander"
+    },
+    "forbidden_frame": {
+      "label": "Vous n'avez encore aucun suivi.",
+      "info": "Ajoutez un nouveau suivi\nen cliquant sur le bouton '+' dans la barre latérale\npour afficher un calendrier.\n\nOu utilisez l’un des exemples ci-dessous.",
+      "example_trackers": {
+        "job": "Travail",
+        "college": "Université",
+        "medicine": "Médicaments",
+        "exercises": "Entraînements"
+      }
+    },
+    "settings": {
+      "language": "Langue :",
+      "current_language": "Langue actuelle :",
+      "option_switch": "Masquer les pop-ups de nouvelle année :",
+      "management": "Gestion :",
+      "themes": "Thèmes",
+      "backup": "Sauvegarde"
+    },
+    "backup": {
+      "time": "%d/%m/%Y à %H:%M",
+      "today_time": "Aujourd'hui à %H:%M",
+      "yesterday_time": "Hier à %H:%M",
+      "last_backup": "Dernière sauvegarde :",
+      "save": "Enregistrer",
+      "restore": "Restaurer",
+      "export": "Exporter",
+      "import": "Importer",
+      "title_save_restore": "Enregistrer/Restaurer la sauvegarde :",
+      "title_import_export": "Importer/Exporter la sauvegarde :",
+      "backup_info": "Vous pouvez créer un point de restauration rapide dans\nl'application elle-même pour éviter de perdre vos données.",
+      "export_info": "Vous pouvez générer une copie de la base de données\nà enregistrer localement.",
+      "no_backup": "Aucune"
+    },
+    "save_backup": {
+      "label": "Enregistrer la sauvegarde",
+      "message": "Cette action remplacera la sauvegarde\nlocale par les données actuelles."
+    },
+    "restore_backup": {
+      "label": "Restaurer la sauvegarde",
+      "message": "Cette action remplacera les données actuelles\npar celles enregistrées dans la sauvegarde.\n\nToute modification effectuée après la\ncréation de la sauvegarde sera perdue.\n\nAssurez-vous d'exporter vos données\npour ne rien perdre d'important."
+    },
+    "import_backup": {
+      "label": "Importer des données",
+      "message": "Cette action remplacera les données actuelles\npar celles enregistrées dans le fichier.\n\nAssurez-vous d'exporter vos données\npour ne rien perdre d'important."
+    }
+  }
+}

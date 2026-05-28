@@ -1,7 +1,15 @@
 #!/bin/bash
 # Script para compilar o executável do HabitCalendar usando PyInstaller
 source .venv/bin/activate
-pyinstaller --onefile --windowed \
+pyinstaller --onefile --windowed --strip \
+  --exclude-module "unittest" \
+  --exclude-module "email" \
+  --exclude-module "http" \
+  --exclude-module "html" \
+  --exclude-module "xml" \
+  --exclude-module "pydoc" \
+  --exclude-module "pdb" \
+  --exclude-module "multiprocessing" \
   --name "HabitCalendar" \
   --icon "icon.png" \
   --add-data "locales:locales" \
