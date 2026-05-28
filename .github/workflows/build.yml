@@ -145,6 +145,7 @@ jobs:
             -n habitcalendar \
             -v 0.0.0-nightly \
             --architecture amd64 \
+            -p HabitCalendar-linux.deb \
             --description "A minimalist desktop app for tracking daily habits" \
             --maintainer "arthurkitice" \
             --url "https://github.com/arthurkitice/HabitCalendar" \
@@ -163,4 +164,4 @@ jobs:
             dist/HabitCalendar-linux
             dist/HabitCalendar-macos
             dist/HabitCalendar-windows.exe
-            *.deb
+            HabitCalendar-linux.deb
