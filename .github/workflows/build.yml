@@ -22,6 +22,10 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Install UPX (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y upx-ucl
+
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
@@ -100,11 +104,15 @@ jobs:
             -C pkg \
             .
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+      - name: Atualizar Release de Teste (Nightly)
+        uses: softprops/action-gh-release@v2
         with:
-          name: HabitCalendar-Builds-${{ matrix.os }}
-          path: |
+          tag_name: "nightly"
+          name: "Versão de Teste Contínuo"
+          body: "Esta versão é atualizada automaticamente a cada novo commit enviado ao repositório. Use-a apenas para testes."
+          prerelease: true
+          make_latest: false
+          files: |
             dist/HabitCalendar-linux
             dist/HabitCalendar-macos
             dist/HabitCalendar-windows.exe
