@@ -24,7 +24,11 @@ jobs:
 
       - name: Install UPX (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y upx-ucl
+        run: |
+          curl -L -o upx.tar.xz https://github.com/upx/upx/releases/download/v4.2.4/upx-4.2.4-amd64_linux.tar.xz
+          tar -xf upx.tar.xz
+          sudo cp upx-4.2.4-amd64_linux/upx /usr/local/bin/
+          upx --version
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
@@ -32,7 +36,8 @@ jobs:
       - name: Build (Linux)
         if: runner.os == 'Linux'
         run: |
-          pyinstaller --onefile --windowed \
+          pyinstaller --onefile --windowed --strip --optimize 2 \
+            --upx-dir /usr/local/bin \
             --name "HabitCalendar-linux" \
             --icon "icon.png" \
             --add-data "locales:locales" \
@@ -40,12 +45,26 @@ jobs:
             --add-data "icon.png:." \
             --hidden-import "PIL._tkinter_finder" \
             --hidden-import "PIL._imagingtk" \
+            --exclude-module "greenlet" \
+            --exclude-module "sqlalchemy.dialects.postgresql" \
+            --exclude-module "sqlalchemy.dialects.mysql" \
+            --exclude-module "sqlalchemy.dialects.oracle" \
+            --exclude-module "sqlalchemy.dialects.mssql" \
+            --exclude-module "sqlalchemy.testing" \
+            --exclude-module "tkinter.test" \
+            --exclude-module "sqlite3.test" \
+            --exclude-module "test" \
+            --exclude-module "pydoc" \
+            --exclude-module "bdb" \
+            --exclude-module "pdb" \
+            --exclude-module "xmlrpc" \
+            --exclude-module "http.server" \
             main.py
 
       - name: Build (macOS)
         if: runner.os == 'macOS'
         run: |
-          pyinstaller --onefile --windowed \
+          pyinstaller --onefile --windowed --strip --optimize 2 \
             --name "HabitCalendar-macos" \
             --icon "icon.png" \
             --add-data "locales:locales" \
@@ -53,12 +72,26 @@ jobs:
             --add-data "icon.png:." \
             --hidden-import "PIL._tkinter_finder" \
             --hidden-import "PIL._imagingtk" \
+            --exclude-module "greenlet" \
+            --exclude-module "sqlalchemy.dialects.postgresql" \
+            --exclude-module "sqlalchemy.dialects.mysql" \
+            --exclude-module "sqlalchemy.dialects.oracle" \
+            --exclude-module "sqlalchemy.dialects.mssql" \
+            --exclude-module "sqlalchemy.testing" \
+            --exclude-module "tkinter.test" \
+            --exclude-module "sqlite3.test" \
+            --exclude-module "test" \
+            --exclude-module "pydoc" \
+            --exclude-module "bdb" \
+            --exclude-module "pdb" \
+            --exclude-module "xmlrpc" \
+            --exclude-module "http.server" \
             main.py
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --onefile --windowed `
+          pyinstaller --onefile --windowed --strip --optimize 2 `
             --name "HabitCalendar-windows" `
             --icon "icon.png" `
             --add-data "locales;locales" `
@@ -66,6 +99,20 @@ jobs:
             --add-data "icon.png;." `
             --hidden-import "PIL._tkinter_finder" `
             --hidden-import "PIL._imagingtk" `
+            --exclude-module "greenlet" `
+            --exclude-module "sqlalchemy.dialects.postgresql" `
+            --exclude-module "sqlalchemy.dialects.mysql" `
+            --exclude-module "sqlalchemy.dialects.oracle" `
+            --exclude-module "sqlalchemy.dialects.mssql" `
+            --exclude-module "sqlalchemy.testing" `
+            --exclude-module "tkinter.test" `
+            --exclude-module "sqlite3.test" `
+            --exclude-module "test" `
+            --exclude-module "pydoc" `
+            --exclude-module "bdb" `
+            --exclude-module "pdb" `
+            --exclude-module "xmlrpc" `
+            --exclude-module "http.server" `
             main.py
 
       - name: Create .deb package (Linux)
@@ -96,7 +143,7 @@ jobs:
 
           fpm -s dir -t deb \
             -n habitcalendar \
-            -v ${{ github.ref_name }} \
+            -v 0.0.0-nightly \
             --architecture amd64 \
             --description "A minimalist desktop app for tracking daily habits" \
             --maintainer "arthurkitice" \
