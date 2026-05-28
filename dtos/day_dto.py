@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from models.day import Day
 
-class DayDTO(BaseModel):
+@dataclass
+class DayDTO:
     id: int
     number: int
     checked: bool

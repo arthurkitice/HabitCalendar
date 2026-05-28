@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from models.tracker import Tracker
 from .year_dto import YearDTO
 
-class TrackerDTO(BaseModel):
+@dataclass
+class TrackerDTO:
     id: int
     name: str
 
@@ -10,7 +11,8 @@ class TrackerDTO(BaseModel):
     def from_entity(cls, tracker: Tracker) -> "TrackerDTO":
         return cls(id=tracker.id, name=tracker.name)
 
-class TrackerWithYearsDTO(BaseModel):
+@dataclass
+class TrackerWithYearsDTO:
     id: int
     name: str
     years: list[YearDTO]

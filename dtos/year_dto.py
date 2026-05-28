@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from models import Year
 from .month_dto import MonthDTO
 
-class YearDTO(BaseModel):
+@dataclass
+class YearDTO:
     id: int
     number: int
 
@@ -10,7 +11,8 @@ class YearDTO(BaseModel):
     def from_entity(cls, year: Year) -> "YearDTO":
         return cls(id=year.id, number=year.number)
 
-class YearWithMonthsDTO(BaseModel):
+@dataclass
+class YearWithMonthsDTO:
     id: int
     number: int
     months: list[MonthDTO]

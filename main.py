@@ -52,31 +52,12 @@ def handle_exception(exc_type, exc_value, exc_traceback):
         return
     logging.critical("Erro não tratado", exc_info=(exc_type, exc_value, exc_traceback))
 
-def gen_icon() -> None:
-    icon_path = os.path.join(BASE_DIR, 'icon.png')
-    svg_path = os.path.join(BASE_DIR, 'ui/icons/app_icon.svg')
-    
-    if not os.path.exists(icon_path) and os.path.exists(svg_path):
-        import cairosvg
-        
-        # Lê os bytes de forma segura
-        with open(svg_path, 'rb') as f:
-            svg_bytes = f.read()
-            
-        cairosvg.svg2png(
-            bytestring=svg_bytes, # Substitui a url quebrada
-            output_width=256,
-            output_height=256,
-            write_to=icon_path
-        )
-
 if __name__ == "__main__":
     from database import APP_DIR
     setup_logging(APP_DIR)
     sys.excepthook = handle_exception
     from ui.views.main_app.app import CalendarApp
     Base.metadata.create_all(bind=engine)
-    gen_icon()
         
     if ThemeJSON.get_current_language() == None:
         ThemeJSON.save_current_language(detect_sys_language())

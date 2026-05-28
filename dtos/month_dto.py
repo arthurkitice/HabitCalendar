@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 from models.month import Month
 from .day_dto import DayDTO
 
-class MonthDTO(BaseModel):
+@dataclass
+class MonthDTO:
     id: int
     name: str
     number: int
@@ -15,7 +16,8 @@ class MonthDTO(BaseModel):
             number=month.number
         )
 
-class MonthWithDaysDTO(BaseModel):
+@dataclass
+class MonthWithDaysDTO:
     id: int
     name: str
     number: int
