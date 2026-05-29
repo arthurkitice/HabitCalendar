@@ -92,7 +92,7 @@ jobs:
             --icon "icon.ico" `
             --add-data "locales;locales" `
             --add-data "ui/icons;ui/icons" `
-            --add-data "icon.png;." `
+            --add-data "icon.ico;." `
             --hidden-import "PIL._tkinter_finder" `
             --hidden-import "PIL._imagingtk" `
             --exclude-module "tkinter.test" `

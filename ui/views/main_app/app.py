@@ -37,20 +37,37 @@ class CalendarApp(ctk.CTk):
 
     def _set_icon(self):
         from PIL import Image, ImageTk
+        import sys
         import os
 
-        icon_path = os.path.join(self.base_dir, 'icon.png')
-        if not os.path.exists(icon_path):
-            print(f"Ícone não encontrado em: {icon_path}")
-            return
-        
         try:
-            img = Image.open(icon_path)
-            self._icon = ImageTk.PhotoImage(img)
-            self.wm_iconphoto(True, self._icon)
+            if sys.platform == "win32":
+                import ctypes
+                try:
+                    # Identificador único para a barra de tarefas
+                    myappid = 'arthurkitice.habitcalendar.1.2' 
+                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+                except Exception:
+                    pass
+                
+                # No Windows, usamos o ficheiro .ico empacotado em alta definição
+                icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
+                if os.path.exists(icon_ico_path):
+                    self.iconbitmap(default=icon_ico_path)
+                else:
+                    print(f"Ficheiro .ico não encontrado em: {icon_ico_path}")
+                    
+            else:
+                icon_png_path = os.path.join(self.base_dir, 'icon.png')
+                if os.path.exists(icon_png_path):
+                    img = Image.open(icon_png_path)
+                    self._icon = ImageTk.PhotoImage(img)
+                    self.wm_iconphoto(True, self._icon)
+                else:
+                    print(f"Ficheiro .png não encontrado em: {icon_png_path}")
 
         except Exception as e:
-            print(f"Erro ao setar ícone: {e}")
+            print(f"Erro ao definir o ícone: {e}")
 
     def _maximize(self):
         if sys.platform.startswith('linux'):
