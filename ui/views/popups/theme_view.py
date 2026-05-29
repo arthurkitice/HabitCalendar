@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, SmartScrollableFrame
+from ui.widgets import CustomButton, SmartScrollableFrame, PopupFrame
 from functools import partial
 from themes import PRIMARY_THEME, MAIN_COLORS, TERTIARY_THEME, TEXT_COLOR, SECONDARY_THEME
 from config import ThemeJSON
@@ -8,18 +8,9 @@ import i18n
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 210
 
-class ThemeView(ctk.CTkFrame):
+class ThemeView(PopupFrame):
     def __init__(self, parent, on_color_change, on_theme_change):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400,
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
-
-        self.grid_propagate(False)
+        super().__init__(parent)
 
         self.parent = parent
         self.on_color_change = on_color_change
@@ -108,25 +99,8 @@ class ThemeView(ctk.CTkFrame):
         
         self.on_theme_change()
 
-    def build_back_button(self):
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=9, column=0, padx=10, pady=(0, 10), sticky="nsew")
-        self.button_frame.grid_columnconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-
     def build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(0, weight=1)
-
         self.build_themes()
-        # self.build_current_color()
         self.build_color()
         self.build_back_button()
 

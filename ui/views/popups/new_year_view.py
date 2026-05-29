@@ -12,7 +12,7 @@ class NewYearView(ConfirmationView):
 
     def checkbox(self):
         self.check_hide_popup = ctk.CTkCheckBox(
-            self, 
+            self.main_frame, 
             text=f" {i18n.t('new_year.checkbox')}",
             fg_color=PRIMARY_THEME.fg_color(),
             hover_color=PRIMARY_THEME.hover_color(),

@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, IconButton
+from ui.widgets import CustomButton, IconButton, PopupFrame
 from icon_assets import DISK, CALENDAR_REFRESH, EXPORT, IMPORT
 from themes import PRIMARY_THEME, TEXT_COLOR
 from backup_manager import create_backup, restore_backup, get_backup_info, export_database, import_database
@@ -10,18 +10,9 @@ from functools import partial
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85
 
-class BackupView(ctk.CTkFrame):
+class BackupView(PopupFrame):
     def __init__(self, parent, on_restore_backup):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400,
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
-
-        self.grid_propagate(False)
+        super().__init__(parent)
 
         self.parent = parent
         self.on_restore_backup = on_restore_backup
@@ -33,7 +24,7 @@ class BackupView(ctk.CTkFrame):
 
     def build_button_row_1(self):
         self.settings_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_SAVE_RESTORE)
-        self.settings_label.grid(padx=15, pady=(10, 0),  sticky="w")
+        self.settings_label.grid(row=0, column=0, padx=15, pady=(10, 0),  sticky="w")
 
         # Formata o timestamp real do arquivo com o formato pego acima
         data_formatada = self._get_correct_time_format()
@@ -42,14 +33,14 @@ class BackupView(ctk.CTkFrame):
         text = f"{self.text.LAST_BACKUP} {data_formatada}"
 
         self.backup_time = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=16), text=text)
-        self.backup_time.grid(padx=15, pady=0,  sticky="w")
+        self.backup_time.grid(row=1, column=0, padx=15, pady=0,  sticky="w")
 
-        self.buttons_frame = ctk.CTkFrame(self.main_frame)
-        self.buttons_frame.grid(padx=15, pady=(5,10), sticky="nsew")
-        self.buttons_frame.grid_columnconfigure((0, 1), weight=1)
+        self.backup_btns_frame = ctk.CTkFrame(self.main_frame)
+        self.backup_btns_frame.grid(row=2, column=0, padx=15, pady=(5,10), sticky="nsew")
+        self.backup_btns_frame.grid_columnconfigure((0, 1), weight=1)
         
         buttons_config = {
-            "parent":self.buttons_frame,
+            "parent":self.backup_btns_frame,
             "font":ctk.CTkFont(size=15),
             "height":30,
             "width":125
@@ -63,18 +54,18 @@ class BackupView(ctk.CTkFrame):
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
         self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.BACKUP_INFO, text_color='grey')
-        self.backup_info.grid(padx=15, pady=2,  sticky="nsew")
+        self.backup_info.grid(row=3, column=0, padx=15, pady=2,  sticky="nsew")
 
     def build_button_row_2(self):
         self.settings_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_IMPORT_EXPORT)
-        self.settings_label.grid(padx=15, pady=(20, 0),  sticky="w")
+        self.settings_label.grid(row=4, column=0, padx=15, pady=(20, 0),  sticky="w")
 
-        self.buttons_frame = ctk.CTkFrame(self.main_frame)
-        self.buttons_frame.grid(padx=15, pady=(5,10), sticky="nsew")
-        self.buttons_frame.grid_columnconfigure((0, 1), weight=1)
+        self.backup_btns_frame = ctk.CTkFrame(self.main_frame)
+        self.backup_btns_frame.grid(row=5, column=0, padx=15, pady=(5,10), sticky="nsew")
+        self.backup_btns_frame.grid_columnconfigure((0, 1), weight=1)
         
         buttons_config = {
-            "parent":self.buttons_frame,
+            "parent":self.backup_btns_frame,
             "font":ctk.CTkFont(size=15),
             "height":30,
             "width":125
@@ -88,16 +79,7 @@ class BackupView(ctk.CTkFrame):
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
         self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.EXPORT_INFO, text_color='grey')
-        self.backup_info.grid(padx=15, pady=2,  sticky="nsew")
-
-    def build_back_button(self):
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(padx=10, pady=(20,10), sticky="nsew")
-        self.button_frame.grid_columnconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=40)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+        self.backup_info.grid(row=6, column=0, padx=15, pady=(2, 15),  sticky="nsew")
 
     def on_save_backup(self):
         create_backup()
@@ -142,13 +124,6 @@ class BackupView(ctk.CTkFrame):
         self.popup_frame = import_popup(self, on_save=partial(self.on_import, file_path))
 
     def build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(0, weight=1)
-
         self.build_button_row_1()
         self.build_button_row_2()
         self.build_back_button()

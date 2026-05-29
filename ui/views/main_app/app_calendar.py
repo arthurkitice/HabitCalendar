@@ -48,12 +48,6 @@ class MainCalendarView(ctk.CTkFrame):
 
         self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
 
-        # Proteção contra anos deletados
-        if self.years and self.current_year not in self.years:
-            self.current_year = self.years[0]
-            self.current_month = 1
-            TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
-
         self.update_top_bar()
         self.update_days_frame()
 
@@ -68,13 +62,21 @@ class MainCalendarView(ctk.CTkFrame):
 
     def add_year(self, year: int) -> None:
         self.year_service.add_tracker_year(self.current_tracker_id, year)
-        
+
         self.current_month = 12 if year < self.current_year else 1
         self.current_year = year
         
         TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
         self.update_top_bar()
         self.update_days_frame()
+
+    def add_year_from_popup(self):
+        self._refresh_years()
+
+        if self.current_year - 1 == self.years[0] and self.current_month == 1:
+            self.prev_button.update_button(condition=self._get_condition(LEFT_ARROW))
+        elif self.current_year + 1 == self.years[-1] and self.current_month == 12:
+            self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))
 
     def _refresh_years(self):
         """Atualiza apenas a lista de anos disponíveis para o popup e botões de navegação"""
@@ -192,16 +194,19 @@ class MainCalendarView(ctk.CTkFrame):
     # TOP BAR (NAVEGAÇÃO ENTRE MESES)
     # ===============================
     def open_years_popup(self, year: int):
-        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.update_top_bar)
+        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.add_year_from_popup)
 
     def update_top_bar(self) -> None:
         self._refresh_years()
 
         month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
-        self.month_button.configure(
-            text=f"{self.current_year}\n{month_text}", 
-            command=partial(self.open_years_popup, self.current_year)
-        )
+        current_text = self.month_button._text
+
+        if month_text not in current_text or str(self.current_year) not in current_text:
+            self.month_button.configure(
+                text=f"{self.current_year}\n{month_text}", 
+                command=partial(self.open_years_popup, self.current_year)
+            )
 
         self.prev_button.update_button(condition=self._get_condition(LEFT_ARROW))
         self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))

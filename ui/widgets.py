@@ -2,6 +2,7 @@ import customtkinter as ctk
 from icon_assets import PLUS
 from themes import PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
+import i18n
 
 class CustomButton(ctk.CTkButton):
     def __init__(
@@ -201,6 +202,53 @@ class IconButton(ctk.CTkButton):
 
     def _get_image(self):
         return self.icon if self.icon else None
+
+class PopupFrame(ctk.CTkFrame):
+    def __init__(self, parent, on_confirm = None, main_col=0):
+        super().__init__(
+            parent, 
+            width=500, 
+            height=400,
+            corner_radius=15,
+            border_width=1, 
+            border_color=TEXT_COLOR
+        )
+
+        self.grid_propagate(False)
+
+        self.on_confirm = on_confirm
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
+        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
+        self.main_frame.grid_columnconfigure(main_col, weight=1)
+
+        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
+        self.button_frame.grid(row=99, column=main_col, padx=10, pady=(0, 10), sticky="nsew")
+        self.button_frame.grid_rowconfigure(0, weight=1)
+
+    def build_back_button(self, text = None):
+        self.button_frame.grid_columnconfigure(0, weight=1)
+
+        self.back_button = CustomButton(self.button_frame, text=text or i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
+        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+
+    def build_back_confirm_buttons(self, back_button_text = None, confirm_button_text = None):
+        self.button_frame.grid_columnconfigure(1, weight=1)
+
+        self.confirm_button = CustomButton(self.button_frame, text=confirm_button_text or i18n.t('actions.confirm'), command=self.save, font_size=15, height=35)
+        self.confirm_button.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
+
+        self.build_back_button(text = back_button_text)
+        self.back_button.main_color = False
+        self.back_button.reload_colors()
+
+    def save(self):
+        if self.on_confirm is not None:
+            self.on_confirm()
+        self.destroy()
 
 class SmartScrollableFrame(ctk.CTkScrollableFrame):
     def __init__(self, master, scroll_bar_on_right=True, **kwargs):

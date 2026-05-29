@@ -1,27 +1,18 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, NavigationButton
+from ui.widgets import CustomButton, NavigationButton, PopupFrame
 from functools import partial
-from themes import TEXT_COLOR, SECONDARY_THEME
+from themes import SECONDARY_THEME
 from services import YearService, MonthService
 from config import ThemeJSON
-import i18n
 from icon_assets import RIGHT_ARROW, LEFT_ARROW
+import i18n
 
-class YearView(ctk.CTkFrame):
+class YearView(PopupFrame):
     def __init__(self, parent, tracker_id, on_select, year, on_new_year):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400,
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
+        super().__init__(parent)
 
         self.year_service = YearService()
         self.month_service = MonthService()
-
-        self.grid_propagate(False)
 
         self.parent = parent
         self.tracker_id = tracker_id
@@ -147,22 +138,7 @@ class YearView(ctk.CTkFrame):
         )
         self.btn_left.grid(row=0, column=0, padx=5, pady=5, sticky="w")
 
-    def build_back_button(self):
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=2, column=0, padx=10, pady=(0, 10), sticky="nsew")
-        self.button_frame.grid_columnconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-
     def build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10, fg_color=("#EBEBEB", "#242424"))
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(1, weight=1)
 
         self.build_months()

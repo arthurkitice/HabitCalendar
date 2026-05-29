@@ -1,23 +1,14 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, IconButton
+from ui.widgets import IconButton, PopupFrame
 from functools import partial
 from themes import TEXT_COLOR
 from icon_assets import BIG_TRASH
 from services import YearService, TrackerService
 import i18n
 
-class TrackerFrame(ctk.CTkFrame):
+class TrackerFrame(PopupFrame):
     def __init__(self, parent, tracker_id, tracker_name, on_year_remove):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400, 
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
-
-        self.grid_propagate(False)
+        super().__init__(parent)
 
         self.year_service = YearService()
         self.tracker_service = TrackerService()
@@ -173,15 +164,6 @@ class TrackerFrame(ctk.CTkFrame):
         self.warning_label = ctk.CTkLabel(self.warning_frame, font=ctk.CTkFont(size=20), text=text['warning'], text_color="grey")
         self.warning_label.grid(row=0, column=0, sticky="ew")
 
-    def build_back_button(self):
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=3, column=0, padx=10, pady=(0, 10), sticky="nsew")
-        self.button_frame.grid_columnconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-
     def show_double_year_frame(self):
         self.single_year_frame.grid_forget()
         self.warning_frame.grid_forget()
@@ -195,12 +177,6 @@ class TrackerFrame(ctk.CTkFrame):
         self.warning_frame.grid(row=2, column=0, padx=15, pady=(10, 15), sticky="nsew")
 
     def build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure(0, weight=1)
         self.main_frame.grid_rowconfigure((1, 2), weight=1)
 

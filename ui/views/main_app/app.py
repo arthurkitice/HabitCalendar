@@ -174,11 +174,8 @@ class CalendarApp(ctk.CTk):
         self.example_trackers.reload_colors()
 
     def handle_theme_change(self):
-        import tkinter as tk
-
         cor_fundo_atual = self._apply_appearance_mode(self.cget("fg_color"))
-
-        cortina = tk.Frame(self, bg=cor_fundo_atual)
+        cortina = ctk.CTkFrame(self, fg_color=cor_fundo_atual)
         cortina.place(relwidth=1.0, relheight=1.0, x=0, y=0)
 
         self.update() #Força o frame a aparecer na tela
@@ -186,9 +183,6 @@ class CalendarApp(ctk.CTk):
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
         self.update_idletasks() #Só passa para a próxima etapa quando a fila de execução limpar
-        
-        # MÁGICA AQUI: Reafirma o ícone para o sistema operacional após o redesenho
-        self._set_icon()
 
         cortina.destroy()
 

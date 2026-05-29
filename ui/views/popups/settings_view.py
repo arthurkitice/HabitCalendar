@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, SmartScrollableFrame, IconButton
+from ui.widgets import CustomButton, SmartScrollableFrame, IconButton, PopupFrame
 from functools import partial
 from icon_assets import PALLETE, DISK
 from themes import PRIMARY_THEME, TEXT_COLOR
@@ -10,18 +10,9 @@ import i18n
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85
 
-class SettingsView(ctk.CTkFrame):
+class SettingsView(PopupFrame):
     def __init__(self, parent, on_color_change, on_theme_change, on_language_change, on_restore_backup):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400,
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
-
-        self.grid_propagate(False)
+        super().__init__(parent)
 
         self.parent = parent
         self.on_color_change = on_color_change
@@ -152,23 +143,7 @@ class SettingsView(ctk.CTkFrame):
         self.selected_lang_btn.reload_colors()
         self.on_color_change()
 
-    def build_back_button(self):
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=9, column=0, padx=10, pady=10, sticky="nsew")
-        self.button_frame.grid_columnconfigure(0, weight=1)
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=i18n.t('actions.back'), command=self.destroy, font_size=15, height=40)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-
     def build_ui(self):
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(0, weight=1)
-
         self.build_buttons()
         self.build_language()
         self.build_new_year_options()
