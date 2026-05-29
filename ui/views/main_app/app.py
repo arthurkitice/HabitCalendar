@@ -44,27 +44,32 @@ class CalendarApp(ctk.CTk):
             if sys.platform == "win32":
                 import ctypes
                 try:
-                    # Identificador único para a barra de tarefas
-                    myappid = 'arthurkitice.habitcalendar.1.2' 
+                    # Trocamos para 1.3 apenas para invalidar qualquer cache de imagem restante
+                    myappid = 'arthurkitice.habitcalendar.1.3' 
                     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
                 except Exception:
                     pass
-                
-                # No Windows, usamos o ficheiro .ico empacotado em alta definição
+
                 icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
                 if os.path.exists(icon_ico_path):
                     self.iconbitmap(default=icon_ico_path)
-                else:
-                    print(f"Ficheiro .ico não encontrado em: {icon_ico_path}")
-                    
-            else:
+                
                 icon_png_path = os.path.join(self.base_dir, 'icon.png')
                 if os.path.exists(icon_png_path):
                     img = Image.open(icon_png_path)
                     self._icon = ImageTk.PhotoImage(img)
                     self.wm_iconphoto(True, self._icon)
-                else:
-                    print(f"Ficheiro .png não encontrado em: {icon_png_path}")
+                    
+            else:
+                # Mantém a sua lógica original intacta e limpa para o Linux e macOS
+                icon_png_path = os.path.join(self.base_dir, 'icon.png')
+                if os.path.exists(icon_png_path):
+                    img = Image.open(icon_png_path)
+                    self._icon = ImageTk.PhotoImage(img)
+                    self.wm_iconphoto(True, self._icon)
+
+        except Exception as e:
+            print(f"Erro ao definir o ícone: {e}")
 
         except Exception as e:
             print(f"Erro ao definir o ícone: {e}")
