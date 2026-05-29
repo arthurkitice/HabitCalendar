@@ -20,8 +20,9 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Atualizado para bater com seu ambiente local
+          python-version: '3.12'
 
+      # Instala UPX no Linux
       - name: Install UPX (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -29,6 +30,11 @@ jobs:
           tar -xf upx.tar.xz
           sudo cp upx-4.2.4-amd64_linux/upx /usr/local/bin/
           upx --version
+
+      # Instala UPX no Windows usando Chocolatey (Novo)
+      - name: Install UPX (Windows)
+        if: runner.os == 'Windows'
+        run: choco install upx
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
@@ -75,6 +81,13 @@ jobs:
             --exclude-module "xmlrpc" \
             --exclude-module "http.server" \
             main.py
+
+      # Comprime o arquivo .app do macOS para não corromper no Release (Novo)
+      - name: Zip macOS App
+        if: runner.os == 'macOS'
+        run: |
+          cd dist
+          zip -r HabitCalendar-macos.zip HabitCalendar-macos.app
 
       - name: Build (Windows)
         if: runner.os == 'Windows'
@@ -144,6 +157,6 @@ jobs:
           make_latest: false
           files: |
             dist/HabitCalendar-linux
-            dist/HabitCalendar-macos
+            dist/HabitCalendar-macos.zip
             dist/HabitCalendar-windows.exe
             HabitCalendar-linux.deb
