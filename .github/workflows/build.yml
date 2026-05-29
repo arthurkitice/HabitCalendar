@@ -31,11 +31,6 @@ jobs:
           sudo cp upx-4.2.4-amd64_linux/upx /usr/local/bin/
           upx --version
 
-      # Instala UPX no Windows usando Chocolatey (Novo)
-      - name: Install UPX (Windows)
-        if: runner.os == 'Windows'
-        run: choco install upx
-
       - name: Install Python dependencies
         run: pip install -r requirements.txt
 
@@ -92,7 +87,7 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --onefile --windowed --strip --optimize 2 `
+          pyinstaller --onefile --windowed --strip --noupx --optimize 2 `
             --name "HabitCalendar-windows" `
             --icon "icon.png" `
             --add-data "locales;locales" `
