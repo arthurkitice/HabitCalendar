@@ -50,27 +50,23 @@ class CalendarApp(ctk.CTk):
                 import ctypes
                 import tempfile
                 
-                # 1. Avisa ao Windows que este é um App único
                 try:
                     myappid = 'arthurkitice.habitcalendar.1.0'
                     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
                 except Exception:
                     pass
                 
-                # 2. O Tkinter no Windows precisa de um ficheiro .ico para a barra de tarefas.
-                # Convertemos o .png para .ico e guardamos na pasta temporária do sistema.
                 icon_ico_path = os.path.join(tempfile.gettempdir(), 'habitcalendar_icon.ico')
                 
-                # Gera o ficheiro .ico se ainda não existir
+                # O .ico é uma "caixa" que consegue guardar diferentes imagens para diferentes resoluções
                 if not os.path.exists(icon_ico_path):
                     img = Image.open(icon_path)
-                    img.save(icon_ico_path, format='ICO')
+                    icon_sizes = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
+                    img.save(icon_ico_path, format='ICO', sizes=icon_sizes)
                 
-                # 3. Aplica o ícone usando o método nativo para Windows
                 self.iconbitmap(default=icon_ico_path)
                 
             else:
-                # --- LINUX / macOS ---
                 img = Image.open(icon_path)
                 self._icon = ImageTk.PhotoImage(img)
                 self.wm_iconphoto(True, self._icon)
