@@ -87,7 +87,7 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          pyinstaller --onefile --windowed --strip --noupx --optimize 2 `
+          pyinstaller --onefile --windowed --noupx --optimize 2 `
             --name "HabitCalendar-windows" `
             --icon "icon.png" `
             --add-data "locales;locales" `
