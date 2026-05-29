@@ -17,8 +17,8 @@ def get_save_directory():
         return os.path.expanduser(f"~/Library/Application Support/{app_name}")
         
     else:
-        # Linux e outros sistemas Unix-like
-        # Tenta seguir a especificação XDG, senão usa o fallback tradicional
+        # Linx e outros sistemas Unix-like
+        # Tenta seguir a especificação XDG, senão usa o fallback tradicionalu
         base_dir = os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share")
         return os.path.join(base_dir, app_name)
 

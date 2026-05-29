@@ -12,6 +12,10 @@ from ui.widgets import SliderButton
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
 
+ctk.deactivate_automatic_dpi_awareness()
+ctk.set_window_scaling(1.0)
+ctk.set_widget_scaling(1.0)
+
 class CalendarApp(ctk.CTk):
     def __init__(self, base_dir):
         super().__init__(className='HabitCalendar')
@@ -48,6 +52,16 @@ class CalendarApp(ctk.CTk):
                     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
                 except Exception:
                     pass
+
+                try:
+                    # Avisa ao Windows 8.1/10/11 para não esticar a janela
+                    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+                except Exception:
+                    try:
+                        # Fallback para Windows mais antigos
+                        ctypes.windll.user32.SetProcessDPIAware()
+                    except Exception:
+                        pass
                 
                 icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
                 if os.path.exists(icon_ico_path):
