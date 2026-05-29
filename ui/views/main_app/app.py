@@ -36,32 +36,20 @@ class CalendarApp(ctk.CTk):
         self.build_all_ui()
 
     def _set_icon(self):
+        from PIL import Image, ImageTk
+
         icon_path = os.path.join(self.base_dir, 'icon.png')
         if not os.path.exists(icon_path):
-            print("Ícone não encontrado!")
+            print(f"Ícone não encontrado em: {icon_path}")
             return
         
         try:
-            import tkinter as tk
-            # 1. Usa o Tkinter nativo (Python 3.12 suporta PNG perfeitamente)
-            # O PIL muitas vezes perde a referência da imagem no Linux
-            self.icon_image = tk.PhotoImage(file=icon_path)
-            
-            # 2. Força o nome do processo para o gerenciador de janelas
-            self.wm_iconname("HabitCalendar")
-
-            # 3. Essa função só vai rodar quando o SO desenhar a janela na tela
-            def apply_icon(event=None):
-                self.wm_iconphoto(True, self.icon_image)
-                # Removemos o gatilho para não rodar toda vez que maximizar/minimizar
-                self.unbind('<Map>')
-            
-            # 4. O "pulo do gato": Avisa o Linux para chamar a apply_icon
-            # no exato momento em que a janela for Mapeada (visível)
-            self.bind('<Map>', apply_icon)
+            img = Image.open(icon_path)
+            self._icon = ImageTk.PhotoImage(img)
+            self.wm_iconphoto(True, self._icon)
 
         except Exception as e:
-            print(f"Erro brutal de ícone: {e}")
+            print(f"Erro ao setar ícone: {e}")
 
     def _maximize(self):
         if sys.platform.startswith('linux'):

@@ -57,6 +57,16 @@ if __name__ == "__main__":
     setup_logging(APP_DIR)
     sys.excepthook = handle_exception
     create_tables()
+
+    if sys.platform == "win32":
+        import ctypes
+        try:
+            # Cria um ID único para o seu aplicativo
+            myappid = 'arthurkitice.habitcalendar.1.0' 
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except Exception:
+            pass
+
     from ui.views.main_app.app import CalendarApp
         
     if ThemeJSON.get_current_language() == None:
