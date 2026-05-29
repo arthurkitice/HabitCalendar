@@ -87,7 +87,6 @@ class BackupView(ctk.CTkFrame):
         self.backup_button = IconButton(command=self.button_import_click, text=self.text.IMPORT, icon=IMPORT, **buttons_config)
         self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
-        text='Você pode gerar uma cópia do banco de dados\nque ficará salva no seu computador ou pen drive.'
         self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.EXPORT_INFO, text_color='grey')
         self.backup_info.grid(padx=15, pady=2,  sticky="nsew")
 
