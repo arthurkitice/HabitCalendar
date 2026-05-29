@@ -54,11 +54,20 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
 if __name__ == "__main__":
     from database import APP_DIR
-    
+
     setup_logging(APP_DIR)
     sys.excepthook = handle_exception
 
     create_tables()
+    
+    if sys.platform == "win32":
+        import ctypes
+        
+        try:
+            myappid = 'arthurkitice.habitcalendar.1.1'
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+        except Exception:
+            pass
 
     from ui.views.main_app.app import CalendarApp
         

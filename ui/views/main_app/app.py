@@ -37,7 +37,6 @@ class CalendarApp(ctk.CTk):
 
     def _set_icon(self):
         from PIL import Image, ImageTk
-        import sys
         import os
 
         icon_path = os.path.join(self.base_dir, 'icon.png')
@@ -46,35 +45,9 @@ class CalendarApp(ctk.CTk):
             return
         
         try:
-            if sys.platform == "win32":
-                import ctypes
-                import tempfile
-                
-                # 1. O TRUQUE DA CACHE: Mudamos o ID (de 1.0 para 1.1) para obrigar 
-                # a barra de tarefas do Windows a tratar este como um programa totalmente novo.
-                try:
-                    myappid = 'arthurkitice.habitcalendar.1.1'
-                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-                except Exception:
-                    pass
-                
-                # 2. Mudamos o nome do ficheiro gerado para ignorar a versão antiga borrada
-                icon_ico_path = os.path.join(tempfile.gettempdir(), 'habitcalendar_icon_hd.ico')
-                
-                # 3. Forçamos a criação do ficheiro colocando as maiores resoluções PRIMEIRO.
-                # Removemos a verificação "if not os.path.exists" para garantir a recriação.
-                img = Image.open(icon_path)
-                icon_sizes = [(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)]
-                img.save(icon_ico_path, format='ICO', sizes=icon_sizes)
-                
-                # Aplica o novo ficheiro de alta definição
-                self.iconbitmap(default=icon_ico_path)
-                
-            else:
-                # Mantém o seu código que funciona perfeitamente no Linux
-                img = Image.open(icon_path)
-                self._icon = ImageTk.PhotoImage(img)
-                self.wm_iconphoto(True, self._icon)
+            img = Image.open(icon_path)
+            self._icon = ImageTk.PhotoImage(img)
+            self.wm_iconphoto(True, self._icon)
 
         except Exception as e:
             print(f"Erro ao setar ícone: {e}")

@@ -89,7 +89,7 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --noupx --optimize 2 `
             --name "HabitCalendar-windows" `
-            --icon "icon.png" `
+            --icon "icon.ico" `
             --add-data "locales;locales" `
             --add-data "ui/icons;ui/icons" `
             --add-data "icon.png;." `
