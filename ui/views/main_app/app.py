@@ -8,7 +8,6 @@ import i18n
 import sys
 import os
 from ui.widgets import SliderButton
-from PIL import Image, ImageTk
 
 SIDEBAR_WEIGHT = 1
 MAIN_WEIGHT = 4
@@ -16,8 +15,9 @@ MAIN_WEIGHT = 4
 class CalendarApp(ctk.CTk):
     def __init__(self, base_dir):
         super().__init__(className='HabitCalendar')
-        self.base_dir = base_dir
 
+        self.base_dir = base_dir
+        
         self.title("HabitCalendar")
         self._set_icon()
         self.geometry("850x500")
@@ -38,15 +38,30 @@ class CalendarApp(ctk.CTk):
     def _set_icon(self):
         icon_path = os.path.join(self.base_dir, 'icon.png')
         if not os.path.exists(icon_path):
-            print(f"Ícone não encontrado em: {icon_path}")
+            print("Ícone não encontrado!")
             return
         
         try:
-            img = Image.open(icon_path)
-            self._icon = ImageTk.PhotoImage(img)
-            self.wm_iconphoto(True, self._icon)
+            import tkinter as tk
+            # 1. Usa o Tkinter nativo (Python 3.12 suporta PNG perfeitamente)
+            # O PIL muitas vezes perde a referência da imagem no Linux
+            self.icon_image = tk.PhotoImage(file=icon_path)
+            
+            # 2. Força o nome do processo para o gerenciador de janelas
+            self.wm_iconname("HabitCalendar")
+
+            # 3. Essa função só vai rodar quando o SO desenhar a janela na tela
+            def apply_icon(event=None):
+                self.wm_iconphoto(True, self.icon_image)
+                # Removemos o gatilho para não rodar toda vez que maximizar/minimizar
+                self.unbind('<Map>')
+            
+            # 4. O "pulo do gato": Avisa o Linux para chamar a apply_icon
+            # no exato momento em que a janela for Mapeada (visível)
+            self.bind('<Map>', apply_icon)
+
         except Exception as e:
-            print(f"Erro ao setar ícone: {e}")
+            print(f"Erro brutal de ícone: {e}")
 
     def _maximize(self):
         if sys.platform.startswith('linux'):
@@ -155,6 +170,9 @@ class CalendarApp(ctk.CTk):
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
 
         self.update_idletasks() #Só passa para a próxima etapa quando a fila de execução limpar
+        
+        # MÁGICA AQUI: Reafirma o ícone para o sistema operacional após o redesenho
+        self._set_icon()
 
         cortina.destroy()
 
@@ -191,7 +209,6 @@ class CalendarApp(ctk.CTk):
     def handle_backup_restore(self):
         self.sidebar_view.build_sidebar_buttons()
         self.sidebar_view.change_to_first_tracker()
-        #self.calendar_view.update_days_frame()
         self.calendar_view.update_calendar()
         self.handle_tracker_change()
 

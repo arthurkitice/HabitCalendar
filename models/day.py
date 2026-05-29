@@ -1,14 +1,17 @@
-from sqlalchemy import Column, Integer, Date, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
-from database import Base
+from dataclasses import dataclass
 
-class Day(Base):
-    __tablename__ = "days"
-
-    id = Column(Integer, primary_key=True)
-    month_id = Column(Integer, ForeignKey("months.id", ondelete='CASCADE'))
-    number = Column(Integer)
-    checked = Column(Boolean, default=False)
-
-    def __repr__(self):
-        return f"Day(id={self.id}, number='{self.number}', checked='{self.checked}')"
+@dataclass
+class Day:
+    id: int
+    number: int
+    checked: bool
+    month_id: int
+    
+    @classmethod
+    def from_row(cls, row) -> "Day":
+        return cls(
+            id=row["id"],
+            number=row["number"],
+            checked=bool(row["checked"]),
+            month_id=row["month_id"]
+        )

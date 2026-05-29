@@ -34,7 +34,7 @@ class TrackerFrame(ctk.CTkFrame):
         self.build_ui()
 
     def _update_years(self):
-        self.years: list[int] = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
         self.top_year: int = self.years[-1]
         self.bottom_year: int = self.years[0]
 

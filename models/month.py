@@ -1,16 +1,32 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from database import Base
+from dataclasses import dataclass
+from .day import Day
 
-class Month(Base):
-    __tablename__ = "months"
+@dataclass
+class Month:
+    id: int
+    number: int
+    year_id: int
+    
+    @classmethod
+    def from_row(cls, row) -> "Month":
+        return cls(
+            id=row["id"],
+            number=row["number"],
+            year_id=row["year_id"]
+        )
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    number = Column(Integer)
-    year_id = Column(Integer, ForeignKey("years.id", ondelete='CASCADE')) 
-
-    days = relationship("Day", backref="month", cascade="all, delete-orphan", passive_deletes=True)
-
-    def __repr__(self):
-        return f"Month(id={self.id}, name='{self.name}', number={self.number}, year_id={self.year_id})"
+@dataclass
+class MonthWithDays:
+    id: int
+    number: int
+    year_id: int
+    days: list[Day]
+    
+    @classmethod
+    def from_rows(cls, month_row, day_rows) -> "MonthWithDays":
+        return cls(
+            id=month_row["id"],
+            number=month_row["number"],
+            year_id=month_row["year_id"],
+            days=[Day.from_row(row) for row in day_rows]
+        )

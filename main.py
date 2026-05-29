@@ -1,5 +1,5 @@
 
-from database import engine, Base
+from database_manager import create_tables
 from constants import LANGUAGES
 from config import ThemeJSON
 import logging, locale, i18n, sys, os
@@ -56,8 +56,8 @@ if __name__ == "__main__":
     from database import APP_DIR
     setup_logging(APP_DIR)
     sys.excepthook = handle_exception
+    create_tables()
     from ui.views.main_app.app import CalendarApp
-    Base.metadata.create_all(bind=engine)
         
     if ThemeJSON.get_current_language() == None:
         ThemeJSON.save_current_language(detect_sys_language())

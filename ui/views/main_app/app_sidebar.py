@@ -4,7 +4,7 @@ from config import LastTrackerJSON, TrackerDataJSON, ThemeJSON, SidebarStatusJSO
 from ui.widgets import SidebarButton, CustomButton, SmartScrollableFrame, IconButton
 from icon_assets import SETTINGS, EDIT, TRASH, CONFIG
 from themes import PRIMARY_THEME, TEXT_COLOR
-from dtos import TrackerDTO
+from models import Tracker
 from services import TrackerService
 from ..popups import PopupHandler
 import i18n
@@ -85,19 +85,19 @@ class SidebarView(ctk.CTkFrame):
         if last_tracker_id == 0 or tracker_id == self.current_tracker_id:
             self.change_tracker(last_tracker_id)
 
-    def open_new_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
+    def open_new_tracker_popup(self, tracker: Tracker | None = None) -> None:
         if tracker:
             PopupHandler.alter_tracker_popup(self, tracker_name=tracker.name, tracker_id=tracker.id, on_save=self.edit_tracker)
         else:
             PopupHandler.alter_tracker_popup(self, on_save=self.create_new_tracker)
 
-    def open_tracker_view_popup(self, tracker: TrackerDTO | None = None) -> None:
+    def open_tracker_view_popup(self, tracker: Tracker | None = None) -> None:
         PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
 
     def settings_popup(self):
         PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change, self.on_restore_backup)
 
-    def open_delete_tracker_popup(self, tracker: TrackerDTO | None = None) -> None:
+    def open_delete_tracker_popup(self, tracker: Tracker | None = None) -> None:
         if self.tracker_service.get_checked_days_count(tracker.id) == 0:
             self.remove_tracker(tracker.id)
         else:
@@ -121,7 +121,7 @@ class SidebarView(ctk.CTkFrame):
         TrackerDataJSON.populate_tracker_data(new_tracker.id)
         self.build_button_row(new_tracker, len(self.btn_list))
 
-        if self.current_tracker_id == 0:
+        if self.tracker_service.get_tracker_by_id(self.current_tracker_id) is None:
             trackers = self.tracker_service.get_all_trackers()
             self.current_tracker_id = trackers[0].id if trackers else 0
             self.change_tracker(self.current_tracker_id)

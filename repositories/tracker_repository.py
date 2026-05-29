@@ -1,66 +1,60 @@
-from sqlalchemy.orm import Session
 from models import Tracker, Month, Day, Year
-from .year_repository import YearRepository  # Importamos o repositório irmão
 from datetime import datetime
+import sqlite3
 
 class TrackerRepository:
-    def __init__(self, db: Session):
-        self.db = db
+    def __init__(self, conn: sqlite3.Connection):
+        self.conn = conn
 
     def get_tracker_by_id(self, tracker_id: int) -> Tracker | None:
-        return self.db.query(Tracker).filter(Tracker.id == tracker_id).first()
+        row = self.conn.execute("SELECT * FROM trackers WHERE id = ?", (tracker_id,)).fetchone()
+        return Tracker.from_row(row) if row else None
 
     def get_tracker_by_name(self, tracker_name: str) -> Tracker | None:
-        return self.db.query(Tracker).filter(Tracker.name == tracker_name).first()
+        row = self.conn.execute("SELECT * FROM trackers WHERE name = ?", (tracker_name,)).fetchone()
+        return Tracker.from_row(row) if row else None
     
     def get_all_trackers(self) -> list[Tracker]:
-        return self.db.query(Tracker).all()
-
-    def get_tracker_name(self, tracker_id: int) -> str | None:
-        tracker = self.get_tracker_by_id(tracker_id)
-        return tracker.name if tracker else None
+        rows = self.conn.execute("SELECT * FROM trackers").fetchall()
+        return [Tracker.from_row(row) for row in rows]
 
     def create_tracker(self, name: str) -> Tracker | None:
         if self.get_tracker_by_name(name):
             return None
+        
+        self.conn.execute("INSERT INTO trackers (name) VALUES (?)", (name,))
 
-        tracker = Tracker(name=name)
-        self.db.add(tracker)
-        self.db.flush()
-
-        # Por padrão, cada marcador criado inicia com o ano atual
-        year_repo = YearRepository(self.db)
-        current_year = datetime.now().year
-        year_repo.create_year_with_cascade(tracker_id=tracker.id, year_number=current_year)
-
-        return tracker
+        return self.get_tracker_by_name(name)
 
     def update_tracker(self, tracker_id: int, name: str) -> Tracker | None:
-        tracker = self.get_tracker_by_id(tracker_id)
-        if not tracker:
+        if self.get_tracker_by_id(tracker_id) is None:
             return None
-            
-        tracker.name = name
-        self.db.commit()
-        self.db.refresh(tracker)
-        return tracker
+        
+        self.conn.execute("UPDATE trackers SET name = ? WHERE id = ?", (name, tracker_id))
+        new_tracker = self.get_tracker_by_name(name)
+
+        return new_tracker
 
     def delete_tracker(self, tracker_id: int) -> bool:
-        tracker = self.get_tracker_by_id(tracker_id)
-        if not tracker:
+        if self.get_tracker_by_id(tracker_id) is None:
             return False
             
-        self.db.delete(tracker)
-        self.db.commit()
+        self.conn.execute("DELETE FROM trackers WHERE id = ?", (tracker_id,))
         return True
     
     def get_all_checked_days(self, tracker_id: int) -> int:
         """Retorna a quantidade de dias marcados"""
-        return self.db.query(Day)\
-            .join(Month)\
-            .join(Year)\
-            .join(Tracker)\
-            .filter(
-                Tracker.id == tracker_id,
-                Day.checked == True
-            ).count()
+
+        if self.get_tracker_by_id(tracker_id) is None:
+            return 0
+        
+        sql = """
+            SELECT SUM(d.checked) FROM days AS d
+            JOIN months AS m ON d.month_id = m.id
+            JOIN years AS y ON m.year_id = y.id
+            WHERE y.tracker_id = ?
+        """
+
+        result = self.conn.execute(sql, (tracker_id,)).fetchone()
+
+        return result[0] if result[0] is not None else 0

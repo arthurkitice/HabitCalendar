@@ -30,7 +30,7 @@ class TrackerDataJSON:
 
         tracker = data["trackers"].setdefault(str(tracker_id), {})
 
-        tracker["month"] = 1
+        tracker["month"] = datetime.now().month
         tracker["year"] = datetime.now().year
         tracker["color"] = "Rosa"
         _save_config_data(data)
@@ -52,7 +52,7 @@ class TrackerDataJSON:
         data = _load_config_data()
         tracker_data = data["trackers"].get(str(tracker_id), {})
         if isinstance(tracker_data, int): return datetime.now().month
-        return tracker_data.get("month", 1)
+        return tracker_data.get("month", datetime.now().month)
 
     @staticmethod
     def get_last_year(tracker_id: int) -> int:

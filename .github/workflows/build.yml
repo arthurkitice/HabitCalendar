@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12' # Atualizado para bater com seu ambiente local
 
       - name: Install UPX (Linux)
         if: runner.os == 'Linux'
@@ -45,12 +45,6 @@ jobs:
             --add-data "icon.png:." \
             --hidden-import "PIL._tkinter_finder" \
             --hidden-import "PIL._imagingtk" \
-            --exclude-module "greenlet" \
-            --exclude-module "sqlalchemy.dialects.postgresql" \
-            --exclude-module "sqlalchemy.dialects.mysql" \
-            --exclude-module "sqlalchemy.dialects.oracle" \
-            --exclude-module "sqlalchemy.dialects.mssql" \
-            --exclude-module "sqlalchemy.testing" \
             --exclude-module "tkinter.test" \
             --exclude-module "sqlite3.test" \
             --exclude-module "test" \
@@ -72,12 +66,6 @@ jobs:
             --add-data "icon.png:." \
             --hidden-import "PIL._tkinter_finder" \
             --hidden-import "PIL._imagingtk" \
-            --exclude-module "greenlet" \
-            --exclude-module "sqlalchemy.dialects.postgresql" \
-            --exclude-module "sqlalchemy.dialects.mysql" \
-            --exclude-module "sqlalchemy.dialects.oracle" \
-            --exclude-module "sqlalchemy.dialects.mssql" \
-            --exclude-module "sqlalchemy.testing" \
             --exclude-module "tkinter.test" \
             --exclude-module "sqlite3.test" \
             --exclude-module "test" \
@@ -99,12 +87,6 @@ jobs:
             --add-data "icon.png;." `
             --hidden-import "PIL._tkinter_finder" `
             --hidden-import "PIL._imagingtk" `
-            --exclude-module "greenlet" `
-            --exclude-module "sqlalchemy.dialects.postgresql" `
-            --exclude-module "sqlalchemy.dialects.mysql" `
-            --exclude-module "sqlalchemy.dialects.oracle" `
-            --exclude-module "sqlalchemy.dialects.mssql" `
-            --exclude-module "sqlalchemy.testing" `
             --exclude-module "tkinter.test" `
             --exclude-module "sqlite3.test" `
             --exclude-module "test" `

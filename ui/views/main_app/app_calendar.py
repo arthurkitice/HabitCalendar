@@ -1,6 +1,6 @@
 import customtkinter as ctk
 from functools import partial
-from dtos import DayDTO
+from models import Day
 from ..popups import PopupHandler
 from config import TrackerDataJSON, ThemeJSON
 from ui.widgets import NavigationButton, DayButton, CustomButton
@@ -47,7 +47,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.reload_colors()
 
         self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
-        
+
         # Proteção contra anos deletados
         if self.years and self.current_year not in self.years:
             self.current_year = self.years[0]
@@ -129,7 +129,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.current_year = target_year
         self.update_calendar()
 
-    def _generate_month_cells(self) -> list[DayDTO]:
+    def _generate_month_cells(self) -> list[Day]:
         month_data = self.month_service.get_specific_month_with_days(
             tracker_id=self.current_tracker_id, 
             year=self.current_year, 
@@ -139,10 +139,10 @@ class MainCalendarView(ctk.CTkFrame):
         month_days = month_data.days if month_data else []
 
         first_week_day = (calendar.monthrange(self.current_year, self.current_month)[0] + 1) % 7
-        empty_day: DayDTO = DayDTO(id=0, number=0, checked=False, month_id=0)
+        empty_day: Day = Day(id=0, number=0, checked=False, month_id=0)
 
         total_cells = CALENDAR_ROWS * CALENDAR_COLS
-        all_cells: list[DayDTO] = [empty_day] * first_week_day + month_days
+        all_cells: list[Day] = [empty_day] * first_week_day + month_days
         all_cells.extend([empty_day] * (total_cells - len(all_cells)))
 
         return all_cells

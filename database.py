@@ -1,8 +1,6 @@
-from sqlalchemy import create_engine, event
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.engine import Engine
 from contextlib import contextmanager
 import os, logging
+import sqlite3
 
 def get_app_dir() -> str:
     app_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "HabitCalendar")
@@ -10,29 +8,20 @@ def get_app_dir() -> str:
     return app_dir
 
 APP_DIR = get_app_dir()
-DATABASE_URL = f"sqlite:///{os.path.join(APP_DIR, 'database.db')}"
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
-Base = declarative_base()
+DB_PATH = os.path.join(APP_DIR, 'database.db')
 
 logger = logging.getLogger(__name__)
 @contextmanager
-def get_db():
-    db = SessionLocal()
+def get_connection():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     try:
-        yield db
-        db.commit()
+        yield conn
+        conn.commit()
     except Exception as e:
-        db.rollback()
+        conn.rollback()
         logger.error(f"Falha na operação de banco: {e}", exc_info=True)
         raise
     finally:
-        db.close()
-
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, _):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
+        conn.close()

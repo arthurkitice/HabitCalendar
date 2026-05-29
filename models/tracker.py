@@ -1,20 +1,28 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
-from database import Base
+from dataclasses import dataclass
+from .year import Year
 
-class Tracker(Base):
-    __tablename__ = "trackers"
+@dataclass
+class Tracker:
+    id: int
+    name: str
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    @classmethod
+    def from_row(cls, row) -> "Tracker":
+        return cls(
+            id=row["id"], 
+            name=row["name"]
+        )
 
-    years = relationship(
-        "Year", 
-        backref="tracker", 
-        order_by="Year.number.asc()", 
-        cascade="all, delete-orphan", 
-        passive_deletes=True
-    )
+@dataclass
+class TrackerWithYears:
+    id: int
+    name: str
+    years: list[Year]
 
-    def __repr__(self):
-        return f"Tracker(id={self.id}, name='{self.name}')"
+    @classmethod
+    def from_rows(cls, tracker_row, year_rows) -> "TrackerWithYears":
+        return cls(
+            id=tracker_row["id"], 
+            name=tracker_row["name"],
+            years=[Year.from_row(row) for row in year_rows]
+        )

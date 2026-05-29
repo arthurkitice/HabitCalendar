@@ -1,52 +1,35 @@
-from database import get_db # Ajuste para o seu caminho real
+from database import get_connection
 from repositories import YearRepository
-from dtos import YearDTO
+from models import Year
 
 class YearService:
-    def get_year_by_id(self, year_id: int) -> YearDTO | None:
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            year = year_repository.get_year_by_id(year_id)
-            if not year:
-                return None
-            return YearDTO.from_entity(year)
+    def get_year_by_id(self, year_id: int) -> Year | None:
+        with get_connection() as conn:
+            return YearRepository(conn).get_year_by_id(year_id)
 
-    def get_year_by_number(self, tracker_id: int, year_number: int) -> YearDTO | None:
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            year = year_repository.get_specific_year(tracker_id, year_number)
-            if not year:
-                return None
-            return YearDTO.from_entity(year)
+    def get_year_by_number(self, tracker_id: int, year_number: int) -> Year | None:
+        with get_connection() as conn:
+            return YearRepository(conn).get_specific_year(tracker_id, year_number)
 
     def get_years_from_tracker(self, tracker_id: int) -> list[int]:
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            years = year_repository.get_years_from_tracker(tracker_id)
-            if not years:
-                return []
-            return [y.number for y in years]
+        with get_connection() as conn:
+            years = YearRepository(conn).get_years_from_tracker(tracker_id)
+            return [year.number for year in years]
 
-    def add_tracker_year(self, tracker_id: int, year_number: int) -> YearDTO | None:
+    def add_tracker_year(self, tracker_id: int, year_number: int) -> Year | None:
         MIN_YEAR = 2000
         MAX_YEAR = 2100
         
         if not (MIN_YEAR <= year_number <= MAX_YEAR):
-            return False
+            return None
 
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            created_year = year_repository.create_year_with_cascade(tracker_id, year_number)
-            if not created_year:
-                return None
-            return YearDTO.from_entity(created_year)
+        with get_connection() as conn:
+            return YearRepository(conn).create_year_with_cascade(tracker_id, year_number)
     
     def delete_year(self, tracker_id: int, year_number: int) -> bool:
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            return year_repository.delete_year(tracker_id, year_number)
+        with get_connection() as conn:
+            return YearRepository(conn).delete_year(tracker_id, year_number)
         
     def get_checked_days_count(self, tracker_id: int, year: int) -> int | None:
-        with get_db() as db:
-            year_repository = YearRepository(db)
-            return year_repository.get_all_checked_days(tracker_id, year)
+        with get_connection() as conn:
+            return YearRepository(conn).get_all_checked_days(tracker_id, year)
