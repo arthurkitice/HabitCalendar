@@ -36,7 +36,6 @@ class CalendarApp(ctk.CTk):
         self.build_all_ui()
 
     def _set_icon(self):
-        from PIL import Image, ImageTk
         import sys
         import os
 
@@ -44,32 +43,23 @@ class CalendarApp(ctk.CTk):
             if sys.platform == "win32":
                 import ctypes
                 try:
-                    # Trocamos para 1.3 apenas para invalidar qualquer cache de imagem restante
-                    myappid = 'arthurkitice.habitcalendar.1.3' 
+                    myappid = 'arthurkitice.habitcalendar.1.5' 
                     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
                 except Exception:
                     pass
-
+                
                 icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
                 if os.path.exists(icon_ico_path):
                     self.iconbitmap(default=icon_ico_path)
-                
-                icon_png_path = os.path.join(self.base_dir, 'icon.png')
-                if os.path.exists(icon_png_path):
-                    img = Image.open(icon_png_path)
-                    self._icon = ImageTk.PhotoImage(img)
-                    self.wm_iconphoto(True, self._icon)
                     
             else:
-                # Mantém a sua lógica original intacta e limpa para o Linux e macOS
+                # O seu código original para Linux e macOS
+                from PIL import Image, ImageTk
                 icon_png_path = os.path.join(self.base_dir, 'icon.png')
                 if os.path.exists(icon_png_path):
                     img = Image.open(icon_png_path)
                     self._icon = ImageTk.PhotoImage(img)
                     self.wm_iconphoto(True, self._icon)
-
-        except Exception as e:
-            print(f"Erro ao definir o ícone: {e}")
 
         except Exception as e:
             print(f"Erro ao definir o ícone: {e}")
