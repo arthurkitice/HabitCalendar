@@ -21,9 +21,10 @@ class CalendarApp(ctk.CTk):
         self.title("HabitCalendar")
         self._set_icon()
         self.geometry("850x500")
+        
 
         if WindowSizeJSON.is_window_maximized():
-            self.after(1, self._maximize)
+            self.after(0, self._maximize)
         else:
             width, height = WindowSizeJSON.get_window_size()
             self.geometry(f"{width}x{height}")
@@ -66,9 +67,9 @@ class CalendarApp(ctk.CTk):
 
     def _maximize(self):
         if sys.platform.startswith('linux'):
-            self._maximize_linux()
-        elif sys.platform == 'win32':
-            self.state('zoomed')
+            self._maximize_linux() # testar  self.attributes('-zoomed', True) depois
+        if sys.platform == 'win32':
+            self.after(100, lambda: self.state('zoomed'))
         elif sys.platform == 'darwin':
             self.attributes('-zoomed', True)
 
@@ -191,13 +192,7 @@ class CalendarApp(ctk.CTk):
         self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
 
     def on_exit(self):
-        is_maximized = False
-        try:
-            is_maximized = bool(self.attributes('-zoomed'))
-        except:
-            pass
-
-        if is_maximized:
+        if self.state() == "zoomed":
             WindowSizeJSON.maximize_window()
         else:
             medidas = self.geometry().split('+')[0]
