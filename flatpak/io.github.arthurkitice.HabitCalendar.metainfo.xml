@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.arthurkitice.HabitCalendar</id>
+  
+  <name>HabitCalendar</name>
+  <summary>An interactive calendar to track your daily habits</summary>
+  <summary xml:lang="pt-BR">Um calendário interativo para rastrear seus hábitos diários</summary>
+  
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  
+  <developer id="io.github.arthurkitice">
+    <name>Arthur Kitice</name>
+  </developer>
+
+  <description>
+    <p>HabitCalendar is a productivity-focused tool that allows for visual tracking of habits and goals directly from your desktop.</p>
+    <p xml:lang="pt-BR">O HabitCalendar é uma ferramenta focada em produtividade que permite o acompanhamento visual de hábitos e metas diretamente do seu desktop.</p>
+    
+    <p>With a clean and simple interface, you can visualize your monthly and yearly trackers, configure different themes, and manage your routine.</p>
+    <p xml:lang="pt-BR">Com uma interface limpa e simples, você pode visualizar seus rastreadores mensais e anuais, configurar diferentes temas e gerenciar sua rotina.</p>
+  </description>
+
+  <launchable type="desktop-id">io.github.arthurkitice.HabitCalendar.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image>https://github.com/arthurkitice/HabitCalendar/blob/main/icon.png?raw=true</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://github.com/arthurkitice/habitcalendar</url>
+  <url type="bugtracker">https://github.com/arthurkitice/habitcalendar/issues</url>
+
+  <releases>
+    <release version="1.1.0" date="2026-05-29"/>
+  </releases>
+</component>

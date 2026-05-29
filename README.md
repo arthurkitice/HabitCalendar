@@ -2,7 +2,7 @@
 
 A minimalist desktop calendar app for tracking daily habits — built with Python and CustomTkinter.
 
-![HabitCalendar](ui/icons/app_icon.svg)
+![HabitCalendar](app_icon.png)
 
 ---
 

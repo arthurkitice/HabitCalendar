@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=HabitCalendar
+Comment=Rastreador de hábitos e calendário
+Exec=habitcalendar
+Icon=io.github.arthurkitice.HabitCalendar
+Terminal=false
+Type=Application
+Categories=Utility;Office;
+StartupNotify=true

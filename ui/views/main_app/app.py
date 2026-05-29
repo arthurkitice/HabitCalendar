@@ -81,7 +81,7 @@ class CalendarApp(ctk.CTk):
 
     def _maximize(self):
         if sys.platform.startswith('linux'):
-            self._maximize_linux() # testar  self.attributes('-zoomed', True) depois
+            self._maximize_linux()
         if sys.platform == 'win32':
             self.after(100, lambda: self.state('zoomed'))
         elif sys.platform == 'darwin':
@@ -200,7 +200,12 @@ class CalendarApp(ctk.CTk):
         self.calendar_view.update_tracker_data(self.calendar_view.current_tracker_id)
 
     def on_exit(self):
-        if self.state() == "zoomed":
+        if sys.platform == 'win32' or sys.platform == 'darwin':
+            is_maximized = self.state() == "zoomed"
+        else:
+            is_maximized = bool(self.attributes('-zoomed'))
+            
+        if is_maximized:
             WindowSizeJSON.maximize_window()
         else:
             medidas = self.geometry().split('+')[0]

@@ -216,6 +216,8 @@ class SidebarView(ctk.CTkFrame):
         self.background_tracker_frame.grid(row=2, column=0, columnspan=4, padx=5, pady=5, sticky="nsew")
         self.background_tracker_frame.grid_columnconfigure(0, weight=1)
 
+        self.background_tracker_frame.configure(fg_color = PRIMARY_THEME.fg_color())
+
         self.tracker_frame = ctk.CTkFrame(self.background_tracker_frame, corner_radius=0)
         self.tracker_frame.grid(row=2, column=0, columnspan=4, padx=0, pady=4, sticky="nsew")
         self.tracker_frame.grid_columnconfigure(0, weight=1)
@@ -246,11 +248,13 @@ class SidebarView(ctk.CTkFrame):
     def reload_colors(self):
         self.add_tracker_button.reload_colors()
         color = PRIMARY_THEME.fg_color()
+    
+        self.background_tracker_frame.configure(fg_color=color)
+
         if len(self.btn_list) == 0:
             return
         for frame in self.btn_list:
             frame.selected_line.configure(fg_color=color if frame.tracker.id == self.current_tracker_id else "transparent")
-        self.background_tracker_frame.configure(fg_color=color)
 
     def reload_language(self):
         self.sidebar_label.configure(text=i18n.t(f'sidebar.top_label'))
