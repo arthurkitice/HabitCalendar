@@ -46,9 +46,12 @@ class SidebarView(ctk.CTkFrame):
 
         self.build_ui()
         self.update_sidebar()
+
         if not self.sidebar_visible:
             self.sidebar_visible = not self.sidebar_visible
             self.toggle_sidebar()
+
+        self.popup_frame = None
 
     # ==================
     # MÉTODOS DA SIDEBAR
@@ -87,21 +90,21 @@ class SidebarView(ctk.CTkFrame):
 
     def open_new_tracker_popup(self, tracker: Tracker | None = None) -> None:
         if tracker:
-            PopupHandler.alter_tracker_popup(self, tracker_name=tracker.name, tracker_id=tracker.id, on_save=self.edit_tracker)
+            self.popup_frame = PopupHandler.alter_tracker_popup(self, tracker_name=tracker.name, tracker_id=tracker.id, on_save=self.edit_tracker)
         else:
-            PopupHandler.alter_tracker_popup(self, on_save=self.create_new_tracker)
+            self.popup_frame = PopupHandler.alter_tracker_popup(self, on_save=self.create_new_tracker)
 
     def open_tracker_view_popup(self, tracker: Tracker | None = None) -> None:
-        PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
+        self.popup_frame = PopupHandler.tracker_popup(self, tracker.name, tracker.id, self.on_year_remove)
 
     def settings_popup(self):
-        PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change, self.on_restore_backup)
+        self.popup_frame = PopupHandler.settings_popup(self, self.on_color_change, self.on_theme_change, self.on_language_change, self.on_restore_backup)
 
     def open_delete_tracker_popup(self, tracker: Tracker | None = None) -> None:
         if self.tracker_service.get_checked_days_count(tracker.id) == 0:
             self.remove_tracker(tracker.id)
         else:
-            PopupHandler.delete_tracker_popup(self, on_save=partial(self.remove_tracker, tracker.id), tracker_name=tracker.name)
+            self.popup_frame = PopupHandler.delete_tracker_popup(self, on_save=partial(self.remove_tracker, tracker.id), tracker_name=tracker.name)
 
     def change_tracker(self, tracker_id: int) -> None:
         self.current_tracker_id = tracker_id

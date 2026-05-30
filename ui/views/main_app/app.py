@@ -18,12 +18,11 @@ ctk.set_widget_scaling(1.0)
 
 class CalendarApp(ctk.CTk):
     def __init__(self, base_dir):
-        super().__init__(className='HabitCalendar')
+        super().__init__(className='io.github.arthurkitice.HabitCalendar')
 
         self.base_dir = base_dir
         
         self.title("Habit Calendar")
-        #self.wm_class("io.github.arthurkitice.HabitCalendar", "io.github.arthurkitice.HabitCalendar")
         self._set_icon()
         self.geometry("850x500")
         

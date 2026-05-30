@@ -101,9 +101,6 @@ class SettingsView(PopupFrame):
             self.option_switch.select()
 
     def open_theme_popup(self):
-        if self.popup_frame is not None:
-            self.popup_frame.destroy()
-
         from . import PopupHandler
         self.popup_frame = PopupHandler.theme_popup(
             self, 
@@ -112,9 +109,6 @@ class SettingsView(PopupFrame):
         )
 
     def open_backup_popup(self):
-        if self.popup_frame is not None:
-            self.popup_frame.destroy()
-
         from . import PopupHandler
         self.popup_frame = PopupHandler.backup_popup(
             self,

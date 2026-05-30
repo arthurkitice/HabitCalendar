@@ -90,9 +90,6 @@ class YearView(PopupFrame):
             self.add_year(year)
             return
 
-        if hasattr(self, "popup_frame"):
-            self.popup_frame.destroy()
-
         from . import PopupHandler
         self.popup_frame = PopupHandler.new_year_popup(
             self, 

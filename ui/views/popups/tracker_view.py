@@ -63,9 +63,6 @@ class TrackerFrame(PopupFrame):
             self.remove_year(year)
             return
         
-        if self.popup_frame is not None:
-            self.popup_frame.destroy()
-
         from . import PopupHandler
         self.popup_frame = PopupHandler.delete_year_popup(
             self, 

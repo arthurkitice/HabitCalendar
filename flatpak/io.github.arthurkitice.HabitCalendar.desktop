@@ -8,4 +8,4 @@ Terminal=false
 Type=Application
 Categories=Utility;Office;
 StartupNotify=true
-StartupWMClass=habitcalendar
+StartupWMClass=io.github.arthurkitice.HabitCalendar
