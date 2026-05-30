@@ -34,3 +34,6 @@ app_settings.json
 dist/
 build/
 *.spec
+
+build-dir/
+.flatpak-builder/

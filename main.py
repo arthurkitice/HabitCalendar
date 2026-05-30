@@ -56,7 +56,7 @@ if __name__ == "__main__":
     from database import APP_DIR
 
     setup_logging(APP_DIR)
-    sys.excepthook = handle_exception
+    #sys.excepthook = handle_exception
 
     create_tables()
     

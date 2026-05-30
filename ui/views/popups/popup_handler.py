@@ -13,7 +13,17 @@ import i18n
 def apply_popup_binds(popup):
     """Gerencia uma pilha de popups para garantir que os atalhos afetem apenas o popup ativo."""
     root = popup.winfo_toplevel()
-    
+
+    orig_destroy = popup.destroy
+    def new_destroy():
+        if popup in getattr(root, "_popup_stack", []):
+            root._popup_stack.remove(popup)
+            if len(root._popup_stack) > 0:
+                root._popup_stack[-1].grab_set()
+            print(len(root._popup_stack))
+        orig_destroy()
+    popup.destroy = new_destroy
+
     # Configura os binds globais e a pilha apenas na primeira vez
     if not hasattr(root, "_popup_stack"):
         root._popup_stack = []
@@ -36,15 +46,11 @@ def apply_popup_binds(popup):
         
     # Adiciona o popup atual no topo da pilha
     if popup not in root._popup_stack:
+        print("popup adicionado")
         root._popup_stack.append(popup)
     
     # Intercepta o fechamento para remover este popup da pilha e devolver o controle ao popup de baixo
-    orig_destroy = popup.destroy
-    def new_destroy():
-        if popup in getattr(root, "_popup_stack", []):
-            root._popup_stack.remove(popup)
-        orig_destroy()
-    popup.destroy = new_destroy
+    
 
 def _show_popup(func):
     @wraps(func)

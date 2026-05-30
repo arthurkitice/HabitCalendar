@@ -22,7 +22,8 @@ class CalendarApp(ctk.CTk):
 
         self.base_dir = base_dir
         
-        self.title("HabitCalendar")
+        self.title("Habit Calendar")
+        #self.wm_class("io.github.arthurkitice.HabitCalendar", "io.github.arthurkitice.HabitCalendar")
         self._set_icon()
         self.geometry("850x500")
         

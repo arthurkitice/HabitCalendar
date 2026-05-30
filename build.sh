@@ -1,9 +1,9 @@
 #!/bin/bash
 # Script para compilar o executável do HabitCalendar usando PyInstaller
 source .venv/bin/activate
-pyinstaller --onefile --windowed --strip --optimize 2 \
+pyinstaller --onefile --windowed --optimize 2 \
   --upx-dir /usr/local/bin \
-  --name "HabitCalendar-linux" \
+  --name "HabitCalendar" \
   --icon "icon.png" \
   --add-data "locales:locales" \
   --add-data "ui/icons:ui/icons" \

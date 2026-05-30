@@ -2,7 +2,7 @@
 <component type="desktop-application">
   <id>io.github.arthurkitice.HabitCalendar</id>
   
-  <name>HabitCalendar</name>
+  <name>Habit Calendar</name>
   <summary>An interactive calendar to track your daily habits</summary>
   <summary xml:lang="pt-BR">Um calendário interativo para rastrear seus hábitos diários</summary>
   
@@ -25,7 +25,23 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://github.com/arthurkitice/HabitCalendar/blob/main/icon.png?raw=true</image>
+      <image>https://raw.githubusercontent.com/arthurkitice/HabitCalendar/refs/heads/main/screenshots/screenshot2.webp</image>
+    </screenshot>
+
+    <screenshot>
+      <image>https://raw.githubusercontent.com/arthurkitice/HabitCalendar/refs/heads/main/screenshots/screenshot1.webp</image>
+    </screenshot>
+
+    <screenshot>
+      <image>https://raw.githubusercontent.com/arthurkitice/HabitCalendar/refs/heads/main/screenshots/screenshot3.webp</image>
+    </screenshot>
+
+    <screenshot>
+      <image>https://raw.githubusercontent.com/arthurkitice/HabitCalendar/refs/heads/main/screenshots/screenshot4.webp</image>
+    </screenshot>
+
+    <screenshot>
+      <image>https://raw.githubusercontent.com/arthurkitice/HabitCalendar/refs/heads/main/screenshots/screenshot5.webp</image>
     </screenshot>
   </screenshots>
 

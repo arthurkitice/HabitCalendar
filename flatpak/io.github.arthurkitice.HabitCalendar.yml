@@ -1,0 +1,71 @@
+app-id: io.github.arthurkitice.HabitCalendar
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: habitcalendar
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --env=LC_NUMERIC=C
+modules:
+  # --- BLOCO DO TKINTER (Mecanismo Gráfico) ---
+  - name: tcl
+    buildsystem: autotools
+    subdir: unix
+    post-install:
+      - chmod +w ${FLATPAK_DEST}/lib/libtcl*.so
+    sources:
+      - type: archive
+        url: https://prdownloads.sourceforge.net/tcl/tcl8.6.12-src.tar.gz
+        sha256: 26c995dd0f167e48b11961d891ee555f680c175f7173ff8cb829f4ebcde4c1a6
+
+  - name: tk
+    buildsystem: autotools
+    subdir: unix
+    post-install:
+      - chmod +w ${FLATPAK_DEST}/lib/libtk*.so
+    sources:
+      - type: archive
+        url: https://prdownloads.sourceforge.net/tcl/tk8.6.12-src.tar.gz
+        sha256: 12395c1f3fcb6bed2938689f797ea3cdf41ed5cb6c4766eec8ac949560310630
+
+  - name: tkinter
+    buildsystem: simple
+    build-commands:
+      # 1. Cria a pasta padrão do Python no Flatpak
+      - mkdir -p /app/lib/python3.11/site-packages
+      # 2. Copia os arquivos Python puros do Tkinter direto do código oficial
+      - cp -r Lib/tkinter /app/lib/python3.11/site-packages/
+      # 3. Cria um script de instalação minúsculo e infalível
+      - echo "from setuptools import setup, Extension" > build_tk.py
+      - echo "setup(name='tkext', ext_modules=[Extension('_tkinter', sources=['Modules/_tkinter.c', 'Modules/tkappinit.c'], include_dirs=['/app/include'], library_dirs=['/app/lib'], libraries=['tcl8.6', 'tk8.6'], define_macros=[('WITH_APPINIT', 1)])])" >> build_tk.py
+      # 4. Compila a ponte em C perfeitamente alinhada com o sistema e joga na pasta
+      - python3 build_tk.py build_ext --inplace
+      - cp _tkinter*.so /app/lib/python3.11/site-packages/
+    sources:
+      # Nós vamos baixar o Python 3.11 original direto da fonte oficial
+      - type: git
+        url: https://github.com/python/cpython.git
+        branch: '3.11'
+  # --------------------------------------------
+
+  # Suas bibliotecas (CustomTkinter e Pillow)
+  - python3-requirements.json
+  
+  # O seu Aplicativo Habit Calendar
+  - name: habitcalendar
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/share/habitcalendar
+      - mkdir -p /app/bin
+      - cp -r * /app/share/habitcalendar/
+      - echo -e '#!/bin/sh\nexec python3 /app/share/habitcalendar/main.py "$@"' > /app/bin/habitcalendar
+      - chmod +x /app/bin/habitcalendar
+      - install -Dm644 flatpak/io.github.arthurkitice.HabitCalendar.desktop /app/share/applications/io.github.arthurkitice.HabitCalendar.desktop
+      - install -Dm644 flatpak/io.github.arthurkitice.HabitCalendar.metainfo.xml /app/share/metainfo/io.github.arthurkitice.HabitCalendar.metainfo.xml
+      - install -Dm644 icon.png /app/share/icons/hicolor/256x256/apps/io.github.arthurkitice.HabitCalendar.png
+    sources:
+      - type: git
+        url: https://github.com/arthurkitice/habitcalendar.git
+        branch: main
