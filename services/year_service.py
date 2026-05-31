@@ -17,8 +17,7 @@ class YearService:
             return [year.number for year in years]
 
     def add_tracker_year(self, tracker_id: int, year_number: int) -> Year | None:
-        MIN_YEAR = 2000
-        MAX_YEAR = 2100
+        MIN_YEAR, MAX_YEAR = 2000, 2100
         
         if not (MIN_YEAR <= year_number <= MAX_YEAR):
             return None

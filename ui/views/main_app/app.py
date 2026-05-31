@@ -4,9 +4,7 @@ from services import TrackerService
 from .app_sidebar import SidebarView
 from .app_calendar import MainCalendarView
 from themes import PRIMARY_THEME, TEXT_COLOR
-import i18n
-import sys
-import os
+import i18n, sys, os
 from ui.widgets import SliderButton
 
 SIDEBAR_WEIGHT = 1
@@ -26,7 +24,6 @@ class CalendarApp(ctk.CTk):
         self._set_icon()
         self.geometry("850x500")
         
-
         if WindowSizeJSON.is_window_maximized():
             self.after(0, self._maximize)
         else:
@@ -40,105 +37,7 @@ class CalendarApp(ctk.CTk):
         self.main_container = None
         self.build_all_ui()
 
-    def _set_icon(self):
-        import sys
-        import os
-
-        try:
-            if sys.platform == "win32":
-                import ctypes
-                try:
-                    myappid = 'arthurkitice.habitcalendar.1.5' 
-                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-                except Exception:
-                    pass
-
-                try:
-                    # Avisa ao Windows 8.1/10/11 para não esticar a janela
-                    ctypes.windll.shcore.SetProcessDpiAwareness(2)
-                except Exception:
-                    try:
-                        # Fallback para Windows mais antigos
-                        ctypes.windll.user32.SetProcessDPIAware()
-                    except Exception:
-                        pass
-                
-                icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
-                if os.path.exists(icon_ico_path):
-                    self.iconbitmap(default=icon_ico_path)
-                    
-            else:
-                # O seu código original para Linux e macOS
-                from PIL import Image, ImageTk
-                icon_png_path = os.path.join(self.base_dir, 'icon.png')
-                if os.path.exists(icon_png_path):
-                    img = Image.open(icon_png_path)
-                    self._icon = ImageTk.PhotoImage(img)
-                    self.wm_iconphoto(True, self._icon)
-
-        except Exception as e:
-            print(f"Erro ao definir o ícone: {e}")
-
-    def _maximize(self):
-        if sys.platform.startswith('linux'):
-            self._maximize_linux()
-        if sys.platform == 'win32':
-            self.after(100, lambda: self.state('zoomed'))
-        elif sys.platform == 'darwin':
-            self.attributes('-zoomed', True)
-
-    def _maximize_linux(self):
-        try:
-            from ewmh import EWMH
-            ewmh = EWMH()
-            titulo = self.title().encode('utf-8')
-            for w in reversed(ewmh.getClientList()):
-                try:
-                    if ewmh.getWmName(w) and titulo in ewmh.getWmName(w):
-                        ewmh.setWmState(w, 1, '_NET_WM_STATE_MAXIMIZED_VERT', '_NET_WM_STATE_MAXIMIZED_HORZ')
-                        ewmh.display.flush()
-                        return
-                except:
-                    continue
-            self.attributes('-zoomed', True)
-        except:
-            self.attributes('-zoomed', True)
-            
-    def build_all_ui(self):
-        self.main_container = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
-        self.main_container.pack(fill="both", expand=True)
-
-        self.main_container.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
-        self.main_container.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window", minsize=500)
-        self.main_container.grid_rowconfigure(0, weight=1, minsize=400)
-
-        PRIMARY_THEME.set_theme(ThemeJSON.get_current_color())
-        ctk.set_appearance_mode(ThemeJSON.get_current_theme())
-
-        # Instancia a Sidebar dentro do MAIN_CONTAINER
-        initial_tracker_id = LastTrackerJSON.get_last_tracker_id()
-        self.sidebar_view = SidebarView(
-            self.main_container, 
-            initial_tracker_id=initial_tracker_id,
-            on_tracker_change=self.handle_tracker_change,
-            on_color_change=self.handle_color_change,
-            on_toggle_visibility=self.handle_sidebar_toggle,
-            on_year_remove=self.handle_year_remove,
-            on_theme_change=self.handle_theme_change,
-            on_language_change=self.handle_language_change,
-            on_restore_backup=self.handle_backup_restore
-        )
-        self.sidebar_view.grid(row=0, column=0, sticky="nsew")
-
-        # Instancia o Calendário dentro do MAIN_CONTAINER
-        self.calendar_view = MainCalendarView(
-            self.main_container, 
-            initial_tracker_id=initial_tracker_id
-        )
-
-        self.build_forbidden_content()
-
-        self.handle_tracker_change()
+    # --- Métodos callbacks ---
 
     def handle_sidebar_toggle(self, is_visible: bool):
         if is_visible:
@@ -165,7 +64,6 @@ class CalendarApp(ctk.CTk):
         self.forbidden_label_info.configure(text=i18n.t('forbidden_frame.info'))
 
         values = self._get_forbidden_values()
-
         self.example_trackers.change_values(values)
 
     def handle_color_change(self):
@@ -174,17 +72,15 @@ class CalendarApp(ctk.CTk):
         self.example_trackers.reload_colors()
 
     def handle_theme_change(self):
-        cor_fundo_atual = self._apply_appearance_mode(self.cget("fg_color"))
-        cortina = ctk.CTkFrame(self, fg_color=cor_fundo_atual)
-        cortina.place(relwidth=1.0, relheight=1.0, x=0, y=0)
+        current_color = self._apply_appearance_mode(self.cget("fg_color"))
+        cover = ctk.CTkFrame(self, fg_color=current_color)
+        cover.place(relwidth=1.0, relheight=1.0, x=0, y=0)
 
-        self.update() #Força o frame a aparecer na tela
-
+        self.update()
         ctk.set_appearance_mode(ThemeJSON.get_current_theme())
+        self.update_idletasks()
 
-        self.update_idletasks() #Só passa para a próxima etapa quando a fila de execução limpar
-
-        cortina.destroy()
+        cover.destroy()
 
     def handle_year_remove(self, year: int, is_top_year: bool = True):
         if self.calendar_view.current_year != year:
@@ -221,6 +117,42 @@ class CalendarApp(ctk.CTk):
         self.calendar_view.update_calendar()
         self.handle_tracker_change()
 
+    # --- Métodos construtores ---
+
+    def build_all_ui(self):
+        self.main_container = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
+        self.main_container.pack(fill="both", expand=True)
+
+        self.main_container.grid_columnconfigure(0, weight=SIDEBAR_WEIGHT, uniform="window", minsize=350)
+        self.main_container.grid_columnconfigure(1, weight=MAIN_WEIGHT, uniform="window", minsize=500)
+        self.main_container.grid_rowconfigure(0, weight=1, minsize=400)
+
+        PRIMARY_THEME.set_theme(ThemeJSON.get_current_color())
+        ctk.set_appearance_mode(ThemeJSON.get_current_theme())
+
+        initial_tracker_id = LastTrackerJSON.get_last_tracker_id()
+
+        self.sidebar_view = SidebarView(
+            self.main_container, 
+            initial_tracker_id=initial_tracker_id,
+            on_tracker_change=self.handle_tracker_change,
+            on_color_change=self.handle_color_change,
+            on_toggle_visibility=self.handle_sidebar_toggle,
+            on_year_remove=self.handle_year_remove,
+            on_theme_change=self.handle_theme_change,
+            on_language_change=self.handle_language_change,
+            on_restore_backup=self.handle_backup_restore
+        )
+        self.sidebar_view.grid(row=0, column=0, sticky="nsew")
+
+        self.calendar_view = MainCalendarView(
+            self.main_container, 
+            initial_tracker_id=initial_tracker_id
+        )
+
+        self.build_forbidden_content()
+        self.handle_tracker_change()
+
     def build_forbidden_content(self) -> None:
         self.forbidden_frame = ctk.CTkFrame(self.main_container, corner_radius=10)
         self.forbidden_frame.grid_columnconfigure(0, weight=1)
@@ -253,6 +185,76 @@ class CalendarApp(ctk.CTk):
             bold=False
         )
         self.example_trackers.grid(row=3, column=0, sticky='n', padx=5, pady=20)
+    
+    # --- Métodos utilitários ---
+
+    def _set_icon(self):
+        try:
+            if sys.platform == "win32":
+                import ctypes
+                # Necessário criar um id no windows, para um reconhecimento do app e
+                # garantir que não faltará nenhum elemento
+                try:
+                    myappid = 'arthurkitice.habitcalendar.1.5' 
+                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+                except Exception:
+                    pass
+                
+                # Caso a tela esteja em uma escala maior que 100%
+                try:
+                    # Impede o windows de esticar a janela
+                    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+                except Exception:
+                    try:
+                        # Fallback para Windows mais antigos
+                        ctypes.windll.user32.SetProcessDPIAware()
+                    except Exception:
+                        pass
+                
+                icon_ico_path = os.path.join(self.base_dir, 'icon.ico')
+
+                if os.path.exists(icon_ico_path):
+                    self.iconbitmap(default=icon_ico_path)
+            
+            else:
+                from PIL import Image, ImageTk
+                icon_png_path = os.path.join(self.base_dir, 'icon.png')
+
+                if os.path.exists(icon_png_path):
+                    img = Image.open(icon_png_path)
+                    self._icon = ImageTk.PhotoImage(img)
+                    self.wm_iconphoto(True, self._icon)
+
+        except Exception as e:
+            print(f"Erro ao definir o ícone: {e}")
+
+    def _maximize(self):
+        if sys.platform.startswith('linux'):
+            self._maximize_linux()
+        if sys.platform == 'win32':
+            # Não atrapalha na fase de construção da janela, maximizando posteriormente e previnindo falhas
+            self.after(100, lambda: self.state('zoomed'))
+        elif sys.platform == 'darwin':
+            self.attributes('-zoomed', True)
+
+    def _maximize_linux(self):
+        # Normalmente "self.attributes('-zoomed', True)" funcionaria, 
+        # mas algumas distros possuem um gerenciador de janelas mais rígido
+        try:
+            from ewmh import EWMH
+            ewmh = EWMH()
+            titulo = self.title().encode('utf-8')
+            for w in reversed(ewmh.getClientList()):
+                try:
+                    if ewmh.getWmName(w) and titulo in ewmh.getWmName(w):
+                        ewmh.setWmState(w, 1, '_NET_WM_STATE_MAXIMIZED_VERT', '_NET_WM_STATE_MAXIMIZED_HORZ')
+                        ewmh.display.flush()
+                        return
+                except Exception:
+                    continue
+            self.attributes('-zoomed', True)
+        except Exception:
+            self.attributes('-zoomed', True)
 
     def _get_forbidden_values(self):
         return [

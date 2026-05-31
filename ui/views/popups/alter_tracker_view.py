@@ -1,7 +1,9 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, PopupFrame
+from ui.widgets import PopupFrame
 from services import TrackerService
 from config import TrackerDataJSON
+from themes import TRACKER_COLORS
+from functools import partial
 import i18n
 
 class AlterTrackerFrame(PopupFrame):
@@ -19,6 +21,8 @@ class AlterTrackerFrame(PopupFrame):
         self.main_frame.configure(fg_color = "transparent")
 
         self.build_ui()
+
+    # --- Métodos de construção ---
 
     def ui_new_tracker(self):
         self.main_frame.grid_rowconfigure(0, weight=1)
@@ -54,9 +58,6 @@ class AlterTrackerFrame(PopupFrame):
         self.main_frame.update_idletasks()
 
     def build_color_buttons(self):
-        from themes import TRACKER_COLORS
-        from functools import partial
-
         text = i18n.t(f'{self._translation_path}.color')
         self.color_label = ctk.CTkLabel(self.main_frame, text=text, font=ctk.CTkFont(size=16, weight="bold"))
         self.color_label.grid(row=4, column=1, padx=5, pady=5, sticky="w")
@@ -73,7 +74,7 @@ class AlterTrackerFrame(PopupFrame):
                 self.color_frame,
                 text="", 
                 corner_radius=100, 
-                command=partial(self.set_color, color), 
+                command=partial(self._set_color, color), 
                 fg_color=TRACKER_COLORS[color]["fg"],
                 hover_color=TRACKER_COLORS[color]["hover"],
                 cursor="hand2",
@@ -86,12 +87,7 @@ class AlterTrackerFrame(PopupFrame):
 
             self.btn_list.append(btn)
 
-        self.set_color(TrackerDataJSON.get_color(self.tracker_id))
-    
-    def set_color(self, color):
-        self.current_color = color
-        for btn in self.btn_list:
-            btn.configure(border_width=3 if btn.color == color else 0)
+        self._set_color(TrackerDataJSON.get_color(self.tracker_id))
 
     def build_ui(self):
         self.main_frame.grid_columnconfigure((0, 2), weight=1)
@@ -106,19 +102,19 @@ class AlterTrackerFrame(PopupFrame):
         else:
             self.ui_new_tracker()
 
+    # --- Utilitários ---
+
     def save(self):
         text = self.entry.get().split()
 
         if not text:
-            self.error_msg.grid(row=3, column=1, padx=5, pady=0, sticky="w")
-            self.error_msg.configure(text=i18n.t(f'{self._translation_path}.warning1'))
+            self._show_error(i18n.t(f'{self._translation_path}.warning1'))
             return
         
         text = ' '.join(text)
 
         if self.tracker_name != text and TrackerService().get_tracker_by_name(text):
-            self.error_msg.grid(row=3, column=1, padx=5, pady=0, sticky="w")
-            self.error_msg.configure(text=i18n.t(f'{self._translation_path}.warning2'))
+            self._show_error(i18n.t(f'{self._translation_path}.warning2'))
             return
 
         if self.tracker_id is not None:
@@ -126,4 +122,14 @@ class AlterTrackerFrame(PopupFrame):
             self.on_save(text, self.tracker_id)
         else:
             self.on_save(text)
+            
         self.destroy()
+
+    def _show_error(self, msg):
+        self.error_msg.grid(row=3, column=1, padx=5, pady=0, sticky="w")
+        self.error_msg.configure(text=msg)
+
+    def _set_color(self, color):
+        self.current_color = color
+        for btn in self.btn_list:
+            btn.configure(border_width=3 if btn.color == color else 0)

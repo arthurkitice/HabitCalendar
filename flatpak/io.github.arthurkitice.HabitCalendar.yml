@@ -9,7 +9,6 @@ finish-args:
   - --socket=wayland
   - --env=LC_NUMERIC=C
 modules:
-  # --- BLOCO DO TKINTER (Mecanismo Gráfico) ---
   - name: tcl
     buildsystem: autotools
     subdir: unix
@@ -33,27 +32,19 @@ modules:
   - name: tkinter
     buildsystem: simple
     build-commands:
-      # 1. Cria a pasta padrão do Python no Flatpak
       - mkdir -p /app/lib/python3.11/site-packages
-      # 2. Copia os arquivos Python puros do Tkinter direto do código oficial
       - cp -r Lib/tkinter /app/lib/python3.11/site-packages/
-      # 3. Cria um script de instalação minúsculo e infalível
       - echo "from setuptools import setup, Extension" > build_tk.py
       - echo "setup(name='tkext', ext_modules=[Extension('_tkinter', sources=['Modules/_tkinter.c', 'Modules/tkappinit.c'], include_dirs=['/app/include'], library_dirs=['/app/lib'], libraries=['tcl8.6', 'tk8.6'], define_macros=[('WITH_APPINIT', 1)])])" >> build_tk.py
-      # 4. Compila a ponte em C perfeitamente alinhada com o sistema e joga na pasta
       - python3 build_tk.py build_ext --inplace
       - cp _tkinter*.so /app/lib/python3.11/site-packages/
     sources:
-      # Nós vamos baixar o Python 3.11 original direto da fonte oficial
       - type: git
         url: https://github.com/python/cpython.git
         branch: '3.11'
-  # --------------------------------------------
 
-  # Suas bibliotecas (CustomTkinter e Pillow)
   - python3-requirements.json
-  
-  # O seu Aplicativo Habit Calendar
+
   - name: habitcalendar
     buildsystem: simple
     build-commands:

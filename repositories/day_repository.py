@@ -20,7 +20,7 @@ class DayRepository:
         self.conn.execute(sql, (day_id,))
     
     def get_specific_day(self, tracker_id: int, year: int, month: int, day: int) -> Day | None:
-        """Retorna um dia específico em um mês, ano e tracker"""
+        """Retorna um dia específico em um mês, ano e tracker, sem precisar do ID's do dia, mês e ano"""
         
         sql = """
             SELECT d.* FROM days AS d

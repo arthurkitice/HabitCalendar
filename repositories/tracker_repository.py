@@ -43,7 +43,7 @@ class TrackerRepository:
         return True
     
     def get_all_checked_days(self, tracker_id: int) -> int:
-        """Retorna a quantidade de dias marcados"""
+        """Retorna a quantidade de dias marcados totais do tracker"""
 
         if self.get_tracker_by_id(tracker_id) is None:
             return 0

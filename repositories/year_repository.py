@@ -15,10 +15,12 @@ class YearRepository:
         return [Year.from_row(row) for row in rows]
 
     def get_specific_year(self, tracker_id: int, year_number: int) -> Year | None:
+        """Retorna um ano específico sem precisar do ID do ano, somente o ID do tracker e número do ano."""
         row = self.conn.execute("SELECT * FROM years WHERE tracker_id = ? AND number = ?", (tracker_id, year_number)).fetchone()
         return Year.from_row(row) if row else None
 
     def create_year_with_cascade(self, tracker_id: int, year_number: int) -> Year | None:
+        """Cria um ano no banco de dados, preenchendo-o automaticamente com os meses e dias"""
         if self.get_specific_year(tracker_id, year_number):
             return None 
 
@@ -38,7 +40,7 @@ class YearRepository:
         return cursor.rowcount > 0 #Se deletou algo incrementa o rowcount
     
     def get_all_checked_days(self, tracker_id: int, year: int) -> int:
-        """Retorna a quantidade de dias marcados"""
+        """Retorna a quantidade de dias marcados do ano"""
 
         if self.get_year_by_id(tracker_id) is None:
             return 0

@@ -32,7 +32,7 @@ class MonthRepository:
         return Month.from_row(row) if row else None
     
     def get_all_checked_days(self, tracker_id: int, year: int, month: int) -> int:
-        """Retorna a quantidade de dias marcados"""
+        """Retorna a quantidade de dias marcados no mês"""
 
         sql = """
             SELECT SUM(d.checked) FROM days AS d

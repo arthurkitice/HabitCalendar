@@ -7,8 +7,7 @@ from ui.widgets import NavigationButton, DayButton, CustomButton
 from themes import TEXT_COLOR
 from icon_assets import RIGHT_ARROW, LEFT_ARROW
 from services import TrackerService, DayService, YearService, MonthService
-import calendar
-import i18n
+import calendar, i18n
 
 CALENDAR_ROWS = 6
 CALENDAR_COLS = 7
@@ -39,21 +38,8 @@ class MainCalendarView(ctk.CTkFrame):
 
         self.build_ui()
 
-    def update_tracker_data(self, tracker_id: int):
-        """Chamado pela Sidebar quando o marcador muda"""
-        self.current_tracker_id = tracker_id
-        self.current_month = TrackerDataJSON.get_last_month(self.current_tracker_id)
-        self.current_year = TrackerDataJSON.get_last_year(self.current_tracker_id)
-        self.reload_colors()
+    # --- Métodos usados em botões ou popups  ---
 
-        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
-
-        self.update_top_bar()
-        self.update_days_frame()
-
-    # ================================
-    # MÉTODOS DE INTERAÇÃO COM O BANCO
-    # ================================
     def check_day(self, day_id: int, index: int) -> None:
         if day_id == 0:
             return
@@ -78,29 +64,11 @@ class MainCalendarView(ctk.CTkFrame):
         elif self.current_year + 1 == self.years[-1] and self.current_month == 12:
             self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))
 
-    def _refresh_years(self):
-        """Atualiza apenas a lista de anos disponíveis para o popup e botões de navegação"""
-        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
-
-    # =======================
-    # MÉTODOS DOS DIAS DO MÊS
-    # =======================
-    def style_empty_buttons(self) -> None:
-        first_week_day, month_days = calendar.monthrange(self.current_year, self.current_month)
-        first_week_day = (first_week_day+1)%7
-
-        prev_year = self.current_year - 1 if self.current_month == 1 else self.current_year
-        prev_month = 12 if self.current_month == 1 else self.current_month - 1
-        last_month_days = calendar.monthrange(prev_year, prev_month)[1]
-
-        prev_days = range(last_month_days - first_week_day + 1, last_month_days + 1)
-        next_days = range(1, 42 - month_days - first_week_day + 1)
-
-        filler_number = list(prev_days) + list(next_days)
-        empty_indexes = [i for i, btn in enumerate(self.day_buttons) if btn.day == "0"]
-
-        for index, number in zip(empty_indexes, filler_number):
-            self.day_buttons[index].update_button(day=number, command=None, checked=False, disabled=True)
+    def jump_to_month(self, target_month: int, target_year: int) -> None:
+        """Chamado pelo popup de visualização de anos. Limpo e sem queries desnecessárias."""
+        self.current_month = target_month
+        self.current_year = target_year
+        self.update_calendar()
 
     def previous_month(self) -> None:
         if self.current_month == 1:
@@ -120,40 +88,58 @@ class MainCalendarView(ctk.CTkFrame):
         self.current_month = (self.current_month%12)+1
         self.update_calendar()
 
+    # --- Popups  ---
+
+    def open_new_year_popup(self, year: int) -> None:
+        if ThemeJSON.is_new_year_popup_hidden():
+            self.add_year(year)
+            return
+        PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
+
+    def open_years_popup(self, year: int):
+        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.add_year_from_popup)
+
+    # --- Métodos de update ---
+
+    def update_tracker_data(self, tracker_id: int):
+        """Chamado pela Sidebar quando o marcador muda"""
+        self.current_tracker_id = tracker_id
+        self.current_month = TrackerDataJSON.get_last_month(self.current_tracker_id)
+        self.current_year = TrackerDataJSON.get_last_year(self.current_tracker_id)
+        self.reload_colors()
+
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
+
+        self.update_top_bar()
+        self.update_days_frame()
+
     def update_calendar(self):
         TrackerDataJSON.save_current_date(self.current_tracker_id, self.current_month, self.current_year)
         self.update_top_bar()
         self.update_days_frame()
 
-    def jump_to_month(self, target_month: int, target_year: int) -> None:
-        """Chamado pelo popup de visualização de anos. Limpo e sem queries desnecessárias."""
-        self.current_month = target_month
-        self.current_year = target_year
-        self.update_calendar()
-
-    def _generate_month_cells(self) -> list[Day]:
-        month_data = self.month_service.get_specific_month_with_days(
-            tracker_id=self.current_tracker_id, 
-            year=self.current_year, 
-            month_number=self.current_month
-        )
-
-        month_days = month_data.days if month_data else []
-
-        first_week_day = (calendar.monthrange(self.current_year, self.current_month)[0] + 1) % 7
-        empty_day: Day = Day(id=0, number=0, checked=False, month_id=0)
-
-        total_cells = CALENDAR_ROWS * CALENDAR_COLS
-        all_cells: list[Day] = [empty_day] * first_week_day + month_days
-        all_cells.extend([empty_day] * (total_cells - len(all_cells)))
-
-        return all_cells
-
     def update_days_frame(self) -> None:
         for i, (btn, day) in enumerate(zip(self.day_buttons, self._generate_month_cells())):
             btn.update_button(day=day.number, checked=day.checked, command=partial(self.check_day, day.id, i))
 
-        self.style_empty_buttons()
+        self._style_empty_buttons()
+
+    def update_top_bar(self) -> None:
+        self._refresh_years()
+
+        month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
+        current_text = self.month_button._text
+
+        if month_text not in current_text or str(self.current_year) not in current_text:
+            self.month_button.configure(
+                text=f"{self.current_year}\n{month_text}", 
+                command=partial(self.open_years_popup, self.current_year)
+            )
+
+        self.prev_button.update_button(condition=self._get_condition(LEFT_ARROW))
+        self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))
+
+    # --- Métodos de construção ---
 
     def build_days_frame(self) -> None:
         self.days_frame = ctk.CTkFrame(self, corner_radius=10)
@@ -182,34 +168,7 @@ class MainCalendarView(ctk.CTkFrame):
             button.grid(row=row+1, column=col, padx=5, pady=5, sticky="nsew")
             self.day_buttons.append(button)
 
-        self.style_empty_buttons()
-    
-    def open_new_year_popup(self, year: int) -> None:
-        if ThemeJSON.is_new_year_popup_hidden():
-            self.add_year(year)
-            return
-        PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
-
-    # ===============================
-    # TOP BAR (NAVEGAÇÃO ENTRE MESES)
-    # ===============================
-    def open_years_popup(self, year: int):
-        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.add_year_from_popup)
-
-    def update_top_bar(self) -> None:
-        self._refresh_years()
-
-        month_text = i18n.t(f'calendar.months.{str(self.current_month)}')
-        current_text = self.month_button._text
-
-        if month_text not in current_text or str(self.current_year) not in current_text:
-            self.month_button.configure(
-                text=f"{self.current_year}\n{month_text}", 
-                command=partial(self.open_years_popup, self.current_year)
-            )
-
-        self.prev_button.update_button(condition=self._get_condition(LEFT_ARROW))
-        self.next_button.update_button(condition=self._get_condition(RIGHT_ARROW))
+        self._style_empty_buttons()
 
     def build_top_bar(self) -> None:
         self.top_frame = ctk.CTkFrame(self, corner_radius=10)
@@ -244,6 +203,12 @@ class MainCalendarView(ctk.CTkFrame):
         )
         self.next_button.grid(row=0, column=2, padx=5, pady=5, sticky="e")
 
+    def build_ui(self) -> None:
+        self.build_top_bar()
+        self.build_days_frame()
+
+    # --- Métodos de atualização utilizados por callbacks ---
+
     def reload_colors(self):
         for btn in self.day_buttons:
             btn.tracker_id = self.current_tracker_id
@@ -255,11 +220,63 @@ class MainCalendarView(ctk.CTkFrame):
         for i, label in enumerate(self.week_days):
             label.configure(text=i18n.t(f'calendar.short_weekdays.{str((i+6)%7)}'))
 
+    # --- Métodos utilitários ---
+
+    def _refresh_years(self):
+        """Serve apenas para atualizar os anos de maneira mais direta"""
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.current_tracker_id)
+
     def _get_condition(self, icon) -> bool | None:
         if icon == RIGHT_ARROW:
             return self.current_year +1 not in self.years and self.current_month == 12
         return self.current_year -1 not in self.years and self.current_month == 1
+    
+    def _generate_month_cells(self) -> list[Day]:
+        """Gera as células do calendário"""
+        month_data = self.month_service.get_specific_month_with_days(
+            tracker_id=self.current_tracker_id, 
+            year=self.current_year, 
+            month_number=self.current_month
+        )
 
-    def build_ui(self) -> None:
-        self.build_top_bar()
-        self.build_days_frame()
+        # Pega todos os dias naquele mês para montar as células
+        month_days = month_data.days if month_data else []
+
+        # É preciso fazer (dia+1)%7 para ajustar ao padrão de domingo sendo o primeiro dia da semana
+        first_week_day = (calendar.monthrange(self.current_year, self.current_month)[0] + 1) % 7
+
+        # Salva um dia vazio para ser processado depois pelo _style_empty_buttons
+        empty_day: Day = Day(id=0, number=0, checked=False, month_id=0)
+
+        # Esse ciclo garante que haverá dias vazios até chegar no primeiro dia da semana,
+        # assim resultando naquela exibição onde é possível ver os dias do mês anterior e seguinte
+        total_cells = CALENDAR_ROWS * CALENDAR_COLS
+        all_cells: list[Day] = [empty_day] * first_week_day + month_days
+
+        # Serve para terminar de completar o grid 6x7
+        all_cells.extend([empty_day] * (total_cells - len(all_cells)))
+
+        return all_cells
+    
+    def _style_empty_buttons(self) -> None:
+        first_week_day, month_days = calendar.monthrange(self.current_year, self.current_month)
+        first_week_day = (first_week_day+1)%7
+
+        # Ajustando o ano anterior caso você estiver em janeiro, pois o ano passado para a função monthrange irá mudar
+        prev_year = self.current_year - 1 if self.current_month == 1 else self.current_year
+
+        # Necessário caso estiver no mês 1, pois assim volta ao 12
+        prev_month = (self.current_month - 2) % 12 + 1
+
+        last_month_days = calendar.monthrange(prev_year, prev_month)[1]
+
+        # Definem quais serão os números dos dias vazios para preencher no calendário,
+        # necessário passar +1 para ajustar corretamente 
+        prev_days = range(last_month_days - first_week_day + 1, last_month_days + 1)
+        next_days = range(1, 42 - month_days - first_week_day + 1)
+
+        filler_number = list(prev_days) + list(next_days)
+        empty_indexes = [i for i, btn in enumerate(self.day_buttons) if btn.day == "0"]
+
+        for index, number in zip(empty_indexes, filler_number):
+            self.day_buttons[index].update_button(day=number, command=None, checked=False, disabled=True)

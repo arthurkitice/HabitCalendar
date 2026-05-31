@@ -18,74 +18,78 @@ class BackupView(PopupFrame):
         self.on_restore_backup = on_restore_backup
         self.popup_frame = None
 
+        self.buttons_config = {
+            "font":ctk.CTkFont(size=15),
+            "height":30,
+            "width":125
+        }
+
         self.text = self._Theme_Texts()
 
         self.build_ui()
 
+    # --- Métodos de construção ---
+
     def build_button_row_1(self):
-        self.settings_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_SAVE_RESTORE)
-        self.settings_label.grid(row=0, column=0, padx=15, pady=(10, 0),  sticky="w")
+        self.save_restore_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_SAVE_RESTORE)
+        self.save_restore_label.grid(row=0, column=0, padx=15, pady=(10, 0),  sticky="w")
 
         # Formata o timestamp real do arquivo com o formato pego acima
-        data_formatada = self._get_correct_time_format()
+        date_format = self._get_correct_time_format()
 
-        # Junta a label "Último backup:" com a data já formatada
-        text = f"{self.text.LAST_BACKUP} {data_formatada}"
+        text = f"{self.text.LAST_BACKUP} {date_format}"
 
         self.backup_time = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=16), text=text)
         self.backup_time.grid(row=1, column=0, padx=15, pady=0,  sticky="w")
 
-        self.backup_btns_frame = ctk.CTkFrame(self.main_frame)
-        self.backup_btns_frame.grid(row=2, column=0, padx=15, pady=(5,10), sticky="nsew")
-        self.backup_btns_frame.grid_columnconfigure((0, 1), weight=1)
+        self.save_restore_btns_frame = ctk.CTkFrame(self.main_frame)
+        self.save_restore_btns_frame.grid(row=2, column=0, padx=15, pady=(5,10), sticky="nsew")
+        self.save_restore_btns_frame.grid_columnconfigure((0, 1), weight=1)
         
-        buttons_config = {
-            "parent":self.backup_btns_frame,
-            "font":ctk.CTkFont(size=15),
-            "height":30,
-            "width":125
-        }
+        self.buttons_config["parent"] = self.save_restore_btns_frame
 
         fg, hover = PRIMARY_THEME.get_colors()
-        self.backup_button = IconButton(command=self._show_save_popup, text=self.text.SAVE, icon=DISK, fg_color=fg, hover_color=hover, **buttons_config)
-        self.backup_button.grid(row=0, column=0, padx=(10, 5), pady=5,  sticky="nsew")
+        self.save_button = IconButton(command=self._show_save_popup, text=self.text.SAVE, icon=DISK, fg_color=fg, hover_color=hover, **self.buttons_config)
+        self.save_button.grid(row=0, column=0, padx=(10, 5), pady=5,  sticky="nsew")
 
-        self.backup_button = IconButton(command=self._show_restore_popup, text=self.text.RESTORE, icon=CALENDAR_REFRESH, **buttons_config)
-        self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
+        self.restore_button = IconButton(command=self._show_restore_popup, text=self.text.RESTORE, icon=CALENDAR_REFRESH, **self.buttons_config)
+        self.restore_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
-        self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.BACKUP_INFO, text_color='grey')
-        self.backup_info.grid(row=3, column=0, padx=15, pady=2,  sticky="nsew")
+        self.backup_info_1 = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.BACKUP_INFO, text_color='grey')
+        self.backup_info_1.grid(row=3, column=0, padx=15, pady=2,  sticky="nsew")
 
     def build_button_row_2(self):
-        self.settings_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_IMPORT_EXPORT)
-        self.settings_label.grid(row=4, column=0, padx=15, pady=(20, 0),  sticky="w")
+        self.import_export_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), text=self.text.TITLE_IMPORT_EXPORT)
+        self.import_export_label.grid(row=4, column=0, padx=15, pady=(20, 0),  sticky="w")
 
-        self.backup_btns_frame = ctk.CTkFrame(self.main_frame)
-        self.backup_btns_frame.grid(row=5, column=0, padx=15, pady=(5,10), sticky="nsew")
-        self.backup_btns_frame.grid_columnconfigure((0, 1), weight=1)
+        self.import_export_btns_frame = ctk.CTkFrame(self.main_frame)
+        self.import_export_btns_frame.grid(row=5, column=0, padx=15, pady=(5,10), sticky="nsew")
+        self.import_export_btns_frame.grid_columnconfigure((0, 1), weight=1)
         
-        buttons_config = {
-            "parent":self.backup_btns_frame,
-            "font":ctk.CTkFont(size=15),
-            "height":30,
-            "width":125
-        }
+        self.buttons_config["parent"] = self.import_export_btns_frame
 
         fg, hover = PRIMARY_THEME.get_colors()
-        self.backup_button = IconButton(command=self.button_export_click, text=self.text.EXPORT, icon=EXPORT, fg_color=fg, hover_color=hover, **buttons_config)
-        self.backup_button.grid(padx=(10, 5), pady=5,  sticky="nsew")
+        self.export_button = IconButton(command=self.button_export_click, text=self.text.EXPORT, icon=EXPORT, fg_color=fg, hover_color=hover, **self.buttons_config)
+        self.export_button.grid(padx=(10, 5), pady=5,  sticky="nsew")
 
-        self.backup_button = IconButton(command=self.button_import_click, text=self.text.IMPORT, icon=IMPORT, **buttons_config)
-        self.backup_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
+        self.import_button = IconButton(command=self.button_import_click, text=self.text.IMPORT, icon=IMPORT, **self.buttons_config)
+        self.import_button.grid(row=0, column=1, padx=(5, 10), pady=5,  sticky="nsew")
 
-        self.backup_info = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.EXPORT_INFO, text_color='grey')
-        self.backup_info.grid(row=6, column=0, padx=15, pady=(2, 15),  sticky="nsew")
+        self.backup_info_2 = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=15), text=self.text.EXPORT_INFO, text_color='grey')
+        self.backup_info_2.grid(row=6, column=0, padx=15, pady=(2, 15),  sticky="nsew")
+
+    def build_ui(self):
+        self.build_button_row_1()
+        self.build_button_row_2()
+        self.build_back_button()
 
     def on_save_backup(self):
         create_backup()
-        data_formatada = self._get_correct_time_format()
-        text = f"{self.text.LAST_BACKUP} {data_formatada}"
+        date_format = self._get_correct_time_format()
+        text = f"{self.text.LAST_BACKUP} {date_format}"
         self.backup_time.configure(text=text)
+
+    # --- Métodos que chamam callback ---
 
     def on_restore(self):
         restore_backup()
@@ -94,6 +98,42 @@ class BackupView(PopupFrame):
     def on_import(self, file_path):
         import_database(file_path)
         self.on_restore_backup()
+    
+    # --- Métodos chamados por botões e popups ---
+
+    def button_export_click(self):
+        file_path = DialogHelper.ask_save_file(
+            title="Export Backup",
+            defaultextension=".habitbackup",
+            filetypes=[("Backup Habit Calendar", "*.habitbackup"), ("Todos os arquivos", "*.*")],
+            initialfile="my_habit_backup"
+        )
+
+        if file_path:
+            export_database(file_path)
+
+    def button_import_click(self):
+        file_path = DialogHelper.ask_open_file(
+            title="Import Backup",
+            filetypes=[("Backup Habit Calendar", "*.habitbackup")]
+        )
+
+        if file_path:
+            self._show_import_popup(file_path)
+
+    def _show_save_popup(self):
+        from .popup_handler import save_backup_popup
+        self.popup_frame = save_backup_popup(self, on_save=self.on_save_backup)
+
+    def _show_restore_popup(self):
+        from .popup_handler import restore_backup_popup
+        self.popup_frame = restore_backup_popup(self, on_save=self.on_restore)
+
+    def _show_import_popup(self, file_path):
+        from .popup_handler import import_popup
+        self.popup_frame = import_popup(self, on_save=partial(self.on_import, file_path))
+
+    # --- Utilitários ---
 
     def _get_correct_time_format(self):
         timestamp = get_backup_info()
@@ -111,50 +151,6 @@ class BackupView(PopupFrame):
         else:
             return self.text.NO_BACKUP
 
-    def _show_save_popup(self):
-        from .popup_handler import save_backup_popup
-        self.popup_frame = save_backup_popup(self, on_save=self.on_save_backup)
-
-    def _show_restore_popup(self):
-        from .popup_handler import restore_backup_popup
-        self.popup_frame = restore_backup_popup(self, on_save=self.on_restore)
-
-    def _show_import_popup(self, file_path):
-        from .popup_handler import import_popup
-        self.popup_frame = import_popup(self, on_save=partial(self.on_import, file_path))
-
-    def build_ui(self):
-        self.build_button_row_1()
-        self.build_button_row_2()
-        self.build_back_button()
-
-    def button_export_click(self):
-        # Abre a janela para o usuário escolher a pasta e o nome do arquivo
-        caminho_destino = DialogHelper.ask_save_file(
-            title="Exportar Backup",
-            defaultextension=".habitbackup",
-            filetypes=[("Backup HabitCalendar", "*.habitbackup"), ("Todos os arquivos", "*.*")],
-            initialfile="meu_backup_habitos" # Nome sugerido que aparece preenchido
-        )
-
-        # Se o usuário fechar a janela ou clicar em Cancelar, retorna vazio ("")
-        if caminho_destino:
-            # Aqui você chama aquela função de exportar passando o caminho_destino
-            sucesso = export_database(caminho_destino)
-            if sucesso:
-                print("Exportado com sucesso!")
-
-    def button_import_click(self):
-        # Abre a janela pedindo para ele selecionar um arquivo existente
-        caminho_arquivo = DialogHelper.ask_open_file(
-            title="Importar Backup",
-            filetypes=[("Backup HabitCalendar", "*.habitbackup")]
-        )
-
-        # Se ele selecionou um arquivo e não cancelou
-        if caminho_arquivo:
-            self._show_import_popup(caminho_arquivo)
-
     class _Theme_Texts:
         def __init__(self):
             self.TIME = i18n.t('backup.time')
@@ -171,12 +167,13 @@ class BackupView(PopupFrame):
             self.EXPORT_INFO = i18n.t('backup.export_info')
             self.NO_BACKUP = i18n.t('backup.no_backup')
 
+# --- Classe helper para lidar com a diferença entre sistemas ---
+
 class DialogHelper:
     @staticmethod
     def ask_save_file(title: str, initialfile: str, filetypes: list, defaultextension: str) -> str:
         if platform.system() == "Linux":
             try:
-                # Chama o Zenity para gerar a janela GTK nativa no Linux
                 process = subprocess.run(
                     [
                         'zenity', '--file-selection', '--save', '--confirm-overwrite',
@@ -188,9 +185,9 @@ class DialogHelper:
                 )
                 if process.returncode == 0:
                     return process.stdout.strip()
-                return "" # O utilizador cancelou a janela
+                return ""
             except FileNotFoundError:
-                pass # Se o Zenity não estiver instalado (raro), avança para o fallback do Tkinter
+                pass
         
         # Windows, macOS ou fallback de emergência para Linux
         return ctk.filedialog.asksaveasfilename(
@@ -214,7 +211,7 @@ class DialogHelper:
                 )
                 if process.returncode == 0:
                     return process.stdout.strip()
-                return "" # O utilizador cancelou a janela
+                return ""
             except FileNotFoundError:
                 pass
         
