@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from ui.widgets import PopupFrame
+from .base_popup import PopupFrame
 
 class ConfirmationView(PopupFrame):
     def __init__(self, parent, on_save, label, message):

@@ -1,9 +1,9 @@
 import customtkinter as ctk
-from ui.widgets import PopupFrame
 from services import TrackerService
 from config import TrackerDataJSON
 from themes import TRACKER_COLORS
 from functools import partial
+from .base_popup import PopupFrame
 import i18n
 
 class AlterTrackerFrame(PopupFrame):

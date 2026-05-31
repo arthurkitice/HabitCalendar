@@ -1,5 +1,3 @@
-from functools import wraps
-import tkinter as tk
 from .alter_tracker_view import AlterTrackerFrame
 from .new_year_view import NewYearView
 from .tracker_view import TrackerFrame

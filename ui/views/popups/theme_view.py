@@ -1,11 +1,11 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, SmartScrollableFrame, PopupFrame
+from ui.widgets import CustomButton, SmartScrollableFrame
 from functools import partial
-from themes import PRIMARY_THEME, MAIN_COLORS, TERTIARY_THEME, TEXT_COLOR, SECONDARY_THEME
+from themes import PRIMARY_THEME, MAIN_COLORS, TERTIARY_THEME, TEXT_COLOR, SECONDARY_THEME, DEFAULT_COLOR
 from config import ThemeJSON
+from .base_popup import PopupFrame
 import i18n
 
-DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 210
 
 class ThemeView(PopupFrame):
@@ -19,6 +19,8 @@ class ThemeView(PopupFrame):
         self.text = self._Theme_Texts()
 
         self.build_ui()
+
+    # --- Métodos de construção ---
 
     def build_themes(self):
         self.current_theme_frame = ctk.CTkFrame(self.main_frame, corner_radius=10, fg_color="transparent")
@@ -78,6 +80,13 @@ class ThemeView(PopupFrame):
             if color == DEFAULT_COLOR:
                 self.default_color_btn = btn
 
+    def build_ui(self):
+        self.build_themes()
+        self.build_color()
+        self.build_back_button()
+
+    # --- Utilitários e métodos que chamam callback ---
+
     def change_color(self, color):
         ThemeJSON.save_current_color(color)
         PRIMARY_THEME.set_theme(color)
@@ -98,11 +107,6 @@ class ThemeView(PopupFrame):
             ThemeJSON.save_current_theme("dark")
         
         self.on_theme_change()
-
-    def build_ui(self):
-        self.build_themes()
-        self.build_color()
-        self.build_back_button()
 
     class _Theme_Texts:
         def __init__(self):

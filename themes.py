@@ -2,6 +2,7 @@ from config import ThemeJSON
 from dataclasses import dataclass
 
 TEXT_COLOR = ( "#1F1F1F","#FFFFFF")
+DEFAULT_COLOR = 'pink-man'
 
 MAIN_COLORS = {
     "pink-man": {

@@ -35,6 +35,7 @@ class MainCalendarView(ctk.CTkFrame):
         self.grid_rowconfigure(2, weight=1)
 
         self.days_frame = None
+        self.popup = None
 
         self.build_ui()
 
@@ -94,10 +95,15 @@ class MainCalendarView(ctk.CTkFrame):
         if ThemeJSON.is_new_year_popup_hidden():
             self.add_year(year)
             return
-        PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
+        if self.popup is not None and self.popup.winfo_exists():
+            self.popup.destroy()
+
+        self.popup = PopupHandler.new_year_popup(self, on_save=partial(self.add_year, year), year=year)
 
     def open_years_popup(self, year: int):
-        PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.add_year_from_popup)
+        if self.popup is not None and self.popup.winfo_exists():
+            self.popup.destroy()
+        self.popup = PopupHandler.year_popup(self, on_select=self.jump_to_month, tracker_id=self.current_tracker_id, year=year, on_new_year=self.add_year_from_popup)
 
     # --- Métodos de update ---
 

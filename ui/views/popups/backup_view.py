@@ -1,11 +1,12 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, IconButton, PopupFrame
+from ui.widgets import IconButton
 from icon_assets import DISK, CALENDAR_REFRESH, EXPORT, IMPORT
-from themes import PRIMARY_THEME, TEXT_COLOR
+from themes import PRIMARY_THEME
 from backup_manager import create_backup, restore_backup, get_backup_info, export_database, import_database
 import i18n, platform, subprocess
 from datetime import datetime, timedelta
 from functools import partial
+from .base_popup import PopupFrame
 
 DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85

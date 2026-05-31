@@ -1,13 +1,13 @@
 import customtkinter as ctk
-from ui.widgets import CustomButton, SmartScrollableFrame, IconButton, PopupFrame
+from ui.widgets import CustomButton, SmartScrollableFrame, IconButton
 from functools import partial
 from icon_assets import PALLETE, DISK
-from themes import PRIMARY_THEME, TEXT_COLOR
+from themes import PRIMARY_THEME
 from constants import LANGUAGES
 from config import ThemeJSON
+from .base_popup import PopupFrame
 import i18n
 
-DEFAULT_COLOR = 'pink-man'
 SCROLLABLE_FRAME_SIZE = 85
 
 class SettingsView(PopupFrame):
@@ -24,6 +24,8 @@ class SettingsView(PopupFrame):
         self.text = self._Theme_Texts()
 
         self.build_ui()
+
+    # --- Métodos de construção ---
 
     def build_buttons(self):
         self.settings_label = ctk.CTkLabel(self.main_frame, font=ctk.CTkFont(size=18, weight="bold"), textvariable=self.text.MANAGEMENT)
@@ -100,20 +102,13 @@ class SettingsView(PopupFrame):
         if ThemeJSON.is_new_year_popup_hidden():
             self.option_switch.select()
 
-    def open_theme_popup(self):
-        from . import PopupHandler
-        self.popup_frame = PopupHandler.theme_popup(
-            self, 
-            on_color_change=self.change_color,
-            on_theme_change=self.on_theme_change
-        )
+    def build_ui(self):
+        self.build_buttons()
+        self.build_language()
+        self.build_new_year_options()
+        self.build_back_button()
 
-    def open_backup_popup(self):
-        from . import PopupHandler
-        self.popup_frame = PopupHandler.backup_popup(
-            self,
-            on_restore_backup=self.on_restore_backup
-        )
+    # --- Métodos que chamam callback ---
 
     def change_language(self, language):
         ThemeJSON.save_current_language(language)
@@ -137,12 +132,23 @@ class SettingsView(PopupFrame):
         self.selected_lang_btn.reload_colors()
         self.on_color_change()
 
-    def build_ui(self):
-        self.build_buttons()
-        self.build_language()
-        self.build_new_year_options()
-        self.build_back_button()
+    # --- Utilitários e popups ---
 
+    def open_theme_popup(self):
+        from . import PopupHandler
+        self.popup_frame = PopupHandler.theme_popup(
+            self, 
+            on_color_change=self.change_color,
+            on_theme_change=self.on_theme_change
+        )
+
+    def open_backup_popup(self):
+        from . import PopupHandler
+        self.popup_frame = PopupHandler.backup_popup(
+            self,
+            on_restore_backup=self.on_restore_backup
+        )
+    
     class _Theme_Texts:
         def __init__(self):
             self.LANGUAGE = ctk.StringVar(value=i18n.t('settings.language'))

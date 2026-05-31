@@ -2,8 +2,6 @@ import customtkinter as ctk
 from icon_assets import PLUS
 from themes import PRIMARY_THEME, SECONDARY_THEME, TERTIARY_THEME, TRACKER_COLORS, TEXT_COLOR
 from config import TrackerDataJSON
-import i18n
-import tkinter as tk
 
 class CustomButton(ctk.CTkButton):
     def __init__(
@@ -145,9 +143,6 @@ class DayButton(ctk.CTkButton):
 
 class SidebarButton(ctk.CTkButton):
     def __init__(self, parent, command, icon = None, tracker: str | None = None, **kwargs):
-        """
-        Cria um botão da sidebar. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
-        """
         self.icon = icon
         text = tracker or ""
         
@@ -173,18 +168,11 @@ class SidebarButton(ctk.CTkButton):
         return self.icon if self.icon else None
             
 class IconButton(ctk.CTkButton):
-    def __init__(self, parent, command, icon, text=None, text_var=None, **kwargs):
-        """
-        Cria um botão com ícone. IconTypes: IconType.EDIT, IconType.REMOVE e IconType.CONFIG
-        """
+    def __init__(self, parent, command, text=None, icon=None, text_var=None, **kwargs):
         self.icon = icon
-        
-        image = self._get_image()
 
-        if text_var is not None and text is None:
-            text = " "
-        elif text is None:
-            text = ""
+        # Passar uma textvariable com text = "" quebra as dimensões do botão
+        text = " " if text_var is not None and text is None else text or ""
 
         super().__init__(
             parent,
@@ -200,24 +188,21 @@ class IconButton(ctk.CTkButton):
             width=40
         )
         self.configure(**kwargs)
-
-    def _get_image(self):
-        return self.icon if self.icon else None
     
 class SmartScrollableFrame(ctk.CTkScrollableFrame):
-    def __init__(self, master, scroll_bar_on_right=True, **kwargs):
-        super().__init__(master, **kwargs)
+    def __init__(self, parent, scroll_bar_on_right=True, **kwargs):
+        super().__init__(parent, **kwargs)
 
+        self.parent = parent
         self._check_job = None
         self._scroll_on_right = scroll_bar_on_right
         
-        # Captura a largura exata da barra de rolagem atual (geralmente 16) + 2px de respiro
+        # 2px de respiro para evitar loops de ajuste de tamanho
         self._sb_width = self._scrollbar.cget("width") + 2
 
-        # 1. Removemos do grid para evitar o loop de altura
+        # Remove do grid para evitar o loop de altura
         self._scrollbar.grid_forget()
 
-        # 2. Canvas espalhado ocupando o espaço todo inicialmente
         self._parent_canvas.grid(row=1, column=0, columnspan=2, sticky="nsew")
 
         self._parent_canvas.bind("<Configure>", self._check_scrollbar, add="+")
@@ -236,10 +221,9 @@ class SmartScrollableFrame(ctk.CTkScrollableFrame):
     def _check_scrollbar(self, event=None):
         if self._check_job is not None:
             self.after_cancel(self._check_job)
-        
-        # REMOVIDO O DELAY EM MS!
+
         # after_idle executa o código instantaneamente assim que o motor 
-        # gráfico tiver uma folga, impedindo lag sem precisar de cronômetro.
+        # gráfico tiver uma folga, impedindo lag sem precisar de cronômetro
         self._check_job = self.after_idle(self._apply_scrollbar_logic)
 
     def _apply_scrollbar_logic(self):
@@ -247,37 +231,34 @@ class SmartScrollableFrame(ctk.CTkScrollableFrame):
             return
 
         content_height, visible_height = self._get_heights()
-        scrollbar_visivel = self._scrollbar.winfo_ismapped()
+        scrollbar_visible = self._scrollbar.winfo_ismapped()
 
         if visible_height <= 1:
-            # Opcional: Garante que ela comece limpa e escondida no frame 1
-            if scrollbar_visivel:
+            if scrollbar_visible:
                 self._scrollbar.place_forget()
                 self._parent_canvas.grid_configure(padx=0)
             return
 
         if content_height > visible_height:
-            if scrollbar_visivel:
+            if scrollbar_visible:
                 return
             if self._scroll_on_right:
                 self._scrollbar.place(relx=1.0, rely=0.0, relheight=1.0, anchor="ne")
-                # Aplica padding dinâmico na direita, "empurrando" o conteúdo
                 self._parent_canvas.grid_configure(padx=(0, self._sb_width))
             else:
                 self._scrollbar.place(relx=0.0, rely=0.0, relheight=1.0, anchor="nw")
-                # Aplica padding dinâmico na esquerda
                 self._parent_canvas.grid_configure(padx=(self._sb_width, 0))
-        elif scrollbar_visivel:
+        elif scrollbar_visible:
             self._scrollbar.place_forget()
-            # Remove o padding quando a barra some, devolvendo a largura ao conteúdo
             self._parent_canvas.grid_configure(padx=0)
 
     def _force_mouse_scroll(self, event):
         if not self.winfo_exists():
             return
 
-        # Verifica se não existe um popup segurando a tela
-        if self.grab_current():
+        # Se tiver um popup segurando as interações, o usuário não deve conseguir scrollar no fundo
+        # O startswith serve para verificar se a raíz do objeto que está segurando é igual a raíz que está o scroll
+        if self.grab_current() and not str(self).startswith(str(self.grab_current())):
             return
 
         x, y = self.winfo_pointerxy()
@@ -340,9 +321,9 @@ class SliderButton(ctk.CTkFrame):
         self.values: list[str] = values
         self.current_index = 0
 
-        font = ctk.CTkFont(size=font_size, weight='bold' if bold else 'normal')
         button_style = {
-            "font": font,
+            "parent": self,
+            "font": ctk.CTkFont(size=font_size, weight='bold' if bold else 'normal'),
             "fg_color": button_fg_color,
             "hover_color": button_hover_color,
             "text_color": text_color,
@@ -351,27 +332,13 @@ class SliderButton(ctk.CTkFrame):
             "border_color": button_border_color
         }
 
-        self.prev_btn = CustomButton(
-            self,
-            text='<', 
-            command=self.prev_button, 
-            **button_style
-        )
+        self.prev_btn = CustomButton(text='<', command=self.prev_button, **button_style)
         self.prev_btn.grid(row=0,column=0, padx=(0, 5), sticky="nsew")
 
-        self.button = CustomButton(
-            self, 
-            command=self.on_click, 
-            **button_style
-        )
+        self.button = CustomButton(command=self.on_click, **button_style)
         self.button.grid(row=0,column=1, sticky="nsew")
 
-        self.next_btn = CustomButton(
-            self,
-            text='>', 
-            command=self.next_button, 
-            **button_style
-        )
+        self.next_btn = CustomButton(text='>', command=self.next_button, **button_style)
         self.next_btn.grid(row=0,column=2, padx=(5, 0), sticky="nsew")
 
         self._update_value()
@@ -408,142 +375,3 @@ class SliderButton(ctk.CTkFrame):
         self.button.configure(fg_color=color1, hover_color=color2)
         self.next_btn.configure(fg_color=color1, hover_color=color2)
         self.prev_btn.configure(fg_color=color1, hover_color=color2)
-
-class PopupFrame(ctk.CTkFrame):
-    _popup_stack = []
-    _binds_set = False
-
-    def __init__(self, parent, on_confirm = None, main_col=0):
-        super().__init__(
-            parent, 
-            width=500, 
-            height=400,
-            corner_radius=15,
-            border_width=1, 
-            border_color=TEXT_COLOR
-        )
-
-        PopupFrame._popup_stack.append(self)
-
-        self.grid_propagate(False)
-
-        self.on_confirm = on_confirm
-
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-
-        self.main_frame = ctk.CTkFrame(self, corner_radius=10)
-        self.main_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
-        self.main_frame.grid_columnconfigure(main_col, weight=1)
-
-        self.button_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        self.button_frame.grid(row=99, column=main_col, padx=10, pady=(0, 10), sticky="nsew")
-        self.button_frame.grid_rowconfigure(0, weight=1)
-
-        self.after(0, self._display_popup)    
-    
-        self._setup_global_binds()
-
-    def _display_popup(self):
-        self.place(relx=0.5, rely=0.5, anchor="center")
-        
-        try:
-            self.wait_visibility()
-        except tk.TclError:
-            pass
-
-        self.grab_set()
-        self.focus_set()
-
-        if len(PopupFrame._popup_stack) == 1:
-            top = self.winfo_toplevel()
-            _toggle_background_cursors(top, hide=True)
-
-    def _setup_global_binds(self):
-        if not PopupFrame._binds_set:
-            top_window = self.winfo_toplevel()
-            top_window.bind('<Escape>', PopupFrame._global_handle_escape)
-            top_window.bind('<Return>', PopupFrame._global_handle_enter)
-            PopupFrame._binds_set = True
-    
-    @classmethod
-    def _global_handle_escape(cls, event):
-        """Encontra o popup do topo e o destrói"""
-        if cls._popup_stack:
-            cls._popup_stack[-1].destroy()
-
-    @classmethod
-    def _global_handle_enter(cls, event):
-        """Encontra o popup do topo e tenta salvar"""
-        if cls._popup_stack:
-            topo = cls._popup_stack[-1]
-            if hasattr(topo, 'save') and callable(topo.save):
-                topo.save()
-            else:
-                topo.destroy()
-
-    def build_back_button(self, text = None):
-        self.button_frame.grid_columnconfigure(0, weight=1)
-
-        self.back_button = CustomButton(self.button_frame, text=text or i18n.t('actions.back'), command=self.destroy, font_size=15, height=35)
-        self.back_button.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
-
-    def build_back_confirm_buttons(self, back_button_text = None, confirm_button_text = None):
-        self.button_frame.grid_columnconfigure(1, weight=1)
-
-        self.confirm_button = CustomButton(self.button_frame, text=confirm_button_text or i18n.t('actions.confirm'), command=self.save, font_size=15, height=35)
-        self.confirm_button.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
-
-        self.build_back_button(text = back_button_text)
-        self.back_button.main_color = False
-        self.back_button.reload_colors()
-
-    def save(self):
-        if self.on_confirm is not None:
-            self.on_confirm()
-        self.destroy()
-
-    def destroy(self):
-        PopupFrame._popup_stack.remove(self)
-
-        if len(PopupFrame._popup_stack):
-            last_popup = PopupFrame._popup_stack[-1]
-            last_popup.grab_set()
-            last_popup.focus_set()
-        else:
-            top = self.winfo_toplevel()
-            _toggle_background_cursors(top, hide=False)
-
-        super().destroy()
-
-def _set_silent_cursor(ctk_widget, cursor_name):
-    """Muda o cursor acessando as peças nativas do Tkinter, sem acordar o renderizador do CTK."""
-    
-    # Um CTkButton possui estes 3 componentes internos, que precisam ser alterados
-    # individualmente para garantir que não haja falhas.
-    # Isso é feito para evitar o "flick" dos botões ao atualizar o cursor.
-    for attr in ['_canvas', '_text_label', '_image_label']:
-        if hasattr(ctk_widget, attr):
-            tk_subwidget = getattr(ctk_widget, attr)
-            if tk_subwidget: # Garante que o elemento existe, pode ser que o botão não tenha imagem ou texto
-                tk_subwidget.configure(cursor=cursor_name)
-
-def _toggle_background_cursors(widget, hide=True):
-    """Varre a tela inteira em milissegundos para esconder/devolver as mãozinhas do fundo."""
-    for child in widget.winfo_children():
-        if type(child).__name__ == "PopupFrame" or isinstance(child, PopupFrame):
-            continue
-            
-        if isinstance(child, ctk.CTkButton):
-            if hide:
-                # Salva o cursor original
-                if not hasattr(child, '_original_cursor'):
-                    child._original_cursor = child.cget("cursor")
-                
-                _set_silent_cursor(child, "arrow")
-            else:
-                if hasattr(child, '_original_cursor'):
-                    _set_silent_cursor(child, child._original_cursor)
-                    del child._original_cursor
-                    
-        _toggle_background_cursors(child, hide)

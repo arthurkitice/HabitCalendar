@@ -1,9 +1,9 @@
 import customtkinter as ctk
-from ui.widgets import IconButton, PopupFrame
+from ui.widgets import IconButton
 from functools import partial
-from themes import TEXT_COLOR
 from icon_assets import BIG_TRASH
 from services import YearService, TrackerService
+from .base_popup import PopupFrame
 import i18n
 
 class TrackerFrame(PopupFrame):
@@ -24,23 +24,7 @@ class TrackerFrame(PopupFrame):
 
         self.build_ui()
 
-    def _update_years(self):
-        self.years = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
-        self.top_year: int = self.years[-1]
-        self.bottom_year: int = self.years[0]
-
-    def remove_year(self, year):
-        self.year_service.delete_year(tracker_id=self.tracker_id, year_number=year)
-        self.on_year_remove(year, is_top_year = (year == self.top_year))
-        self._update_years()
-        self.update_top_label()
-
-        if len(self.years) == 1:
-            self.single_year_label.configure(text=self._single_year_text()['year'])
-            self.show_single_year_frame()
-
-        else:
-            self.update_double_year_frame()
+    # --- Métodos de atualização ---
 
     def update_top_label(self):
         text = self._top_label_text()
@@ -58,17 +42,8 @@ class TrackerFrame(PopupFrame):
         self.delete_top_year_btn.configure(command=partial(self.delete_year_popup, self.top_year))
         self.delete_bottom_year_btn.configure(command=partial(self.delete_year_popup, self.bottom_year))
         
-    def delete_year_popup(self, year):
-        if self.year_service.get_checked_days_count(self.tracker_id, year) == 0:
-            self.remove_year(year)
-            return
-        
-        from . import PopupHandler
-        self.popup_frame = PopupHandler.delete_year_popup(
-            self, 
-            on_save=partial(self.remove_year, year), 
-            year=year
-        )
+
+    # --- Métodos de construção ---
 
     def build_top_label(self):
         self.top_label_frame = ctk.CTkFrame(self.main_frame, corner_radius=10, fg_color="transparent")
@@ -188,6 +163,38 @@ class TrackerFrame(PopupFrame):
             self.show_single_year_frame()
 
         self.build_back_button()
+
+    # --- Utilitários e popups ---
+
+    def delete_year_popup(self, year):
+        if self.year_service.get_checked_days_count(self.tracker_id, year) == 0:
+            self._remove_year(year)
+            return
+        
+        from . import PopupHandler
+        self.popup_frame = PopupHandler.delete_year_popup(
+            self, 
+            on_save=partial(self._remove_year, year), 
+            year=year
+        )
+
+    def _remove_year(self, year):
+        self.year_service.delete_year(tracker_id=self.tracker_id, year_number=year)
+        self.on_year_remove(year, is_top_year = (year == self.top_year))
+        self._update_years()
+        self.update_top_label()
+
+        if len(self.years) == 1:
+            self.single_year_label.configure(text=self._single_year_text()['year'])
+            self.show_single_year_frame()
+
+        else:
+            self.update_double_year_frame()
+
+    def _update_years(self):
+        self.years = self.year_service.get_years_from_tracker(tracker_id=self.tracker_id)
+        self.top_year: int = self.years[-1]
+        self.bottom_year: int = self.years[0]
 
     def _top_label_text(self):
         return {
